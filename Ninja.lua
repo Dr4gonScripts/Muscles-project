@@ -1,48 +1,57 @@
--- // FluxLib Oficial
-local Flux = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/fluxlib/main/source.lua"))()
+-- Ninja Hub GUI com Auto Farm, Auto Buy, Fly, TP e mais
+local Fluxus = loadstring(game:HttpGet("https://raw.githubusercontent.com/FluxlineCommunity/Fluxlib/main/source.lua"))()
+local gui = Fluxus:CreateWindow("Ninja Hubs", Color3.fromRGB(255, 255, 255), Color3.fromRGB(50, 50, 50), true)
 
--- // Criar Janela
-local win = Flux:Window("⛩️ Ninja Hubs", " ", Color3.fromRGB(240, 240, 240), Enum.KeyCode.RightControl)
-
--- // Abas
-local autoFarmTab = win:Tab("Auto Farm", "http://www.roblox.com/asset/?id=6023426915")
-local miscTab = win:Tab("Misc", "http://www.roblox.com/asset/?id=6023426915")
-
--- // Referências
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
-local humanoid = char:WaitForChild("Humanoid")
 local root = char:WaitForChild("HumanoidRootPart")
-local UIS = game:GetService("UserInputService")
-local RS = game:GetService("RunService")
-local Mouse = player:GetMouse()
-local VU = game:GetService("VirtualUser")
 
--- // Auto Farm
+-- Tabs
+local autoFarmTab = gui:CreateTab("Auto Farm")
+local miscTab = gui:CreateTab("Misc")
+
+-- Variáveis
 local farmAtivo = false
-local farmLoop, autoSellLoop
+local flyAtivo = false
+local tpAtivo = false
+local tpConnection
+local farmLoop, autoSellLoop, buySwordLoop, buyBeltLoop
 
+-- Anti-AFK
+pcall(function()
+    local vu = game:GetService("VirtualUser")
+    player.Idled:Connect(function()
+        vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end)
+end)
+
+-- Funções
+local function getIslandName()
+    local stat1 = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("UnlockedIslands")
+    local stat2 = player:FindFirstChild("IslandUnlocked")
+    return (stat1 and stat1.Value) or (stat2 and stat2.Value) or "Ground"
+end
+
+-- Auto Farm
 autoFarmTab:Toggle("Auto Farm", "Equipa espada e farma automaticamente", false, function(state)
     farmAtivo = state
     if farmAtivo then
-        -- Auto Sell
         autoSellLoop = task.spawn(function()
             while farmAtivo and task.wait(0.5) do
-                local statsGui = player:WaitForChild("PlayerGui"):FindFirstChild("GameGui")
-                if statsGui then
-                    local bar = statsGui:FindFirstChild("FullBar")
-                    if bar and bar.Visible then
-                        local sellPad = workspace:FindFirstChild("sellAreaCirclePart") or workspace:FindFirstChild("SellAreaPart")
-                        if sellPad then
-                            root.CFrame = sellPad.CFrame + Vector3.new(0, 5, 0)
-                            task.wait(0.5)
-                        end
+                local gui = player:WaitForChild("PlayerGui"):FindFirstChild("GameGui")
+                local bar = gui and gui:FindFirstChild("FullBar")
+                if bar and bar.Visible then
+                    local sell = workspace:FindFirstChild("sellAreaCirclePart") or workspace:FindFirstChild("SellAreaPart")
+                    if sell then
+                        root.CFrame = sell.CFrame + Vector3.new(0, 5, 0)
+                        task.wait(0.5)
                     end
                 end
             end
         end)
 
-        -- Farm
         farmLoop = task.spawn(function()
             while farmAtivo and task.wait() do
                 local tool = player.Backpack:FindFirstChildOfClass("Tool")
@@ -53,100 +62,95 @@ autoFarmTab:Toggle("Auto Farm", "Equipa espada e farma automaticamente", false, 
         end)
     else
         if farmLoop then task.cancel(farmLoop) end
-        if autoSellLoop then task.cancel(autoSellLoop) autoSellLoop = nil end
+        if autoSellLoop then task.cancel(autoSellLoop) end
     end
 end)
 
--- // Velocidade
-miscTab:Slider("Velocidade", "Define a velocidade", 16, 500, humanoid.WalkSpeed, function(val)
-    humanoid.WalkSpeed = val
-end)
-
--- // Pulo
-miscTab:Slider("Pulo", "Define o poder de pulo", 50, 500, humanoid.JumpPower, function(val)
-    humanoid.JumpPower = val
-end)
-
--- // Fly
-local flying = false
-local flyConn
-local bodyGyro, bodyVel
-local direction = Vector3.zero
-
-miscTab:Toggle("Modo Fly", "Ativa/desativa voo", false, function(state)
-    flying = state
-    if flying then
-        bodyGyro = Instance.new("BodyGyro", root)
-        bodyGyro.P = 9e4
-        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        bodyGyro.CFrame = root.CFrame
-
-        bodyVel = Instance.new("BodyVelocity", root)
-        bodyVel.Velocity = Vector3.zero
-        bodyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-
-        flyConn = RS.RenderStepped:Connect(function()
-            bodyGyro.CFrame = workspace.CurrentCamera.CFrame
-            bodyVel.Velocity = workspace.CurrentCamera.CFrame:VectorToWorldSpace(direction) * 100
-        end)
-
-        UIS.InputBegan:Connect(function(input, gpe)
-            if gpe then return end
-            if input.KeyCode == Enum.KeyCode.W then direction = Vector3.new(0, 0, -1)
-            elseif input.KeyCode == Enum.KeyCode.S then direction = Vector3.new(0, 0, 1)
-            elseif input.KeyCode == Enum.KeyCode.A then direction = Vector3.new(-1, 0, 0)
-            elseif input.KeyCode == Enum.KeyCode.D then direction = Vector3.new(1, 0, 0)
-            elseif input.KeyCode == Enum.KeyCode.Space then direction = Vector3.new(0, 1, 0)
-            elseif input.KeyCode == Enum.KeyCode.LeftControl then direction = Vector3.new(0, -1, 0)
+autoFarmTab:Toggle("Auto Comprar Espada", "Compra automaticamente a melhor espada da ilha atual", false, function(state)
+    if state then
+        buySwordLoop = task.spawn(function()
+            while task.wait(1) do
+                local islandName = getIslandName()
+                local event = game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):FindFirstChild("buyAllSwordsEvent")
+                if event then pcall(function() event:FireServer(islandName) end) end
             end
-        end)
-
-        UIS.InputEnded:Connect(function(_, gpe)
-            if not gpe then direction = Vector3.zero end
         end)
     else
-        if flyConn then flyConn:Disconnect() end
-        if bodyGyro then bodyGyro:Destroy() end
-        if bodyVel then bodyVel:Destroy() end
+        if buySwordLoop then task.cancel(buySwordLoop) end
     end
 end)
 
--- // TP com T + Mouse
-local tpClickActive = false
-
-miscTab:Toggle("TP com Mouse (Segure T)", "Clique para teleportar", false, function(state)
-    tpClickActive = state
+autoFarmTab:Toggle("Auto Comprar Faixa", "Compra automaticamente a melhor faixa (belt)", false, function(state)
+    if state then
+        buyBeltLoop = task.spawn(function()
+            while task.wait(1) do
+                local islandName = getIslandName()
+                local event = game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):FindFirstChild("buyAllBeltsEvent")
+                if event then pcall(function() event:FireServer(islandName) end) end
+            end
+        end)
+    else
+        if buyBeltLoop then task.cancel(buyBeltLoop) end
+    end
 end)
 
-UIS.InputBegan:Connect(function(input, gpe)
-    if not tpClickActive or gpe then return end
-    if input.KeyCode == Enum.KeyCode.T then
-        local conn
-        conn = Mouse.Button1Down:Connect(function()
-            local pos = Mouse.Hit.Position
-            if root then
-                root.CFrame = CFrame.new(pos + Vector3.new(0, 5, 0))
-            end
-            conn:Disconnect()
+-- Misc
+miscTab:Slider("Speed", 16, 500, 16, function(val)
+    char:WaitForChild("Humanoid").WalkSpeed = val
+end)
+
+miscTab:Slider("Jump", 50, 500, 50, function(val)
+    char:WaitForChild("Humanoid").JumpPower = val
+end)
+
+miscTab:Toggle("Fly", "Ativa/desativa o modo voo", false, function(state)
+    flyAtivo = state
+    local bodyGyro, bodyVel
+
+    if flyAtivo then
+        bodyGyro = Instance.new("BodyGyro", root)
+        bodyGyro.P = 9e4
+        bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.cframe = root.CFrame
+
+        bodyVel = Instance.new("BodyVelocity", root)
+        bodyVel.velocity = Vector3.zero
+        bodyVel.maxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        local flyConn = game:GetService("RunService").Heartbeat:Connect(function()
+            bodyGyro.cframe = workspace.CurrentCamera.CFrame
+            bodyVel.velocity = workspace.CurrentCamera.CFrame.LookVector * 100
+        end)
+
+        miscTab:Button("Desativar Fly", function()
+            flyConn:Disconnect()
+            bodyGyro:Destroy()
+            bodyVel:Destroy()
+            flyAtivo = false
         end)
     end
 end)
 
--- // Botão de Fechar Script
-miscTab:Button("❌ Fechar Script", "Remove tudo e para funções", function()
-    pcall(function()
-        if farmLoop then task.cancel(farmLoop) end
-        if autoSellLoop then task.cancel(autoSellLoop) end
-        if flyConn then flyConn:Disconnect() end
-        if bodyGyro then bodyGyro:Destroy() end
-        if bodyVel then bodyVel:Destroy() end
-        if win and win.Destroy then win:Destroy() end
-    end)
+miscTab:Toggle("Teleportar com T", "Clique com o mouse segurando T para teleportar", false, function(state)
+    tpAtivo = state
+    if tpConnection then tpConnection:Disconnect() end
+    if tpAtivo then
+        tpConnection = game:GetService("UserInputService").InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.T) then
+                local pos = workspace.CurrentCamera:ScreenPointToRay(game:GetService("UserInputService"):GetMouseLocation().X, game:GetService("UserInputService"):GetMouseLocation().Y)
+                local ray = Ray.new(pos.Origin, pos.Direction * 500)
+                local part, hit = workspace:FindPartOnRay(ray, char, false, true)
+                if hit then
+                    root.CFrame = CFrame.new(hit + Vector3.new(0, 5, 0))
+                end
+            end
+        end)
+    end
 end)
 
--- // Anti-AFK (sempre ativo)
-player.Idled:Connect(function()
-    VU:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-    task.wait(1)
-    VU:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+-- Botão de Fechar
+miscTab:Button("Fechar GUI", function()
+    gui:Destroy()
 end)
+
+-- Deixa a janela arrastável (fluxlib já aplica isso por padrão)

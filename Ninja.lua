@@ -35,7 +35,7 @@ local function getIslandName()
 end
 
 -- Auto Farm
-autoFarmTab:Toggle("Auto Farm", "Equipa espada e farma automaticamente", false, function(state)
+autoFarmTab:AddToggle("Auto Farm", false, function(state)
     farmAtivo = state
     if farmAtivo then
         autoSellLoop = task.spawn(function()
@@ -66,7 +66,7 @@ autoFarmTab:Toggle("Auto Farm", "Equipa espada e farma automaticamente", false, 
     end
 end)
 
-autoFarmTab:Toggle("Auto Comprar Espada", "Compra automaticamente a melhor espada da ilha atual", false, function(state)
+autoFarmTab:AddToggle("Auto Comprar Espada", false, function(state)
     if state then
         buySwordLoop = task.spawn(function()
             while task.wait(1) do
@@ -80,7 +80,7 @@ autoFarmTab:Toggle("Auto Comprar Espada", "Compra automaticamente a melhor espad
     end
 end)
 
-autoFarmTab:Toggle("Auto Comprar Faixa", "Compra automaticamente a melhor faixa (belt)", false, function(state)
+autoFarmTab:AddToggle("Auto Comprar Faixa", false, function(state)
     if state then
         buyBeltLoop = task.spawn(function()
             while task.wait(1) do
@@ -95,15 +95,15 @@ autoFarmTab:Toggle("Auto Comprar Faixa", "Compra automaticamente a melhor faixa 
 end)
 
 -- Misc
-miscTab:Slider("Speed", 16, 500, 16, function(val)
+miscTab:AddSlider("Speed", 16, 500, 16, function(val)
     char:WaitForChild("Humanoid").WalkSpeed = val
 end)
 
-miscTab:Slider("Jump", 50, 500, 50, function(val)
+miscTab:AddSlider("Jump", 50, 500, 50, function(val)
     char:WaitForChild("Humanoid").JumpPower = val
 end)
 
-miscTab:Toggle("Fly", "Ativa/desativa o modo voo", false, function(state)
+miscTab:AddToggle("Fly", false, function(state)
     flyAtivo = state
     local bodyGyro, bodyVel
 
@@ -122,7 +122,7 @@ miscTab:Toggle("Fly", "Ativa/desativa o modo voo", false, function(state)
             bodyVel.velocity = workspace.CurrentCamera.CFrame.LookVector * 100
         end)
 
-        miscTab:Button("Desativar Fly", function()
+        miscTab:AddButton("Desativar Fly", function()
             flyConn:Disconnect()
             bodyGyro:Destroy()
             bodyVel:Destroy()
@@ -131,7 +131,7 @@ miscTab:Toggle("Fly", "Ativa/desativa o modo voo", false, function(state)
     end
 end)
 
-miscTab:Toggle("Teleportar com T", "Clique com o mouse segurando T para teleportar", false, function(state)
+miscTab:AddToggle("Teleportar com T", false, function(state)
     tpAtivo = state
     if tpConnection then tpConnection:Disconnect() end
     if tpAtivo then
@@ -148,9 +148,6 @@ miscTab:Toggle("Teleportar com T", "Clique com o mouse segurando T para teleport
     end
 end)
 
--- Botão de Fechar
-miscTab:Button("Fechar GUI", function()
+miscTab:AddButton("Fechar GUI", function()
     gui:Destroy()
 end)
-
--- Deixa a janela arrastável (fluxlib já aplica isso por padrão)

@@ -1,56 +1,80 @@
--- Robloki Legends Script (Versão Estável)
--- Baseado no estilo Dr4gonHUB mas otimizado para evitar erros
+-- Robloki Legends - Speed Hub X Edition
+-- Versão estável e simplificada
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Robloki Legends", "DarkTheme")
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Robloki Legends",
+   LoadingTitle = "Carregando...",
+   LoadingSubtitle = "by Scripting Team",
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+   Discord = {
+      Enabled = false,
+   }
+})
 
 -- Variáveis essenciais
 local Player = game:GetService("Players").LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 
--- Função segura para chamadas remotas
-local function SafeRemote(remoteName, ...)
-    local remotes = game:GetService("ReplicatedStorage"):FindFirstChild("Remotes")
-    if not remotes then return end
+-- Função ultra-segura para chamadas remotas
+local function SuperSafeRemote(remoteName, ...)
+    local success, result = pcall(function()
+        local remotes = game:GetService("ReplicatedStorage"):FindFirstChild("Remotes")
+        if not remotes then return nil end
+        
+        local remote = remotes:FindFirstChild(remoteName)
+        if not remote then return nil end
+        
+        if remote:IsA("RemoteEvent") then
+            return remote:FireServer(...)
+        elseif remote:IsA("RemoteFunction") then
+            return remote:InvokeServer(...)
+        end
+        return nil
+    end)
     
-    local remote = remotes:FindFirstChild(remoteName)
-    if not remote then return end
-    
-    if remote:IsA("RemoteEvent") then
-        pcall(function() remote:FireServer(...) end)
-    elseif remote:IsA("RemoteFunction") then
-        pcall(function() remote:InvokeServer(...) end)
+    if not success then
+        warn("Remote call failed:", result)
+        return nil
     end
+    return result
 end
 
--- Atualizar personagem quando respawnar
-Player.CharacterAdded:Connect(function(newChar)
-    Character = newChar
-    Humanoid = newChar:WaitForChild("Humanoid")
+-- Atualizar personagem automaticamente
+local function UpdateCharacter()
+    Character = Player.Character or Player.CharacterAdded:Wait()
+    Humanoid = Character:WaitForChild("Humanoid")
+end
+
+Player.CharacterAdded:Connect(UpdateCharacter)
+
+-- Tab Principal
+local MainTab = Window:CreateTab("Principal", 4483362458)
+
+-- Seção Player
+local PlayerSection = MainTab:CreateSection("Configurações do Jogador")
+
+PlayerSection:CreateSlider("Velocidade", 16, 200, 16, false, function(Value)
+    pcall(function() Humanoid.WalkSpeed = Value end)
 end)
 
--- Aba Player
-local PlayerTab = Window:NewTab("Player")
-local PlayerSection = PlayerTab:NewSection("Configurações")
-
-PlayerSection:NewSlider("WalkSpeed", "Altera velocidade", 200, 16, function(s)
-    Humanoid.WalkSpeed = s
+PlayerSection:CreateSlider("Força do Pulo", 50, 200, 50, false, function(Value)
+    pcall(function() Humanoid.JumpPower = Value end)
 end)
 
-PlayerSection:NewSlider("JumpPower", "Altera pulo", 200, 50, function(s)
-    Humanoid.JumpPower = s
-end)
-
-PlayerSection:NewToggle("Anti-AFK", "Evita kick por AFK", function(state)
-    if state then
+PlayerSection:CreateToggle("Anti-AFK", false, function(State)
+    if State then
         getgenv().AntiAFK = true
         coroutine.wrap(function()
             while getgenv().AntiAFK do
                 game:GetService("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
-                wait(1)
+                task.wait(1)
                 game:GetService("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
-                wait(1)
+                task.wait(1)
             end
         end)()
     else
@@ -58,37 +82,53 @@ PlayerSection:NewToggle("Anti-AFK", "Evita kick por AFK", function(state)
     end
 end)
 
--- Aba Auto Farm
-local FarmTab = Window:NewTab("Auto Farm")
-local FarmSection = FarmTab:NewSection("Treinamento")
+-- Seção Auto Farm
+local AutoFarmSection = MainTab:CreateSection("Auto Farm")
 
-FarmSection:NewToggle("Auto Treinar", "Farm automático", function(state)
-    getgenv().AutoTrain = state
-    while getgenv().AutoTrain do
-        SafeRemote("Training")
-        wait()
+AutoFarmSection:CreateToggle("Farm Automático", false, function(State)
+    getgenv().AutoFarm = State
+    while getgenv().AutoFarm do
+        SuperSafeRemote("Training")
+        task.wait()
     end
 end)
 
--- Aba Ovos (Simplificada)
-local EggsTab = Window:NewTab("Ovos")
-local EggsSection = EggsTab:NewSection("Auto Egg")
+-- Tab Ovos
+local EggsTab = Window:CreateTab("Ovos", 9432217880)
 
-EggsSection:NewToggle("Auto Abrir Ovos", "Abre ovos automaticamente", function(state)
-    getgenv().AutoEgg = state
+local EggsSection = EggsTab:CreateSection("Auto Ovos")
+
+EggsSection:CreateToggle("Abrir Ovos Automático", false, function(State)
+    getgenv().AutoEgg = State
     while getgenv().AutoEgg do
-        SafeRemote("EggOpening", "Basic Egg", 1)
-        wait(0.5)
+        SuperSafeRemote("EggOpening", "Basic Egg", 1)
+        task.wait(0.5)
     end
 end)
 
--- Notificação inicial
-Library:Notify("Robloki Legends", "Script carregado com sucesso!", 5)
-
--- Proteção contra memory leaks
-game:GetService("RunService").Heartbeat:Connect(function()
-    if not Character or not Character.Parent then
-        Character = Player.Character or Player.CharacterAdded:Wait()
-        Humanoid = Character:WaitForChild("Humanoid")
+-- Inicialização segura
+task.spawn(function()
+    Rayfield:Notify({
+        Title = "Robloki Legends",
+        Content = "Script carregado com sucesso!",
+        Duration = 5,
+        Image = 4483362458,
+    })
+    
+    -- Verificação contínua
+    while task.wait(5) do
+        if not Character or not Character.Parent then
+            UpdateCharacter()
+        end
     end
+end)
+
+-- Filtro de proteção contra erros
+local __namecall
+__namecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    if tostring(self) == "ThirdPartyUserService" then
+        return nil
+    end
+    return __namecall(self, ...)
 end)

@@ -1,155 +1,155 @@
--- Ninja Legends Hub - Pura Interface Visual
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
+-- // FluxLib Loader
+local flux = loadstring(game:HttpGet("https://raw.githubusercontent.com/FluxHubz/fluxLib/main/fluxLib.txt"))()
 
--- Configuração base
-local player = Players.LocalPlayer
-local interface = Instance.new("ScreenGui")
-interface.Name = "NinjaHub"
-interface.ResetOnSpawn = false
-interface.Parent = player:WaitForChild("PlayerGui")
+-- // Janela principal
+local win = flux:Window("⛩️ Ninja Hubs", " ", Color3.fromRGB(220, 220, 220), Enum.KeyCode.RightControl)
 
--------------------------------------------
--- ESTRUTURA PRINCIPAL
--------------------------------------------
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 500)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-mainFrame.BackgroundTransparency = 0.1
-mainFrame.Parent = interface
+-- // Abas
+local autoFarmTab = win:Tab("Auto Farm", "http://www.roblox.com/asset/?id=6023426915")
+local miscTab = win:Tab("Misc", "http://www.roblox.com/asset/?id=6023426915")
 
--- Efeito de borda
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 8)
-uiCorner.Parent = mainFrame
+-- // Referências
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local humanoid = char:WaitForChild("Humanoid")
+local root = char:WaitForChild("HumanoidRootPart")
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
+local Mouse = player:GetMouse()
+local VU = game:GetService("VirtualUser")
 
-local uiStroke = Instance.new("UIStroke")
-uiStroke.Color = Color3.fromRGB(100, 200, 255)
-uiStroke.Thickness = 2
-uiStroke.Parent = mainFrame
+-- // Auto Farm
+local farmAtivo = false
+local farmLoop
 
--------------------------------------------
--- CABEÇALHO COM SUA IMAGEM
--------------------------------------------
-local header = Instance.new("ImageLabel")
-header.Name = "Header"
-header.Size = UDim2.new(1, -20, 0, 100)
-header.Position = UDim2.new(0, 10, 0, 10)
-header.Image = "rbxassetid://18452874720" -- SUA IMAGEM AQUI
-header.ScaleType = Enum.ScaleType.Crop
-header.BackgroundTransparency = 1
-header.Parent = mainFrame
-
--- Efeito de brilho
-local glow = Instance.new("ImageLabel")
-glow.Image = "rbxassetid://10424139824" -- Efeito de brilho
-glow.Size = UDim2.new(1, 40, 1, 40)
-glow.Position = UDim2.new(0, -20, 0, -20)
-glow.BackgroundTransparency = 1
-glow.ImageTransparency = 0.7
-glow.Parent = header
-
--------------------------------------------
--- BARRA DE ABA
--------------------------------------------
-local tabBar = Instance.new("Frame")
-tabBar.Size = UDim2.new(1, -20, 0, 40)
-tabBar.Position = UDim2.new(0, 10, 0, 120)
-tabBar.BackgroundTransparency = 1
-tabBar.Parent = mainFrame
-
--- Botões de aba
-local tabs = {"Farm", "Auto", "Misc", "Credits"}
-for i, tabName in ipairs(tabs) do
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Text = tabName
-    tabBtn.Font = Enum.Font.GothamBold
-    tabBtn.TextSize = 14
-    tabBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    tabBtn.Size = UDim2.new(1/#tabs, -5, 1, 0)
-    tabBtn.Position = UDim2.new((i-1)/#tabs, 0, 0, 0)
-    tabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-    tabBtn.AutoButtonColor = false
-    
-    -- Efeito hover
-    tabBtn.MouseEnter:Connect(function()
-        game:GetService("TweenService"):Create(tabBtn, TweenInfo.new(0.2), {
-            BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-        }):Play()
+-- Auto Sell Handler
+local autoSellLoop
+local function iniciarAutoSell()
+    if autoSellLoop then return end
+    autoSellLoop = task.spawn(function()
+        while farmAtivo and task.wait(0.5) do
+            local statsGui = player:WaitForChild("PlayerGui"):FindFirstChild("GameGui")
+            if statsGui then
+                local bar = statsGui:FindFirstChild("FullBar")
+                if bar and bar.Visible then
+                    local sellPad = workspace:FindFirstChild("sellAreaCirclePart") or workspace:FindFirstChild("SellAreaPart") or workspace:FindFirstChildWhichIsA("Part", true)
+                    if sellPad then
+                        root.CFrame = sellPad.CFrame + Vector3.new(0, 5, 0)
+                        task.wait(0.5)
+                    end
+                end
+            end
+        end
     end)
-    
-    tabBtn.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(tabBtn, TweenInfo.new(0.2), {
-            BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-        }):Play()
-    end)
-    
-    tabBtn.Parent = tabBar
 end
 
--------------------------------------------
--- ÁREA DE CONTEÚDO
--------------------------------------------
-local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, -20, 1, -180)
-contentFrame.Position = UDim2.new(0, 10, 0, 170)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = mainFrame
-
--- Exemplo de conteúdo (Farm)
-local farmSection = Instance.new("Frame")
-farmSection.Size = UDim2.new(1, 0, 1, 0)
-farmSection.BackgroundTransparency = 1
-farmSection.Visible = true -- Mostrar apenas esta seção inicialmente
-farmSection.Parent = contentFrame
-
--- Toggle de exemplo
-local toggleFrame = Instance.new("Frame")
-toggleFrame.Size = UDim2.new(1, 0, 0, 40)
-toggleFrame.BackgroundTransparency = 1
-toggleFrame.Parent = farmSection
-
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Text = "Auto Farm"
-toggleBtn.Size = UDim2.new(0, 120, 0, 30)
-toggleBtn.Position = UDim2.new(0, 0, 0, 5)
-toggleBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(70, 30, 30)
-toggleBtn.Parent = toggleFrame
-
-local toggleStatus = Instance.new("TextLabel")
-toggleStatus.Text = "OFF"
-toggleStatus.Size = UDim2.new(0, 50, 0, 30)
-toggleStatus.Position = UDim2.new(0, 130, 0, 5)
-toggleStatus.TextColor3 = Color3.fromRGB(255, 80, 80)
-toggleStatus.BackgroundTransparency = 1
-toggleStatus.Parent = toggleFrame
-
--------------------------------------------
--- BOTÃO DE FECHAR
--------------------------------------------
-local closeBtn = Instance.new("TextButton")
-closeBtn.Text = "X"
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -35, 0, 5)
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-closeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-closeBtn.Parent = mainFrame
-
-closeBtn.MouseButton1Click:Connect(function()
-    interface:Destroy()
+autoFarmTab:Toggle("Auto Farm", "Ativa o farm com espada equipada", false, function(state)
+    farmAtivo = state
+    if farmAtivo then
+        iniciarAutoSell()
+        farmLoop = task.spawn(function()
+            while farmAtivo and task.wait() do
+                local tool = player.Backpack:FindFirstChildOfClass("Tool")
+                if tool then tool.Parent = char end
+                local remote = tool and (tool:FindFirstChild("RemoteEvent") or tool:FindFirstChildWhichIsA("RemoteEvent"))
+                if remote then pcall(function() remote:FireServer() end) end
+            end
+        end)
+    else
+        if farmLoop then task.cancel(farmLoop) end
+        if autoSellLoop then task.cancel(autoSellLoop) autoSellLoop = nil end
+    end
 end)
 
--- Efeito de fechar
-closeBtn.MouseEnter:Connect(function()
-    closeBtn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+-- // Speed & Jump
+miscTab:Slider("Velocidade", "Ajusta a velocidade do jogador", 16, 500, humanoid.WalkSpeed, function(val)
+    humanoid.WalkSpeed = val
 end)
 
-closeBtn.MouseLeave:Connect(function()
-    closeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+miscTab:Slider("Pulo", "Ajusta a altura do pulo", 50, 500, humanoid.JumpPower, function(val)
+    humanoid.JumpPower = val
+end)
+
+-- // Fly
+local flying = false
+local flyConn
+local bodyGyro, bodyVel
+local direction = Vector3.zero
+
+miscTab:Toggle("Modo Fly", "Ativa/desativa o voo com WASD", false, function(state)
+    flying = state
+    if flying then
+        bodyGyro = Instance.new("BodyGyro", root)
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = root.CFrame
+
+        bodyVel = Instance.new("BodyVelocity", root)
+        bodyVel.Velocity = Vector3.zero
+        bodyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        flyConn = RS.RenderStepped:Connect(function()
+            bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+            bodyVel.Velocity = workspace.CurrentCamera.CFrame:VectorToWorldSpace(direction) * 100
+        end)
+
+        UIS.InputBegan:Connect(function(input, gpe)
+            if gpe then return end
+            if input.KeyCode == Enum.KeyCode.W then direction = Vector3.new(0, 0, -1)
+            elseif input.KeyCode == Enum.KeyCode.S then direction = Vector3.new(0, 0, 1)
+            elseif input.KeyCode == Enum.KeyCode.A then direction = Vector3.new(-1, 0, 0)
+            elseif input.KeyCode == Enum.KeyCode.D then direction = Vector3.new(1, 0, 0)
+            elseif input.KeyCode == Enum.KeyCode.Space then direction = Vector3.new(0, 1, 0)
+            elseif input.KeyCode == Enum.KeyCode.LeftControl then direction = Vector3.new(0, -1, 0)
+            end
+        end)
+
+        UIS.InputEnded:Connect(function(_, gpe)
+            if not gpe then direction = Vector3.zero end
+        end)
+    else
+        if flyConn then flyConn:Disconnect() end
+        if bodyGyro then bodyGyro:Destroy() end
+        if bodyVel then bodyVel:Destroy() end
+    end
+end)
+
+-- // TP com mouse (T + Clique)
+local tpClickActive = false
+
+miscTab:Toggle("TP com Mouse (Segure T)", "Clique onde quer teleportar", false, function(state)
+    tpClickActive = state
+end)
+
+UIS.InputBegan:Connect(function(input, gpe)
+    if not tpClickActive or gpe then return end
+    if input.KeyCode == Enum.KeyCode.T then
+        local conn
+        conn = Mouse.Button1Down:Connect(function()
+            local pos = Mouse.Hit.Position
+            if root then
+                root.CFrame = CFrame.new(pos + Vector3.new(0, 5, 0))
+            end
+            conn:Disconnect()
+        end)
+    end
+end)
+
+-- // Botão para deletar o script
+miscTab:Button("❌ Fechar Script", "Remove a interface e para tudo", function()
+    pcall(function()
+        if farmLoop then task.cancel(farmLoop) end
+        if autoSellLoop then task.cancel(autoSellLoop) end
+        if flyConn then flyConn:Disconnect() end
+        if bodyGyro then bodyGyro:Destroy() end
+        if bodyVel then bodyVel:Destroy() end
+        if win and win.Destroy then win:Destroy() end
+    end)
+end)
+
+-- // Anti-AFK SEM DESATIVAR
+player.Idled:Connect(function()
+    VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 end)

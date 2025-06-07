@@ -1,8 +1,8 @@
--- // FluxLib Loader
-local flux = loadstring(game:HttpGet("https://raw.githubusercontent.com/FluxHubz/fluxLib/main/fluxLib.txt"))()
+-- // FluxLib Oficial
+local Flux = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/fluxlib/main/source.lua"))()
 
--- // Janela principal
-local win = flux:Window("⛩️ Ninja Hubs", " ", Color3.fromRGB(220, 220, 220), Enum.KeyCode.RightControl)
+-- // Criar Janela
+local win = Flux:Window("⛩️ Ninja Hubs", " ", Color3.fromRGB(240, 240, 240), Enum.KeyCode.RightControl)
 
 -- // Abas
 local autoFarmTab = win:Tab("Auto Farm", "http://www.roblox.com/asset/?id=6023426915")
@@ -20,33 +20,29 @@ local VU = game:GetService("VirtualUser")
 
 -- // Auto Farm
 local farmAtivo = false
-local farmLoop
+local farmLoop, autoSellLoop
 
--- Auto Sell Handler
-local autoSellLoop
-local function iniciarAutoSell()
-    if autoSellLoop then return end
-    autoSellLoop = task.spawn(function()
-        while farmAtivo and task.wait(0.5) do
-            local statsGui = player:WaitForChild("PlayerGui"):FindFirstChild("GameGui")
-            if statsGui then
-                local bar = statsGui:FindFirstChild("FullBar")
-                if bar and bar.Visible then
-                    local sellPad = workspace:FindFirstChild("sellAreaCirclePart") or workspace:FindFirstChild("SellAreaPart") or workspace:FindFirstChildWhichIsA("Part", true)
-                    if sellPad then
-                        root.CFrame = sellPad.CFrame + Vector3.new(0, 5, 0)
-                        task.wait(0.5)
+autoFarmTab:Toggle("Auto Farm", "Equipa espada e farma automaticamente", false, function(state)
+    farmAtivo = state
+    if farmAtivo then
+        -- Auto Sell
+        autoSellLoop = task.spawn(function()
+            while farmAtivo and task.wait(0.5) do
+                local statsGui = player:WaitForChild("PlayerGui"):FindFirstChild("GameGui")
+                if statsGui then
+                    local bar = statsGui:FindFirstChild("FullBar")
+                    if bar and bar.Visible then
+                        local sellPad = workspace:FindFirstChild("sellAreaCirclePart") or workspace:FindFirstChild("SellAreaPart")
+                        if sellPad then
+                            root.CFrame = sellPad.CFrame + Vector3.new(0, 5, 0)
+                            task.wait(0.5)
+                        end
                     end
                 end
             end
-        end
-    end)
-end
+        end)
 
-autoFarmTab:Toggle("Auto Farm", "Ativa o farm com espada equipada", false, function(state)
-    farmAtivo = state
-    if farmAtivo then
-        iniciarAutoSell()
+        -- Farm
         farmLoop = task.spawn(function()
             while farmAtivo and task.wait() do
                 local tool = player.Backpack:FindFirstChildOfClass("Tool")
@@ -61,12 +57,13 @@ autoFarmTab:Toggle("Auto Farm", "Ativa o farm com espada equipada", false, funct
     end
 end)
 
--- // Speed & Jump
-miscTab:Slider("Velocidade", "Ajusta a velocidade do jogador", 16, 500, humanoid.WalkSpeed, function(val)
+-- // Velocidade
+miscTab:Slider("Velocidade", "Define a velocidade", 16, 500, humanoid.WalkSpeed, function(val)
     humanoid.WalkSpeed = val
 end)
 
-miscTab:Slider("Pulo", "Ajusta a altura do pulo", 50, 500, humanoid.JumpPower, function(val)
+-- // Pulo
+miscTab:Slider("Pulo", "Define o poder de pulo", 50, 500, humanoid.JumpPower, function(val)
     humanoid.JumpPower = val
 end)
 
@@ -76,7 +73,7 @@ local flyConn
 local bodyGyro, bodyVel
 local direction = Vector3.zero
 
-miscTab:Toggle("Modo Fly", "Ativa/desativa o voo com WASD", false, function(state)
+miscTab:Toggle("Modo Fly", "Ativa/desativa voo", false, function(state)
     flying = state
     if flying then
         bodyGyro = Instance.new("BodyGyro", root)
@@ -114,10 +111,10 @@ miscTab:Toggle("Modo Fly", "Ativa/desativa o voo com WASD", false, function(stat
     end
 end)
 
--- // TP com mouse (T + Clique)
+-- // TP com T + Mouse
 local tpClickActive = false
 
-miscTab:Toggle("TP com Mouse (Segure T)", "Clique onde quer teleportar", false, function(state)
+miscTab:Toggle("TP com Mouse (Segure T)", "Clique para teleportar", false, function(state)
     tpClickActive = state
 end)
 
@@ -135,8 +132,8 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
--- // Botão para deletar o script
-miscTab:Button("❌ Fechar Script", "Remove a interface e para tudo", function()
+-- // Botão de Fechar Script
+miscTab:Button("❌ Fechar Script", "Remove tudo e para funções", function()
     pcall(function()
         if farmLoop then task.cancel(farmLoop) end
         if autoSellLoop then task.cancel(autoSellLoop) end
@@ -147,9 +144,9 @@ miscTab:Button("❌ Fechar Script", "Remove a interface e para tudo", function()
     end)
 end)
 
--- // Anti-AFK SEM DESATIVAR
+-- // Anti-AFK (sempre ativo)
 player.Idled:Connect(function()
-    VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    VU:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
     task.wait(1)
-    VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    VU:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 end)

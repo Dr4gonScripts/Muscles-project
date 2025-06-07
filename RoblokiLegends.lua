@@ -1,143 +1,218 @@
-local Flux = loadstring(game:HttpGet('https://raw.githubusercontent.com/Robloxian-Studio/FluxLib/main/source.lua'))()
+-- Carrega a biblioteca FluxLib
+local success, Flux = pcall(function()
+    return loadstring(game:HttpGet('https://raw.githubusercontent.com/Robloxian-Studio/FluxLib/main/source.lua'))()
+end)
 
--- Variáveis essenciais
+if not success then
+    error("Falha ao carregar a FluxLib. Verifique sua conexão com a internet.")
+end
+
+-- Configurações iniciais
 local Player = game:GetService("Players").LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 
--- Configuração da Janela
+-- Cria a janela principal
 local Window = Flux:Window({
     Title = "Robloki Legends",
+    SubTitle = "Premium Script v3.0",
+    Size = UDim2.new(0, 500, 0, 450),
     Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 500, 0, 400),
-    Theme = "Dark"
+    Theme = "Dark",
+    Acrylic = true,
+    Blur = true
 })
 
--- Função para chamadas remotas seguras
+-- Sistema de proteção contra erros
 local function SafeRemote(remoteName, ...)
-    local remote = game:GetService("ReplicatedStorage").Remotes:FindFirstChild(remoteName)
+    local remote = game:GetService("ReplicatedStorage"):FindFirstChild("Remotes")
     if remote then
-        if remote:IsA("RemoteEvent") then
-            remote:FireServer(...)
-        elseif remote:IsA("RemoteFunction") then
-            remote:InvokeServer(...)
+        remote = remote:FindFirstChild(remoteName)
+        if remote then
+            if remote:IsA("RemoteEvent") then
+                return remote:FireServer(...)
+            elseif remote:IsA("RemoteFunction") then
+                return remote:InvokeServer(...)
+            end
         end
-    else
-        warn("Remote não encontrado:", remoteName)
     end
+    warn("Remote não encontrado:", remoteName)
+    return nil
 end
 
--- Anti-AFK Automático
+-- Atualiza o personagem quando respawnar
+Player.CharacterAdded:Connect(function(newChar)
+    Character = newChar
+    Humanoid = newChar:WaitForChild("Humanoid")
+end)
+
+-- Anti-AFK
+local VirtualInput = game:GetService("VirtualInputManager")
 local antiAFKConnection
 local function ToggleAntiAFK(state)
     if state then
         antiAFKConnection = game:GetService("RunService").Heartbeat:Connect(function()
-            game:GetService("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
+            VirtualInput:SendKeyEvent(true, "F", false, game)
             task.wait(1)
-            game:GetService("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
+            VirtualInput:SendKeyEvent(false, "F", false, game)
         end)
     elseif antiAFKConnection then
         antiAFKConnection:Disconnect()
+        antiAFKConnection = nil
     end
 end
 
 -------------------------
--- Aba: Player
+-- ABA: PLAYER
 -------------------------
-local PlayerTab = Window:Tab("Player", "rbxassetid://7734065396")
+local PlayerTab = Window:Tab("Jogador", "rbxassetid://7734065396")
 
-PlayerTab:Slider("Velocidade (WalkSpeed)", 16, 200, 16, function(Value)
-    Humanoid.WalkSpeed = Value
+-- WalkSpeed
+PlayerTab:Slider("Velocidade", 16, 200, 16, function(value)
+    Humanoid.WalkSpeed = value
 end)
 
-PlayerTab:Slider("Tamanho (Scale)", 0.5, 5, 1, function(Value)
-    if Character:FindFirstChild("Humanoid") then
-        Character.Humanoid.BodyHeightScale.Value = Value
-        Character.Humanoid.BodyWidthScale.Value = Value
-    end
+-- JumpPower
+PlayerTab:Slider("Pulo", 50, 200, 50, function(value)
+    Humanoid.JumpPower = value
 end)
 
-PlayerTab:Toggle("Anti-AFK Automático", true, function(Value)
-    ToggleAntiAFK(Value)
+-- Size
+PlayerTab:Slider("Tamanho", 0.5, 5, 1, function(value)
+    Humanoid.BodyHeightScale.Value = value
+    Humanoid.BodyWidthScale.Value = value
+end)
+
+-- Anti-AFK
+PlayerTab:Toggle("Anti-AFK", true, function(state)
+    ToggleAntiAFK(state)
 end)
 
 -------------------------
--- Aba: Auto Farm
+-- ABA: AUTO FARM
 -------------------------
 local AutoFarmTab = Window:Tab("Auto Farm", "rbxassetid://7734053491")
 
--- Configuração do Auto Farm
-local ExerciseData = {
-    ["Soco"] = {Tool = "PunchingBag", Remote = "Punch"},
-    ["Peso"] = {Tool = "Dumbbell", Remote = "Lift"},
-    ["Suporte"] = {Tool = "ParallelBars", Remote = "Hold"},
-    ["Pushups"] = {Tool = "PushupStation", Remote = "Push"},
-    ["Situações"] = {Tool = "SitupBench", Remote = "Sit"}
+-- Configuração dos exercícios
+local Exercises = {
+    {
+        Name = "Soco",
+        Tool = "PunchingBag",
+        Remote = "Punch"
+    },
+    {
+        Name = "Peso",
+        Tool = "Dumbbell",
+        Remote = "Lift"
+    },
+    {
+        Name = "Suporte",
+        Tool = "ParallelBars",
+        Remote = "Hold"
+    },
+    {
+        Name = "Pushups",
+        Tool = "PushupStation",
+        Remote = "Push"
+    },
+    {
+        Name = "Situações",
+        Tool = "SitupBench",
+        Remote = "Sit"
+    }
 }
 
-local CurrentExercise = "Soco"
-
-AutoFarmTab:Dropdown("Tipo de Exercício", {"Soco", "Peso", "Suporte", "Pushups", "Situações"}, function(Value)
-    CurrentExercise = Value
+-- Dropdown de exercícios
+local selectedExercise = 1
+AutoFarmTab:Dropdown("Exercício", {
+    "Soco",
+    "Peso",
+    "Suporte",
+    "Pushups",
+    "Situações"
+}, function(index)
+    selectedExercise = index
 end)
 
-AutoFarmTab:Toggle("Auto Farm de Força", false, function(Value)
-    _G.StrengthFarm = Value
-    while _G.StrengthFarm and task.wait() do
-        local exercise = ExerciseData[CurrentExercise]
-        if exercise then
-            -- Equipar a ferramenta
-            local tool = Player.Backpack:FindFirstChild(exercise.Tool)
-            if tool then
-                Humanoid:EquipTool(tool)
-            end
-            
-            -- Executar o exercício
-            SafeRemote(exercise.Remote or "Training")
+-- Auto Farm
+AutoFarmTab:Toggle("Ativar Auto Farm", false, function(state)
+    _G.AutoFarm = state
+    
+    while _G.AutoFarm and task.wait() do
+        local exercise = Exercises[selectedExercise]
+        
+        -- Equipa a ferramenta
+        local tool = Player.Backpack:FindFirstChild(exercise.Tool)
+        if tool then
+            Humanoid:EquipTool(tool)
         end
-    end
-end)
-
-AutoFarmTab:Toggle("Farm de Músculo (No Delay)", false, function(Value)
-    _G.MuscleFarm = Value
-    while _G.MuscleFarm and task.wait() do
-        SafeRemote("Training")
+        
+        -- Executa o exercício
+        SafeRemote(exercise.Remote)
     end
 end)
 
 -------------------------
--- Aba: Egg & Gems
+-- ABA: OVOS & GEMAS
 -------------------------
-local EggTab = Window:Tab("Egg & Gems", "rbxassetid://9432217880")
+local EggsTab = Window:Tab("Ovos & Gemas", "rbxassetid://9432217880")
 
-EggTab:Toggle("Auto Abrir Ovos", false, function(Value)
-    _G.AutoOpenEggs = Value
+-- Auto Abrir Ovos
+EggsTab:Toggle("Auto Abrir Ovos", false, function(state)
+    _G.AutoOpenEggs = state
+    
     while _G.AutoOpenEggs and task.wait(0.5) do
         SafeRemote("EggOpening", "Basic Egg", 1)
     end
 end)
 
-EggTab:Toggle("Farm de Gems", false, function(Value)
-    _G.GemFarm = Value
+-- Farm de Gemas
+EggsTab:Toggle("Farm de Gemas", false, function(state)
+    _G.GemFarm = state
+    
     while _G.GemFarm and task.wait(0.1) do
         SafeRemote("GemFarm")
     end
 end)
 
 -------------------------
--- Aba: Renascimento
+-- ABA: RENASCIMENTO
 -------------------------
 local RebirthTab = Window:Tab("Renascimento", "rbxassetid://7733955741")
 
-RebirthTab:Toggle("Auto Renascimento", false, function(Value)
-    _G.AutoRebirth = Value
+-- Auto Rebirth
+RebirthTab:Toggle("Auto Renascimento", false, function(state)
+    _G.AutoRebirth = state
+    
     while _G.AutoRebirth and task.wait(0.5) do
         SafeRemote("Rebirth")
     end
 end)
 
-RebirthTab:Slider("Quantidade por Vez", 1, 10, 1, function(Value)
-    _G.RebirthAmount = Value
+-- Quantidade de Rebirth
+local rebirthAmount = 1
+RebirthTab:Slider("Quantidade", 1, 10, 1, function(value)
+    rebirthAmount = value
+end)
+
+-------------------------
+-- ABA: CONFIGURAÇÕES
+-------------------------
+local SettingsTab = Window:Tab("Configurações", "rbxassetid://6031091004")
+
+-- Notificações
+SettingsTab:Toggle("Notificações", true, function(state)
+    Flux.Notifications = state
+end)
+
+-- Tema
+SettingsTab:Dropdown("Tema", {
+    "Dark",
+    "Light",
+    "Aqua",
+    "Jester"
+}, function(theme)
+    Flux:SetTheme(theme)
 end)
 
 -- Notificação inicial
@@ -148,8 +223,9 @@ Flux:Notification({
     Icon = "rbxassetid://100680172728539"
 })
 
--- Atualizar personagem quando morrer
-Player.CharacterAdded:Connect(function(newChar)
-    Character = newChar
-    Humanoid = newChar:WaitForChild("Humanoid")
+-- Atualiza o título da janela periodicamente
+task.spawn(function()
+    while task.wait(10) do
+        Window:SetTitle("Robloki Legends | " .. os.date("%H:%M:%S"))
+    end
 end)

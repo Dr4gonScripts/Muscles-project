@@ -17,9 +17,22 @@ local Window = OrionLib:MakeWindow({
     Icon = "rbxassetid://100680172728539"
 })
 
+-- Solução para chamadas remotas seguras
+local function SafeRemoteCall(remote, ...)
+    local success, err = pcall(function()
+        if remote:IsA("RemoteEvent") then
+            remote:FireServer(...)
+        elseif remote:IsA("RemoteFunction") then
+            remote:InvokeServer(...)
+        end
+    end)
+    if not success then
+        warn("Erro no remote call:", err)
+    end
+end
+
 -- Função para criar botões personalizados
 local function AddWindowControls()
-    -- Espera a UI ser criada
     while not OrionLib.Instance or not OrionLib.Instance.MainUI do
         task.wait()
     end
@@ -60,7 +73,6 @@ local function AddWindowControls()
             OrionLib:Destroy()
         end)
         
-        -- Ajusta o tamanho da barra de título
         TitleBar.Size = UDim2.new(1, -90, 0, 25)
     end
 end
@@ -107,8 +119,10 @@ PlayerTab:AddSlider({
     Color = Color3.fromRGB(255, 85, 255),
     Increment = 0.1,
     Callback = function(Value)
-        Character:FindFirstChild("Humanoid").BodyHeightScale.Value = Value
-        Character:FindFirstChild("Humanoid").BodyWidthScale.Value = Value
+        if Character:FindFirstChild("Humanoid") then
+            Character.Humanoid.BodyHeightScale.Value = Value
+            Character.Humanoid.BodyWidthScale.Value = Value
+        end
     end
 })
 
@@ -121,11 +135,63 @@ PlayerTab:AddToggle({
 })
 
 -------------------------
--- Aba: Auto Farm
+-- Aba: Auto Farm (Atualizada)
 -------------------------
 local AutoFarmTab = Window:MakeTab({
     Name = "Auto Farm",
     Icon = "rbxassetid://7734053491"
+})
+
+-- Configuração do Auto Farm de Força
+local ExerciseEquipment = {
+    ["Soco-1"] = "PunchingBag",
+    ["Peso-2"] = "Dumbbell",
+    ["Suporte-3"] = "ParallelBars",
+    ["Pushups-4"] = "PushupStation",
+    ["Situações-5"] = "SitupBench"
+}
+
+local CurrentExercise = "PunchingBag"
+local ExerciseRemotes = {
+    PunchingBag = "Punch",
+    Dumbbell = "Lift",
+    ParallelBars = "Hold",
+    PushupStation = "Push",
+    SitupBench = "Sit"
+}
+
+AutoFarmTab:AddDropdown({
+    Name = "Tipo de Exercício",
+    Default = "Soco-1",
+    Options = {"Soco-1", "Peso-2", "Suporte-3", "Pushups-4", "Situações-5"},
+    Callback = function(Value)
+        CurrentExercise = ExerciseEquipment[Value]
+    end
+})
+
+AutoFarmTab:AddToggle({
+    Name = "Auto Farm de Força",
+    Default = false,
+    Callback = function(Value)
+        _G.StrengthFarm = Value
+        while _G.StrengthFarm do
+            -- Equipa o item primeiro
+            if Player.Backpack:FindFirstChild(CurrentExercise) then
+                Humanoid:EquipTool(Player.Backpack[CurrentExercise])
+            end
+            
+            -- Executa o exercício
+            local remoteName = ExerciseRemotes[CurrentExercise] or "Train"
+            local remote = game:GetService("ReplicatedStorage").Remotes:FindFirstChild(remoteName)
+            if remote then
+                SafeRemoteCall(remote)
+            else
+                SafeRemoteCall(game:GetService("ReplicatedStorage").Remotes.Training)
+            end
+            
+            task.wait()
+        end
+    end
 })
 
 AutoFarmTab:AddToggle({
@@ -134,7 +200,7 @@ AutoFarmTab:AddToggle({
     Callback = function(Value)
         _G.MuscleFarm = Value
         while _G.MuscleFarm do
-            game:GetService("ReplicatedStorage").Remotes.Training:FireServer()
+            SafeRemoteCall(game:GetService("ReplicatedStorage").Remotes.Training)
             task.wait()
         end
     end
@@ -154,7 +220,7 @@ EggTab:AddToggle({
     Callback = function(Value)
         _G.AutoOpenEggs = Value
         while _G.AutoOpenEggs do
-            game:GetService("ReplicatedStorage").Remotes.EggOpening:InvokeServer("Basic Egg", 1)
+            SafeRemoteCall(game:GetService("ReplicatedStorage").Remotes.EggOpening, "Basic Egg", 1)
             task.wait(0.5)
         end
     end
@@ -166,7 +232,7 @@ EggTab:AddToggle({
     Callback = function(Value)
         _G.GemFarm = Value
         while _G.GemFarm do
-            game:GetService("ReplicatedStorage").Remotes.GemFarm:FireServer()
+            SafeRemoteCall(game:GetService("ReplicatedStorage").Remotes.GemFarm)
             task.wait(0.1)
         end
     end
@@ -186,7 +252,7 @@ RebirthTab:AddToggle({
     Callback = function(Value)
         _G.AutoRebirth = Value
         while _G.AutoRebirth do
-            game:GetService("ReplicatedStorage").Remotes.Rebirth:FireServer()
+            SafeRemoteCall(game:GetService("ReplicatedStorage").Remotes.Rebirth)
             task.wait(0.5)
         end
     end
@@ -212,8 +278,9 @@ ToggleAntiAFK(true)
 
 OrionLib:MakeNotification({
     Name = "Robloki Legends",
-    Content = "Script carregado com sucesso!",
-    Time = 5
+    Content = "Script carregado com sucesso!\nVersão 2.0 com Auto Farm aprimorado",
+    Time = 5,
+    Icon = "rbxassetid://100680172728539"
 })
 
 OrionLib:Init()

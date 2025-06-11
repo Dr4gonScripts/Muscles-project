@@ -1,353 +1,297 @@
--- Services
+-- Serviços
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Load Unnamed ESP library (alternative to Rayfield)
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+-- Carregar Orion Lib
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
--- Create main window
-local Window = Library:CreateWindow({
-    Title = "Robloki Hub Premium",
-    AutoHide = false,
+-- Criar a janela principal
+local Window = OrionLib:MakeWindow({
+    Name = "Robloki Hub Premium",
+    HidePremium = false,
     SaveConfig = true,
-    ConfigFolder = "PremiumScriptHub"
+    ConfigFolder = "RoblokiConfigs",
+    IntroEnabled = true,
+    IntroText = "Robloki Hub Premium"
 })
+
+-- Função de Noclip
+local NoclipToggle = false
+local function NoclipLoop()
+    while NoclipToggle do
+        task.wait()
+        if Players.LocalPlayer.Character then
+            for _, part in ipairs(Players.LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+end
 
 --[[
 ======================================
-          UNIVERSAL TAB
+          ABA UNIVERSAL
 ======================================
 --]]
-local UniversalTab = Window:AddTab("Universal")
-local UniversalSection = UniversalTab:AddSection("Scripts para Todos os Jogos")
+local UniversalTab = Window:MakeTab({
+    Name = "Universal",
+    Icon = "rbxassetid://7733960981",
+    PremiumOnly = false
+})
 
--- Flight script
-UniversalSection:AddButton({
-    Text = "Ativar Voo (Universal)",
-    Func = function()
+UniversalTab:AddSection("Scripts para Todos os Jogos")
+
+UniversalTab:AddButton({
+    Name = "Ativar Voo (Universal)",
+    Callback = function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
     end
 })
 
--- Noclip toggle
-local noclipEnabled = false
-UniversalSection:AddToggle({
-    Text = "Ativar Noclip",
-    State = false,
-    Func = function(state)
-        noclipEnabled = state
-        if state then
-            coroutine.wrap(function()
-                while noclipEnabled do
-                    wait()
-                    if Players.LocalPlayer.Character then
-                        for _, part in ipairs(Players.LocalPlayer.Character:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                part.CanCollide = false
-                            end
-                        end
-                    end
-                end
-            end)()
+UniversalTab:AddToggle({
+    Name = "Ativar Noclip",
+    Default = false,
+    Callback = function(Value)
+        NoclipToggle = Value
+        if Value then
+            coroutine.wrap(NoclipLoop)()
         end
     end
 })
 
--- Infinite Yield
-UniversalSection:AddButton({
-    Text = "Infinite Yield",
-    Func = function()
+UniversalTab:AddButton({
+    Name = "Infinite Yield",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
     end
 })
 
+UniversalTab:AddSlider({
+    Name = "Velocidade de Caminhada",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    Callback = function(Value)
+        pcall(function()
+            Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end)
+    end
+})
+
+UniversalTab:AddSlider({
+    Name = "Força de Pulo",
+    Min = 50,
+    Max = 200,
+    Default = 50,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    Callback = function(Value)
+        pcall(function()
+            Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+        end)
+    end
+})
+
 --[[
 ======================================
-          BLOX FRUITS TAB
+          ABA BLOX FRUITS
 ======================================
 --]]
-local BloxFruitsTab = Window:AddTab("Blox Fruits")
-local BFSection1 = BloxFruitsTab:AddSection("Hubs Completos")
+local BloxFruitsTab = Window:MakeTab({
+    Name = "Blox Fruits",
+    Icon = "rbxassetid://12584504442",
+    PremiumOnly = false
+})
 
--- Hoho Hub
-BFSection1:AddButton({
-    Text = "Hoho Hub",
-    Func = function()
+BloxFruitsTab:AddSection("Hubs Completos")
+
+BloxFruitsTab:AddButton({
+    Name = "Hoho Hub",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"))()
     end
 })
 
--- Fluxus Hub
-BFSection1:AddButton({
-    Text = "Speed Hub X",
-    Func = function()
+BloxFruitsTab:AddButton({
+    Name = "Speed Hub X",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
     end
 })
 
--- Banana Hub
-BFSection1:AddButton({
-    Text = "banana hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/refs/heads/main/BananaCatHub.lua"))()
+BloxFruitsTab:AddButton({
+    Name = "Banana Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"))()
     end
 })
 
--- Tsou hub
-BFSection1:AddButton({
-    Text = "Tsou hub",
-    Func = function()
+BloxFruitsTab:AddButton({
+    Name = "Tsou Hub",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/Tsuoscripts"))()
     end
 })
 
--- Solix hub
-BFSection1:AddButton({
-    Text = "Solix hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/debunked69/Solixreworkkeysystem/refs/heads/main/solix%20new%20keyui.lua"))()
-    end
-})
-
--- Alchemy Hub
-BFSection1:AddButton({
-    Text = "Alchemy Hub",
-    Func = function()
-        loadstring(game:HttpGet("https://scripts.alchemyhub.xyz"))()
+BloxFruitsTab:AddButton({
+    Name = "Solix Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/debunked69/Solixreworkkeysystem/main/solix%20new%20keyui.lua"))()
     end
 })
 
 --[[
 ======================================
-          GROW A GARDEN TAB
+          ABA GROW A GARDEN
 ======================================
 --]]
-local GrowGardenTab = Window:AddTab("Grow a Garden")
-local GGSection = GrowGardenTab:AddSection("Farms")
+local GrowGardenTab = Window:MakeTab({
+    Name = "Grow a Garden",
+    Icon = "rbxassetid://10983741056",
+    PremiumOnly = false
+})
 
--- No-lag hub
-GGSection:AddButton({
-    Text = "No-lag hub",
-    Func = function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+GrowGardenTab:AddSection("Farms")
+
+GrowGardenTab:AddButton({
+    Name = "No-lag Hub",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"))()
     end
 })
 
--- Solix Hub
-GGSection:AddButton({
-    Text = "Solix Hub",
-    Func = function()
-        _G.AutoFarm = true
-        _G.PerformanceMode = "Fast"
-        _G.TeleportCooldown = 0.1
-        _G.AutoRebuy = true
-        _G.SeedPrice = 4000
-        _G.AutoSellThreshold = 50
-        _G.AutoWatering = true
-        _G.AutoSprinklers = true
-        _G.GearShopAutoBuy = true
-        _G.GearShopItems = {"Basic Watering Can", "Basic Sprinkler", "Basic Shovel"}
-        _G.RenderDistance = 50
-        _G.UIUpdateInterval = 2
-        _G.OptimizeRendering = true
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/debunked69/solixloader/refs/heads/main/solix%20v2%20new%20loader.lua"))()
+GrowGardenTab:AddButton({
+    Name = "Solix Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"))()
     end
 })
 
--- Speed Hub X
-GGSection:AddButton({
-    Text = "Speed Hub X",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-    end
-})
-
--- Lunor hub
-GGSection:AddButton({
-    Text = "Lunor hub",
-    Func = function()
+GrowGardenTab:AddButton({
+    Name = "Lunor Hub",
+    Callback = function()
         loadstring(game:HttpGet("https://lunor.dev/loader"))()
     end
 })
 
 --[[
 ======================================
-          BLUE LOCK RIVALS TAB
+          ABA BLUE LOCK RIVALS
 ======================================
 --]]
-local BlueLockTab = Window:AddTab("Blue Lock Rivals")
-local BLRSection1 = BlueLockTab:AddSection("Auto Farm & hacks")
+local BlueLockTab = Window:MakeTab({
+    Name = "Blue Lock Rivals",
+    Icon = "rbxassetid://12345678901",
+    PremiumOnly = false
+})
 
--- Alchemy Hub
-BLRSection1:AddButton({
-    Text = "Alchemy Hub",
-    Func = function()
+BlueLockTab:AddSection("Auto Farm & Hacks")
+
+BlueLockTab:AddButton({
+    Name = "Alchemy Hub",
+    Callback = function()
         loadstring(game:HttpGet("https://scripts.alchemyhub.xyz"))()
     end
 })
 
--- Souls Hub
-BLRSection1:AddButton({
-    Text = "Souls Hub",
-    Func = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/SPQT6v5J"))()
-    end
-})
-
--- Shiro X hub
-BLRSection1:AddButton({
-    Text = "Shiro X hub",
-    Func = function()
-        loadstring(game:HttpGet(('https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/refs/heads/main/Protected_3467848847610666.txt')))()
-    end
-})
-
--- Controls Guis
-BLRSection1:AddButton({
-    Text = "Controls Guis",
-    Func = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/WWa5yYf8"))()
-    end
-})
-
--- Speed Hack
-local walkSpeed = 16
-BLRSection1:AddSlider({
-    Text = "Velocidade do Jogador",
-    Min = 16,
-    Max = 100,
-    Default = 16,
-    Func = function(value)
-        walkSpeed = value
-        if Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-            Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-        end
+BlueLockTab:AddButton({
+    Name = "Shiro X Hub",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt'))()
     end
 })
 
 --[[
 ======================================
-          ARSENAL TAB
+          ABA ARSENAL
 ======================================
 --]]
-local ArsenalTab = Window:AddTab("Arsenal")
-local ArsenalSection = ArsenalTab:AddSection("Hacks")
+local ArsenalTab = Window:MakeTab({
+    Name = "Arsenal",
+    Icon = "rbxassetid://6949946023",
+    PremiumOnly = false
+})
 
--- Soluna Hub
-ArsenalSection:AddButton({
-    Text = "Soluna Hub",
-    Func = function()
-        loadstring(game:HttpGet("https://soluna-script.vercel.app/arsenal.lua",true))()
+ArsenalTab:AddSection("Hacks")
+
+ArsenalTab:AddButton({
+    Name = "Soluna Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://soluna-script.vercel.app/arsenal.lua", true))()
     end
 })
 
--- Aether hub
-ArsenalSection:AddButton({
-    Text = "Aether hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Arsenal"))()
-    end
-})
-
--- Nodoll hub
-ArsenalSection:AddButton({
-    Text = "Nodoll hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/NoDollManB/roblox_scripts/refs/heads/main/arsenal.lua"))()
-    end
-})
-
--- Ronix Hub
-ArsenalSection:AddButton({
-    Text = "Ronix Hub",
-    Func = function()
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/93f86be991de0ff7d79e6328e4ceea40.lua"))()
-    end
-})
-
--- Tbao hub
-ArsenalSection:AddButton({
-    Text = "Tbao hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubArsenal"))()
+ArsenalTab:AddButton({
+    Name = "Aether Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/main/Arsenal"))()
     end
 })
 
 --[[
 ======================================
-       MUSCLES LEGENDS TAB
+          ABA MUSCLES LEGENDS
 ======================================
 --]]
-local MusclesTab = Window:AddTab("Muscles Legends")
-local MLSection = MusclesTab:AddSection("Automação")
+local MusclesTab = Window:MakeTab({
+    Name = "Muscles Legends",
+    Icon = "rbxassetid://12779704821",
+    PremiumOnly = false
+})
 
--- Speed hub X
-MLSection:AddButton({
-    Text = "Speed hub X",
-    Func = function()
+MusclesTab:AddSection("Automação")
+
+MusclesTab:AddButton({
+    Name = "Speed Hub X",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
     end
 })
 
--- ML V1 hub
-MLSection:AddButton({
-    Text = "ML V1 hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/2581235867/21/refs/heads/main/By%20Tokattk"))()
-    end
-})
-
--- Nox hub
-MLSection:AddButton({
-    Text = "Nox hub",
-    Func = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/2Cuza2mr"))()
-    end
-})
-
--- KTM hub
-MLSection:AddButton({
-    Text = "KTM hub",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/zapstreams123/KTMHUB/refs/heads/main/PublicVersion"))()
-    end
-})
-
--- CriShoux Hub
-MLSection:AddButton({
-    Text = "CriShoux Hub",
-    Func = function()
+MusclesTab:AddButton({
+    Name = "CriShoux Hub",
+    Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/CriShoux/OwlHub/master/OwlHub.txt"))()
     end
 })
 
 --[[
 ======================================
-          SETTINGS TAB
+          ABA CONFIGURAÇÕES
 ======================================
 --]]
-local SettingsTab = Window:AddTab("Configurações")
-local SettingsSection = SettingsTab:AddSection("Personalização")
+local SettingsTab = Window:MakeTab({
+    Name = "Configurações",
+    Icon = "rbxassetid://6023426915",
+    PremiumOnly = false
+})
 
--- Dark/Light theme
-local darkMode = true
-SettingsSection:AddToggle({
-    Text = "Modo Escuro",
-    State = true,
-    Func = function(state)
-        darkMode = state
-        -- You would need to implement theme changing logic here
-        -- This library doesn't have built-in theme support like Rayfield
+SettingsTab:AddSection("Personalização")
+
+SettingsTab:AddButton({
+    Name = "Fechar Hub",
+    Callback = function()
+        OrionLib:Destroy()
     end
 })
 
--- Close Hub
-SettingsSection:AddButton({
-    Text = "Fechar Hub",
-    Func = function()
-        Library:Destroy()
+SettingsTab:AddButton({
+    Name = "Salvar Configurações",
+    Callback = function()
+        OrionLib:SaveConfig()
     end
 })
 
--- Initialize
-Library:Init()
+SettingsTab:AddButton({
+    Name = "Restaurar Padrões",
+    Callback = function()
+        OrionLib:ResetConfig()
+    end
+})
+
+-- Inicializar a UI
+OrionLib:Init()

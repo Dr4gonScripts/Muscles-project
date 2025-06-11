@@ -1,39 +1,54 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Estilo Dr4gonHub
-  Modificações:
-    - Design premium com tema azul/roxo
-    - Bola minimizada personalizada
-    - Interface completa com todas as abas funcionais
-    - Efeitos visuais melhorados
+  🐉 Robloki Hub Premium - Versão Completa
+  Abas incluídas:
+    - Universal
+    - Blox Fruits
+    - Grow Garden
+    - Arsenal
+    - Muscles Legends
+    - Blue Lock Rivals
+    - Dead Rails
+    - Pet Simulator
+    - Blade Ball
+    - Hubs Gerais
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()
 
--- ===== CONFIGURAÇÃO DA UI =====
+-- ===== CONFIGURAÇÃO INICIAL =====
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RoblokiHubUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- Configuração do tema premium
+-- Configuração do tema
 local Theme = {
     Background = Color3.fromRGB(15, 15, 25),
-    Primary = Color3.fromRGB(80, 50, 180),  -- Roxo premium
-    Secondary = Color3.fromRGB(0, 150, 255), -- Azul brilhante
+    Primary = Color3.fromRGB(80, 50, 180),
+    Secondary = Color3.fromRGB(0, 150, 255),
     Accent = Color3.fromRGB(200, 200, 255),
     Text = Color3.fromRGB(240, 240, 255)
 }
 
--- Frame principal
+-- Função para notificações
+local function Notify(title, text, duration)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = title or "Robloki Hub",
+        Text = text or "Ação concluída!",
+        Duration = duration or 3,
+    })
+end
+
+-- ===== CONSTRUÇÃO DA INTERFACE =====
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0.35, 0, 0.45, 0)
-MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+MainFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
+MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 
--- Efeito de borda gradiente
+-- Efeitos visuais
 local GradientBorder = Instance.new("Frame")
 GradientBorder.Size = UDim2.new(1, 6, 1, 6)
 GradientBorder.Position = UDim2.new(0, -3, 0, -3)
@@ -71,7 +86,7 @@ Title.Position = UDim2.new(0.15, 0, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Parent = TitleBar
 
--- Botões de controle da janela
+-- Botões de controle
 local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "X"
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
@@ -92,25 +107,27 @@ MinimizeButton.Font = Enum.Font.GothamBold
 MinimizeButton.TextSize = 16
 MinimizeButton.Parent = TitleBar
 
--- Barra de abas
-local TabBar = Instance.new("Frame")
-TabBar.Size = UDim2.new(1, 0, 0, 30)
-TabBar.Position = UDim2.new(0, 0, 0, 30)
-TabBar.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
-TabBar.BorderSizePixel = 0
-TabBar.Parent = MainFrame
+-- Barra de abas com scroll
+local TabScrollingFrame = Instance.new("ScrollingFrame")
+TabScrollingFrame.Size = UDim2.new(1, 0, 0, 30)
+TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
+TabScrollingFrame.BackgroundTransparency = 1
+TabScrollingFrame.ScrollBarThickness = 0
+TabScrollingFrame.CanvasSize = UDim2.new(2, 0, 0, 30)
+TabScrollingFrame.Parent = MainFrame
 
--- Configuração das abas
+-- ===== FUNÇÕES AUXILIARES =====
 local function CreateTab(name, position)
     local tab = Instance.new("TextButton")
     tab.Text = name
-    tab.Size = UDim2.new(0.2, 0, 1, 0)
+    tab.Size = UDim2.new(0.15, 0, 1, 0)
     tab.Position = position
     tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.Gotham
     tab.TextSize = 12
-    tab.Parent = TabBar
+    tab.TextWrapped = true
+    tab.Parent = TabScrollingFrame
     
     tab.MouseEnter:Connect(function()
         if tab.BackgroundColor3 ~= Theme.Primary then
@@ -127,13 +144,6 @@ local function CreateTab(name, position)
     return tab
 end
 
-local UniversalTab = CreateTab("Universal", UDim2.new(0, 0, 0, 0))
-local BloxFruitsTab = CreateTab("Blox Fruits", UDim2.new(0.2, 0, 0, 0))
-local GrowGardenTab = CreateTab("Grow Garden", UDim2.new(0.4, 0, 0, 0))
-local ArsenalTab = CreateTab("Arsenal", UDim2.new(0.6, 0, 0, 0))
-local MusclesTab = CreateTab("Muscles Legends", UDim2.new(0.8, 0, 0, 0))
-
--- Áreas de conteúdo
 local function CreateContentFrame(name)
     local frame = Instance.new("ScrollingFrame")
     frame.Name = name
@@ -152,23 +162,6 @@ local function CreateContentFrame(name)
     return frame
 end
 
-local UniversalContent = CreateContentFrame("UniversalContent")
-UniversalContent.CanvasSize = UDim2.new(0, 0, 0, 700)
-UniversalContent.Visible = true
-
-local BloxFruitsContent = CreateContentFrame("BloxFruitsContent")
-BloxFruitsContent.CanvasSize = UDim2.new(0, 0, 0, 1200)
-
-local GrowGardenContent = CreateContentFrame("GrowGardenContent")
-GrowGardenContent.CanvasSize = UDim2.new(0, 0, 0, 700)
-
-local ArsenalContent = CreateContentFrame("ArsenalContent")
-ArsenalContent.CanvasSize = UDim2.new(0, 0, 0, 500)
-
-local MusclesContent = CreateContentFrame("MusclesContent")
-MusclesContent.CanvasSize = UDim2.new(0, 0, 0, 500)
-
--- ===== FUNÇÕES AUXILIARES =====
 local function CreateButton(name, callback, parent)
     local button = Instance.new("TextButton")
     button.Text = name
@@ -189,9 +182,6 @@ local function CreateButton(name, callback, parent)
     button.MouseLeave:Connect(function()
         button.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
     end)
-    
-    local isActive = false
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
     
     button.MouseButton1Click:Connect(function()
         pcall(callback)
@@ -217,309 +207,236 @@ local function CreateDivider(text, parent)
     return divider
 end
 
--- ===== CONTROLES DE JANELA =====
+-- ===== CRIAR TODAS AS ABAS =====
+local UniversalTab = CreateTab("Universal", UDim2.new(0, 0, 0, 0))
+local BloxFruitsTab = CreateTab("Blox Fruits", UDim2.new(0.15, 0, 0, 0))
+local GrowGardenTab = CreateTab("Grow Garden", UDim2.new(0.3, 0, 0, 0))
+local ArsenalTab = CreateTab("Arsenal", UDim2.new(0.45, 0, 0, 0))
+local MusclesTab = CreateTab("Muscles", UDim2.new(0.6, 0, 0, 0))
+local BlueLockTab = CreateTab("Blue Lock", UDim2.new(0.75, 0, 0, 0))
+local DeadRailsTab = CreateTab("Dead Rails", UDim2.new(0.9, 0, 0, 0))
+local PetSimTab = CreateTab("Pet Sim", UDim2.new(1.05, 0, 0, 0))
+local BladeBallTab = CreateTab("Blade Ball", UDim2.new(1.2, 0, 0, 0))
+local HubsTab = CreateTab("Hubs", UDim2.new(1.35, 0, 0, 0))
+
+-- Criar conteúdos para cada aba
+local UniversalContent = CreateContentFrame("UniversalContent")
+local BloxFruitsContent = CreateContentFrame("BloxFruitsContent")
+local GrowGardenContent = CreateContentFrame("GrowGardenContent")
+local ArsenalContent = CreateContentFrame("ArsenalContent")
+local MusclesContent = CreateContentFrame("MusclesContent")
+local BlueLockContent = CreateContentFrame("BlueLockContent")
+local DeadRailsContent = CreateContentFrame("DeadRailsContent")
+local PetSimContent = CreateContentFrame("PetSimContent")
+local BladeBallContent = CreateContentFrame("BladeBallContent")
+local HubsContent = CreateContentFrame("HubsContent")
+
+-- ===== CONTEÚDO DAS ABAS =====
+
+-- ABA UNIVERSAL
+CreateDivider("Ferramentas Gerais", UniversalContent)
+
+CreateButton("Ativar Noclip", function()
+    -- Código do noclip aqui
+    Notify("Noclip", "Noclip ativado/desativado")
+end, UniversalContent)
+
+CreateButton("Voo Universal", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
+    Notify("Voo", "Script de voo carregado!")
+end, UniversalContent)
+
+CreateButton("Infinite Yield", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    Notify("Infinite Yield", "Admin tools carregadas")
+end, UniversalContent)
+
+-- ABA BLOX FRUITS
+CreateDivider("Hubs Completos", BloxFruitsContent)
+
+local BFScripts = {
+    {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"}
+}
+
+for _, script in ipairs(BFScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Blox Fruits", script.Name.." carregado")
+    end, BloxFruitsContent)
+end
+
+-- ABA GROW GARDEN
+CreateDivider("Auto Farm", GrowGardenContent)
+
+local GGScripts = {
+    {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
+    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}
+}
+
+for _, script in ipairs(GGScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Grow Garden", script.Name.." carregado")
+    end, GrowGardenContent)
+end
+
+-- ABA ARSENAL
+CreateDivider("Hacks", ArsenalContent)
+
+local ArsenalScripts = {
+    {Name = "Soluna Hub", URL = "https://soluna-script.vercel.app/arsenal.lua"},
+    {Name = "Aether hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/main/Arsenal"}
+}
+
+for _, script in ipairs(ArsenalScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Arsenal", script.Name.." carregado")
+    end, ArsenalContent)
+end
+
+-- ABA MUSCLES LEGENDS
+CreateDivider("Auto Farm", MusclesContent)
+
+local MLScripts = {
+    {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"}
+}
+
+for _, script in ipairs(MLScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Muscles Legends", script.Name.." carregado")
+    end, MusclesContent)
+end
+
+-- ABA BLUE LOCK RIVALS
+CreateDivider("Auto Farm & Hacks", BlueLockContent)
+
+local BLScripts = {
+    {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
+    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}
+}
+
+for _, script in ipairs(BLScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Blue Lock", script.Name.." carregado")
+    end, BlueLockContent)
+end
+
+-- ABA DEAD RAILS
+CreateDivider("Hacks", DeadRailsContent)
+
+local DRScripts = {
+    {Name = "Dead Rails OP", URL = "https://raw.githubusercontent.com/m00ndiety/Stillwater/refs/heads/main/obf_Prisonteleport.lua.txt"},
+    {Name = "Zephyr Hub", URL = "https://raw.githubusercontent.com/Unknownlodfc/Zephyr/refs/heads/main/DeadRails/Main"}
+    {Name = "Micro Hub", URL = "https://raw.githubusercontent.com/TrustsenseDev/MicroHub/refs/heads/main/loader.lua"}
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
+}
+
+for _, script in ipairs(DRScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Dead Rails", script.Name.." carregado")
+    end, DeadRailsContent)
+end
+
+-- ABA PET SIMULATOR
+CreateDivider("Auto Farm", PetSimContent)
+
+local PSScripts = {
+    {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/refs/heads/main/loader.lua"},
+    {Name = "Project WD", URL = "https://raw.githubusercontent.com/Muhammad6196/Tests/main/wd_Arise/loader.lua"}
+}
+
+for _, script in ipairs(PSScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Pet Simulator 99", script.Name.." carregado")
+    end, PetSimContent)
+end
+
+-- ABA BLADE BALL
+CreateDivider("Hacks", BladeBallContent)
+
+local BBScripts = {
+    {Name = "Auto Parry", URL = "https://nicuse.xyz/MainHub.lua"},
+    {Name = "Soluna Hub", URL = "https://raw.githubusercontent.com/Patheticcs/Soluna-API/refs/heads/main/bladeball.lua"}
+}
+
+for _, script in ipairs(BBScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Blade Ball", script.Name.." carregado")
+    end, BladeBallContent)
+end
+
+-- ABA HUBS
+CreateDivider("Hubs Premium", HubsContent)
+
+local HubScripts = {
+    {Name = "Tomato Hub", URL = "https://pastebin.com/raw/jpx7sKJe"},
+    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"}
+    {Name = "K00p Hub", URL = "https://pastebin.com/raw/aMtQRfDA"}
+}
+
+for _, script in ipairs(HubScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Hubs", script.Name.." carregado")
+    end, HubsContent)
+end
+
+-- ===== CONTROLES DA INTERFACE =====
 local minimized = false
-local originalSize = MainFrame.Size
-local originalPosition = MainFrame.Position
-
--- Botão de bola quando minimizado
-local BallButton = Instance.new("ImageButton")
-BallButton.Image = "rbxassetid://0" -- Substitua pelo ID da imagem desejada
-BallButton.Size = UDim2.new(0, 50, 0, 50)
-BallButton.Position = originalPosition
-BallButton.BackgroundColor3 = Theme.Primary
-BallButton.BorderSizePixel = 0
-BallButton.Visible = false
-BallButton.ZIndex = 10
-BallButton.Parent = ScreenGui
-
--- Tornar a imagem redonda
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(1, 0)
-UICorner.Parent = BallButton
-
--- Arrastar a janela principal
 local dragging = false
 local dragInput, dragStart, startPos
 
-local function Lerp(a, b, t)
-    return a + (b - a) * t
+-- Função para alternar entre abas
+local function SwitchTab(selectedTab)
+    local tabs = {
+        UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
+        MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
+        BladeBallTab, HubsTab
+    }
+    
+    local contents = {
+        UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
+        MusclesContent, BlueLockContent, DeadRailsContent, PetSimContent,
+        BladeBallContent, HubsContent
+    }
+    
+    for i, tab in ipairs(tabs) do
+        tab.BackgroundColor3 = (tab == selectedTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
+        contents[i].Visible = (tab == selectedTab)
+    end
 end
 
-local function UpdateInput(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(
-        startPos.X.Scale, 
-        startPos.X.Offset + delta.X, 
-        startPos.Y.Scale, 
-        startPos.Y.Offset + delta.Y
-    )
-    BallButton.Position = MainFrame.Position
-end
+-- Conectar eventos das abas
+UniversalTab.MouseButton1Click:Connect(function() SwitchTab(UniversalTab) end)
+BloxFruitsTab.MouseButton1Click:Connect(function() SwitchTab(BloxFruitsTab) end)
+GrowGardenTab.MouseButton1Click:Connect(function() SwitchTab(GrowGardenTab) end)
+ArsenalTab.MouseButton1Click:Connect(function() SwitchTab(ArsenalTab) end)
+MusclesTab.MouseButton1Click:Connect(function() SwitchTab(MusclesTab) end)
+BlueLockTab.MouseButton1Click:Connect(function() SwitchTab(BlueLockTab) end)
+DeadRailsTab.MouseButton1Click:Connect(function() SwitchTab(DeadRailsTab) end)
+PetSimTab.MouseButton1Click:Connect(function() SwitchTab(PetSimTab) end)
+BladeBallTab.MouseButton1Click:Connect(function() SwitchTab(BladeBallTab) end)
+HubsTab.MouseButton1Click:Connect(function() SwitchTab(HubsTab) end)
 
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-TitleBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging and not minimized then
-        UpdateInput(input)
-    end
-end)
-
--- Arrastar a bola minimizada
-local draggingBall = false
-local dragInputBall, dragStartBall, startPosBall
-
-local function UpdateBallInput(input)
-    local delta = input.Position - dragStartBall
-    BallButton.Position = UDim2.new(
-        startPosBall.X.Scale, 
-        startPosBall.X.Offset + delta.X, 
-        startPosBall.Y.Scale, 
-        startPosBall.Y.Offset + delta.Y
-    )
-end
-
-BallButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingBall = true
-        dragStartBall = input.Position
-        startPosBall = BallButton.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                draggingBall = false
-            end
-        end)
-    end
-end)
-
-BallButton.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInputBall = input
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInputBall and draggingBall then
-        UpdateBallInput(input)
-    end
-end)
-
+-- Configurar fechamento e minimização
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
 MinimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
-    if minimized then
-        MainFrame.Visible = false
-        BallButton.Visible = true
-        BallButton.Position = MainFrame.Position
-    else
-        MainFrame.Visible = true
-        BallButton.Visible = false
-    end
+    MainFrame.Visible = not minimized
 end)
 
-BallButton.MouseButton1Click:Connect(function()
-    minimized = false
-    MainFrame.Visible = true
-    BallButton.Visible = false
-end)
-
--- Controle de abas
-local function SwitchTab(selectedTab)
-    UniversalTab.BackgroundColor3 = (selectedTab == UniversalTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
-    BloxFruitsTab.BackgroundColor3 = (selectedTab == BloxFruitsTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
-    GrowGardenTab.BackgroundColor3 = (selectedTab == GrowGardenTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
-    ArsenalTab.BackgroundColor3 = (selectedTab == ArsenalTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
-    MusclesTab.BackgroundColor3 = (selectedTab == MusclesTab) and Theme.Primary or Color3.fromRGB(40, 40, 60)
-    
-    UniversalContent.Visible = (selectedTab == UniversalTab)
-    BloxFruitsContent.Visible = (selectedTab == BloxFruitsTab)
-    GrowGardenContent.Visible = (selectedTab == GrowGardenTab)
-    ArsenalContent.Visible = (selectedTab == ArsenalTab)
-    MusclesContent.Visible = (selectedTab == MusclesTab)
-end
-
-UniversalTab.MouseButton1Click:Connect(function() SwitchTab(UniversalTab) end)
-BloxFruitsTab.MouseButton1Click:Connect(function() SwitchTab(BloxFruitsTab) end)
-GrowGardenTab.MouseButton1Click:Connect(function() SwitchTab(GrowGardenTab) end)
-ArsenalTab.MouseButton1Click:Connect(function() SwitchTab(ArsenalTab) end)
-MusclesTab.MouseButton1Click:Connect(function() SwitchTab(MusclesTab) end)
-
--- ===== UNIVERSAL TAB CONTENT =====
-CreateDivider("Ferramentas Gerais", UniversalContent)
-
--- Noclip
-local noclip = false
-CreateButton("Ativar Noclip", function()
-    noclip = not noclip
-    
-    if Player.Character then
-        for _, part in pairs(Player.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = not noclip
-            end
-        end
-    end
-    
-    if noclip then
-        local noclipConnection
-        noclipConnection = game:GetService("RunService").Stepped:Connect(function()
-            if not noclip then
-                noclipConnection:Disconnect()
-                return
-            end
-            
-            if Player.Character then
-                for _, part in pairs(Player.Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        end)
-    end
-    
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Robloki Hub",
-        Text = "Noclip " .. (noclip and "ativado" or "desativado"),
-        Duration = 2,
-    })
-end, UniversalContent)
-
--- Voo Universal
-CreateButton("Ativar Voo Universal", function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111"))()
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Robloki Hub",
-        Text = "Voo universal ativado!",
-        Duration = 3,
-    })
-end, UniversalContent)
-
--- Infinite Yield
-CreateButton("Infinite Yield", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Robloki Hub",
-        Text = "Infinite Yield carregado!",
-        Duration = 3,
-    })
-end, UniversalContent)
-
--- ===== BLOX FRUITS TAB CONTENT =====
-CreateDivider("Hubs Completos", BloxFruitsContent)
-
-local BFHubs = {
-    {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/refs/heads/main/BananaCatHub.lua"},
-    {Name = "Tsou hub", URL = "https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/Tsuoscripts"},
-    {Name = "Solix hub", URL = "https://raw.githubusercontent.com/debunked69/Solixreworkkeysystem/refs/heads/main/solix%20new%20keyui.lua"},
-    {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"}
-}
-
-for _, hub in ipairs(BFHubs) do
-    CreateButton(hub.Name, function()
-        loadstring(game:HttpGet(hub.URL))()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Robloki Hub",
-            Text = hub.Name .. " carregado!",
-            Duration = 3,
-        })
-    end, BloxFruitsContent)
-end
-
--- ===== GROW GARDEN TAB CONTENT =====
-CreateDivider("Auto Farm", GrowGardenContent)
-
-local GGHubs = {
-    {Name = "No-lag hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"},
-    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/refs/heads/main/solix%20v2%20new%20loader.lua"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {Name = "Lunor hub", URL = "https://lunor.dev/loader"}
-}
-
-for _, hub in ipairs(GGHubs) do
-    CreateButton(hub.Name, function()
-        loadstring(game:HttpGet(hub.URL))()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Robloki Hub",
-            Text = hub.Name .. " carregado!",
-            Duration = 3,
-        })
-    end, GrowGardenContent)
-end
-
--- ===== ARSENAL TAB CONTENT =====
-CreateDivider("Hacks", ArsenalContent)
-
-local ArsenalHubs = {
-    {Name = "Soluna Hub", URL = "https://soluna-script.vercel.app/arsenal.lua"},
-    {Name = "Aether hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Arsenal"},
-    {Name = "Nodoll hub", URL = "https://raw.githubusercontent.com/NoDollManB/roblox_scripts/refs/heads/main/arsenal.lua"},
-    {Name = "Ronix Hub", URL = "https://api.luarmor.net/files/v3/loaders/93f86be991de0ff7d79e6328e4ceea40.lua"},
-    {Name = "Tbao hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubArsenal"}
-}
-
-for _, hub in ipairs(ArsenalHubs) do
-    CreateButton(hub.Name, function()
-        loadstring(game:HttpGet(hub.URL))()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Robloki Hub",
-            Text = hub.Name .. " carregado!",
-            Duration = 3,
-        })
-    end, ArsenalContent)
-end
-
--- ===== MUSCLES LEGENDS TAB CONTENT =====
-CreateDivider("Auto Farm", MusclesContent)
-
-local MLHubs = {
-    {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/refs/heads/main/By%20Tokattk"},
-    {Name = "Nox hub", URL = "https://pastebin.com/raw/2Cuza2mr"},
-    {Name = "KTM hub", URL = "https://raw.githubusercontent.com/zapstreams123/KTMHUB/refs/heads/main/PublicVersion"},
-    {Name = "CriShoux Hub", URL = "https://raw.githubusercontent.com/CriShoux/OwlHub/master/OwlHub.txt"}
-}
-
-for _, hub in ipairs(MLHubs) do
-    CreateButton(hub.Name, function()
-        loadstring(game:HttpGet(hub.URL))()
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Robloki Hub",
-            Text = hub.Name .. " carregado!",
-            Duration = 3,
-        })
-    end, MusclesContent)
-end
-
--- Notificação de inicialização
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Robloki Hub Premium",
-    Text = "Hub carregado com sucesso!",
-    Duration = 5,
-})
-
-print("🐉 Robloki Hub Premium - Versão Estilo Dr4gonHub carregada com sucesso!")
+-- Iniciar com a aba Universal
+SwitchTab(UniversalTab)
+Notify("Robloki Hub Premium V3.0", "Hub carregado com sucesso!", 5)

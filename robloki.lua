@@ -1,10 +1,11 @@
 --[[
   🐉 Robloki Hub Premium - Versão Completa Otimizada V4.2
   Atualizações:
-  - Todos os scripts verificados e links corrigidos
+  - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
   - Interface mais fluida
   - Correção de todos os erros de sintaxe
+  - 15 abas completas com todos os scripts originais
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -291,7 +292,7 @@ local ForsakenContent = CreateContentFrame("ForsakenContent")
 local MM2Content = CreateContentFrame("MM2Content")
 local TheMimicContent = CreateContentFrame("TheMimicContent")
 
--- ===== CONTEÚDO DAS ABAS ATUALIZADO =====
+-- ===== CONTEÚDO DAS ABAS COMPLETO =====
 
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
@@ -315,12 +316,14 @@ CreateButton("Ativar Noclip", function()
     game:GetService("RunService").Stepped:Connect(noclipLoop)
 end, UniversalContent)
 
-CreateButton("Voo Premium", function()
-    SafeLoad("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt")
+CreateButton("Voo Universal", function()
+    SafeLoad("https://rawscripts.net/raw/Universal-Script-Gui-Fly-v3-37111")
+    Notify("Voo", "Script de voo carregado!")
 end, UniversalContent)
 
 CreateButton("Infinite Yield", function()
     SafeLoad("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+    Notify("Infinite Yield", "Admin tools carregadas")
 end, UniversalContent)
 
 CreateButton("Anti-AFK", function()
@@ -332,11 +335,13 @@ CreateButton("Anti-AFK", function()
     Notify("Anti-AFK", "Ativado com sucesso!")
 end, UniversalContent)
 
--- ABA BLOX FRUITS (SCRIPTS VERIFICADOS)
+-- ABA BLOX FRUITS
 CreateDivider("Hubs Completos", BloxFruitsContent)
 
 local BFScripts = {
-    {Name = "Hoho Hub V2", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
+    {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"},
     {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/Mukuro.lua"},
     {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/bf.lua"}
 }
@@ -349,10 +354,28 @@ for _, script in ipairs(BFScripts) do
     end, BloxFruitsContent)
 end
 
--- ABA ARSENAL (LINKS ATUALIZADOS)
-CreateDivider("Hacks Premium", ArsenalContent)
+-- ABA GROW GARDEN
+CreateDivider("Auto Farm", GrowGardenContent)
+
+local GGScripts = {
+    {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
+    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}
+}
+
+for _, script in ipairs(GGScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Grow Garden", script.Name.." carregado")
+        end
+    end, GrowGardenContent)
+end
+
+-- ABA ARSENAL
+CreateDivider("Hacks", ArsenalContent)
 
 local ArsenalScripts = {
+    {Name = "Soluna Hub", URL = "https://soluna-script.vercel.app/arsenal.lua"},
+    {Name = "Aether hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/main/Arsenal"},
     {Name = "Vynixius", URL = "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Arsenal.lua"},
     {Name = "Aim Assist", URL = "https://raw.githubusercontent.com/DocYogurt/Arsenal/main/ArsenalAimbot.lua"}
 }
@@ -360,49 +383,155 @@ local ArsenalScripts = {
 for _, script in ipairs(ArsenalScripts) do
     CreateButton(script.Name, function()
         if SafeLoad(script.URL) then
-            Notify("Arsenal", script.Name.." ativado")
+            Notify("Arsenal", script.Name.." carregado")
         end
     end, ArsenalContent)
 end
 
--- ABA PET SIMULATOR 99 (NOVOS LINKS)
-CreateDivider("Auto Farm PS99", PetSimContent)
+-- ABA MUSCLES LEGENDS
+CreateDivider("Auto Farm", MusclesContent)
+
+local MLScripts = {
+    {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"}
+}
+
+for _, script in ipairs(MLScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Muscles Legends", script.Name.." carregado")
+        end
+    end, MusclesContent)
+end
+
+-- ABA BLUE LOCK RIVALS
+CreateDivider("Auto Farm & Hacks", BlueLockContent)
+
+local BLScripts = {
+    {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
+    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}
+}
+
+for _, script in ipairs(BLScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Blue Lock", script.Name.." carregado")
+        end
+    end, BlueLockContent)
+end
+
+-- ABA DEAD RAILS
+CreateDivider("Hacks", DeadRailsContent)
+
+local DRScripts = {
+    {Name = "Dead Rails OP", URL = "https://raw.githubusercontent.com/m00ndiety/Stillwater/main/obf_Prisonteleport.lua.txt"},
+    {Name = "Zephyr Hub", URL = "https://raw.githubusercontent.com/Unknownlodfc/Zephyr/main/DeadRails/Main"},
+    {Name = "Micro Hub", URL = "https://raw.githubusercontent.com/TrustsenseDev/MicroHub/main/loader.lua"},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
+}
+
+for _, script in ipairs(DRScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Dead Rails", script.Name.." carregado")
+        end
+    end, DeadRailsContent)
+end
+
+-- ABA PET SIMULATOR
+CreateDivider("Auto Farm", PetSimContent)
 
 local PSScripts = {
-    {Name = "Project WD", URL = "https://raw.githubusercontent.com/Muhammad6196/Project-WD/main/loader.lua"},
+    {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/main/loader.lua"},
+    {Name = "Project WD", URL = "https://raw.githubusercontent.com/Muhammad6196/Tests/main/wd_Arise/loader.lua"},
     {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/psx.lua"}
 }
 
 for _, script in ipairs(PSScripts) do
     CreateButton(script.Name, function()
         if SafeLoad(script.URL) then
-            Notify("Pet Sim 99", script.Name.." carregado")
+            Notify("Pet Simulator 99", script.Name.." carregado")
         end
     end, PetSimContent)
 end
 
--- ABA BLADE BALL (SISTEMA ATUALIZADO)
-CreateDivider("Hacks Blade Ball", BladeBallContent)
+-- ABA BLADE BALL
+CreateDivider("Hacks", BladeBallContent)
 
 local BBScripts = {
-    {Name = "Auto Parry", URL = "https://raw.githubusercontent.com/XNEOFF/BladeBallScript/main/BladeBall.lua"},
+    {Name = "Auto Parry", URL = "https://nicuse.xyz/MainHub.lua"},
+    {Name = "Soluna Hub", URL = "https://raw.githubusercontent.com/Patheticcs/Soluna-API/main/bladeball.lua"},
+    {Name = "XNEOFF Script", URL = "https://raw.githubusercontent.com/XNEOFF/BladeBallScript/main/BladeBall.lua"},
     {Name = "Aimbot", URL = "https://raw.githubusercontent.com/DocYogurt/BladeBall/main/Aimbot.lua"}
 }
 
 for _, script in ipairs(BBScripts) do
     CreateButton(script.Name, function()
         if SafeLoad(script.URL) then
-            Notify("Blade Ball", script.Name.." ativado")
+            Notify("Blade Ball", script.Name.." carregado")
         end
     end, BladeBallContent)
 end
 
--- ABA FORSAKEN (CORREÇÕES APLICADAS)
-CreateDivider("Forsaken Hacks", ForsakenContent)
+-- ABA HUBS
+CreateDivider("Hubs Premium", HubsContent)
+
+local HubScripts = {
+    {Name = "Tomato Hub", URL = "https://pastebin.com/raw/jpx7sKJe"},
+    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"},
+    {Name = "K00p Hub", URL = "https://pastebin.com/raw/aMtQRfDA"}
+}
+
+for _, script in ipairs(HubScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Hubs", script.Name.." carregado")
+        end
+    end, HubsContent)
+end
+
+-- ABA BUILD A BOAT
+CreateDivider("Build a Boat", BuildBoatContent)
+
+local BuildBoatScripts = {
+    {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
+    {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
+    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}
+}
+
+for _, script in ipairs(BuildBoatScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Build a Boat", script.Name.." carregado")
+        end
+    end, BuildBoatContent)
+end
+
+-- ABA NINJA LEGENDS
+CreateDivider("Ninja Legends", NinjaLegendsContent)
+
+local NinjaLegendsScripts = {
+    {Name = "Zerpqe Hub", URL = "https://raw.githubusercontent.com/zerpqe/script/main/NinjaLegends.lua"},
+    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/AppleScript001/Ninjas_Legends/main/README.md"},
+    {Name = "Venture Hub", URL = "https://raw.githubusercontent.com/NukeVsCity/TheALLHACKLoader/main/NukeLoader"}
+}
+
+for _, script in ipairs(NinjaLegendsScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Ninja Legends", script.Name.." carregado")
+        end
+    end, NinjaLegendsContent)
+end
+
+-- ABA FORSAKEN
+CreateDivider("Forsaken", ForsakenContent)
 
 local ForsakenScripts = {
-    {Name = "Rift Hub", URL = "https://raw.githubusercontent.com/Rift-Hub/Rift-Hub/main/loader.lua"},
-    {Name = "ESP e Stamina", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/Forsaken/main/ESP.lua"}
+    {Name = "Rift Hub", URL = "https://rifton.top/loader.lua"},
+    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/SilkScripts/AppleStuff/refs/heads/main/AppleFSKV2"},
+    {Name = "Esp, stamina ifn e etc", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"},
+    {Name = "Rift Hub (Alt)", URL = "https://raw.githubusercontent.com/Rift-Hub/Rift-Hub/main/loader.lua"}
 }
 
 for _, script in ipairs(ForsakenScripts) do
@@ -413,17 +542,34 @@ for _, script in ipairs(ForsakenScripts) do
     end, ForsakenContent)
 end
 
--- ABA THE MIMIC (LINK CORRIGIDO)
-CreateDivider("The Mimic Hacks", TheMimicContent)
+-- ABA MM2 (Murder Mystery 2)
+CreateDivider("Murder Mystery 2", MM2Content)
+
+local MM2Scripts = {
+    {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
+    {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
+    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}
+}
+
+for _, script in ipairs(MM2Scripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("MM2", script.Name.." carregado")
+        end
+    end, MM2Content)
+end
+
+-- ABA THE MIMIC
+CreateDivider("The Mimic", TheMimicContent)
 
 local TheMimicScripts = {
-    {Name = "Mimic OP", URL = "https://raw.githubusercontent.com/Yumiara/FlowRewrite/main/Mimic.lua"}
+    {Name = "Mimic OP", URL = "https://raw.githubusercontent.com/Yumiara/FlowRewrite/refs/heads/main/Mimic.lua"}
 }
 
 for _, script in ipairs(TheMimicScripts) do
     CreateButton(script.Name, function()
         if SafeLoad(script.URL) then
-            Notify("The Mimic", "Hacks ativados!")
+            Notify("The Mimic", script.Name.." carregado")
         end
     end, TheMimicContent)
 end
@@ -543,8 +689,11 @@ Notify("Robloki Hub Premium V4.2", "Hub carregado com sucesso!\n15 abas disponí
 
 -- Verificação de atualização
 spawn(function()
-    local latestVersion = game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
-    if latestVersion ~= "V4.2" then
+    local success, latestVersion = pcall(function()
+        return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
+    end)
+    
+    if success and latestVersion ~= "V4.2" then
         Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
     end
 end)

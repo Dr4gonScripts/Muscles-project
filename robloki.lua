@@ -1,5 +1,5 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa
+  🐉 Robloki Hub Premium - Versão Completa V4.0
   Abas incluídas:
     - Universal
     - Blox Fruits
@@ -11,6 +11,11 @@
     - Pet Simulator
     - Blade Ball
     - Hubs Gerais
+    - Build a Boat
+    - Ninja Legends
+    - Forsaken
+    - Murder Mystery 2
+    - The Mimic
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -77,7 +82,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "ROBLOKI HUB PREMIUM"
+Title.Text = "ROBLOKI HUB PREMIUM V4.0"
 Title.TextColor3 = Theme.Text
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 14
@@ -113,7 +118,7 @@ TabScrollingFrame.Size = UDim2.new(1, 0, 0, 30)
 TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
 TabScrollingFrame.BackgroundTransparency = 1
 TabScrollingFrame.ScrollBarThickness = 0
-TabScrollingFrame.CanvasSize = UDim2.new(2, 0, 0, 30)
+TabScrollingFrame.CanvasSize = UDim2.new(2.25, 0, 0, 30) -- Ajustado para mais abas
 TabScrollingFrame.Parent = MainFrame
 
 -- ===== FUNÇÕES AUXILIARES =====
@@ -218,6 +223,11 @@ local DeadRailsTab = CreateTab("Dead Rails", UDim2.new(0.9, 0, 0, 0))
 local PetSimTab = CreateTab("Pet Sim", UDim2.new(1.05, 0, 0, 0))
 local BladeBallTab = CreateTab("Blade Ball", UDim2.new(1.2, 0, 0, 0))
 local HubsTab = CreateTab("Hubs", UDim2.new(1.35, 0, 0, 0))
+local BuildBoatTab = CreateTab("Build Boat", UDim2.new(1.5, 0, 0, 0))
+local NinjaLegendsTab = CreateTab("Ninja Legends", UDim2.new(1.65, 0, 0, 0))
+local ForsakenTab = CreateTab("Forsaken", UDim2.new(1.8, 0, 0, 0))
+local MM2Tab = CreateTab("MM2", UDim2.new(1.95, 0, 0, 0))
+local TheMimicTab = CreateTab("The Mimic", UDim2.new(2.1, 0, 0, 0))
 
 -- Criar conteúdos para cada aba
 local UniversalContent = CreateContentFrame("UniversalContent")
@@ -230,6 +240,11 @@ local DeadRailsContent = CreateContentFrame("DeadRailsContent")
 local PetSimContent = CreateContentFrame("PetSimContent")
 local BladeBallContent = CreateContentFrame("BladeBallContent")
 local HubsContent = CreateContentFrame("HubsContent")
+local BuildBoatContent = CreateContentFrame("BuildBoatContent")
+local NinjaLegendsContent = CreateContentFrame("NinjaLegendsContent")
+local ForsakenContent = CreateContentFrame("ForsakenContent")
+local MM2Content = CreateContentFrame("MM2Content")
+local TheMimicContent = CreateContentFrame("TheMimicContent")
 
 -- ===== CONTEÚDO DAS ABAS =====
 
@@ -331,9 +346,9 @@ end
 CreateDivider("Hacks", DeadRailsContent)
 
 local DRScripts = {
-    {Name = "Dead Rails OP", URL = "https://raw.githubusercontent.com/m00ndiety/Stillwater/refs/heads/main/obf_Prisonteleport.lua.txt"},
-    {Name = "Zephyr Hub", URL = "https://raw.githubusercontent.com/Unknownlodfc/Zephyr/refs/heads/main/DeadRails/Main"}
-    {Name = "Micro Hub", URL = "https://raw.githubusercontent.com/TrustsenseDev/MicroHub/refs/heads/main/loader.lua"}
+    {Name = "Dead Rails OP", URL = "https://raw.githubusercontent.com/m00ndiety/Stillwater/main/obf_Prisonteleport.lua.txt"},
+    {Name = "Zephyr Hub", URL = "https://raw.githubusercontent.com/Unknownlodfc/Zephyr/main/DeadRails/Main"},
+    {Name = "Micro Hub", URL = "https://raw.githubusercontent.com/TrustsenseDev/MicroHub/main/loader.lua"},
     {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
 }
 
@@ -348,7 +363,7 @@ end
 CreateDivider("Auto Farm", PetSimContent)
 
 local PSScripts = {
-    {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/refs/heads/main/loader.lua"},
+    {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/main/loader.lua"},
     {Name = "Project WD", URL = "https://raw.githubusercontent.com/Muhammad6196/Tests/main/wd_Arise/loader.lua"}
 }
 
@@ -364,7 +379,7 @@ CreateDivider("Hacks", BladeBallContent)
 
 local BBScripts = {
     {Name = "Auto Parry", URL = "https://nicuse.xyz/MainHub.lua"},
-    {Name = "Soluna Hub", URL = "https://raw.githubusercontent.com/Patheticcs/Soluna-API/refs/heads/main/bladeball.lua"}
+    {Name = "Soluna Hub", URL = "https://raw.githubusercontent.com/Patheticcs/Soluna-API/main/bladeball.lua"}
 }
 
 for _, script in ipairs(BBScripts) do
@@ -379,7 +394,7 @@ CreateDivider("Hubs Premium", HubsContent)
 
 local HubScripts = {
     {Name = "Tomato Hub", URL = "https://pastebin.com/raw/jpx7sKJe"},
-    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"}
+    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"},
     {Name = "K00p Hub", URL = "https://pastebin.com/raw/aMtQRfDA"}
 }
 
@@ -388,6 +403,90 @@ for _, script in ipairs(HubScripts) do
         loadstring(game:HttpGet(script.URL))()
         Notify("Hubs", script.Name.." carregado")
     end, HubsContent)
+end
+
+-- ABA BUILD A BOAT
+CreateDivider("Build a Boat", BuildBoatContent)
+
+local BuildBoatScripts = {
+    {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
+    {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
+    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}
+}
+
+for _, script in ipairs(BuildBoatScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Build a Boat", script.Name.." carregado")
+    end, BuildBoatContent)
+end
+
+-- ABA NINJA LEGENDS
+CreateDivider("Ninja Legends", NinjaLegendsContent)
+
+local NinjaLegendsScripts = {
+    {Name = "Zerpqe Hub", URL = "https://raw.githubusercontent.com/zerpqe/script/main/NinjaLegends.lua"},
+    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/AppleScript001/Ninjas_Legends/main/README.md"},
+    {Name = "Venture Hub", URL = "https://raw.githubusercontent.com/NukeVsCity/TheALLHACKLoader/main/NukeLoader"}
+}
+
+for _, script in ipairs(NinjaLegendsScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Ninja Legends", script.Name.." carregado")
+    end, NinjaLegendsContent)
+end
+
+-- ABA FORSAKEN
+CreateDivider("Forsaken", ForsakenContent)
+
+local ForsakenScripts = {
+    {Name = "Rift Hub", URL = "https://rifton.top/loader.lua"},
+    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/SilkScripts/AppleStuff/refs/heads/main/AppleFSKV2},
+    {Name = "Esp, stamina ifn e etc", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"}
+}
+
+for _, script in ipairs(ForsakenScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("Forsaken", script.Name.." carregado")
+    end, ForsakenContent)
+end
+
+-- ABA MM2 (Murder Mystery 2)
+CreateDivider("Murder Mystery 2", MM2Content)
+
+local MM2Scripts = {
+    {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
+    {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
+    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}
+}
+
+for _, script in ipairs(MM2Scripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("MM2", script.Name.." carregado")
+    end, MM2Content)
+end
+
+-- ABA THE MIMIC
+CreateDivider("The Mimic", TheMimicContent)
+
+local TheMimicScripts = {
+    {Name = "Mimic OP", URL = "getgenv().LoaderSettings = {
+    AllowThemeEdit = false;
+    AllowGraphicsEditor = false;
+    AllowMusic = true;
+};
+
+https://raw.githubusercontent.com/Yumiara/FlowRewrite/refs/heads/main/Main.FCinsoticularisolnialkavoltPxcloudfile"},
+}
+
+for _, script in ipairs(TheMimicScripts) do
+    CreateButton(script.Name, function()
+        loadstring(game:HttpGet(script.URL))()
+        Notify("The Mimic", script.Name.." carregado")
+    end, TheMimicContent)
 end
 
 -- ===== CONTROLES DA INTERFACE =====
@@ -400,13 +499,15 @@ local function SwitchTab(selectedTab)
     local tabs = {
         UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
         MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
-        BladeBallTab, HubsTab
+        BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
+        ForsakenTab, MM2Tab, TheMimicTab
     }
     
     local contents = {
         UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
         MusclesContent, BlueLockContent, DeadRailsContent, PetSimContent,
-        BladeBallContent, HubsContent
+        BladeBallContent, HubsContent, BuildBoatContent, NinjaLegendsContent,
+        ForsakenContent, MM2Content, TheMimicContent
     }
     
     for i, tab in ipairs(tabs) do
@@ -426,6 +527,11 @@ DeadRailsTab.MouseButton1Click:Connect(function() SwitchTab(DeadRailsTab) end)
 PetSimTab.MouseButton1Click:Connect(function() SwitchTab(PetSimTab) end)
 BladeBallTab.MouseButton1Click:Connect(function() SwitchTab(BladeBallTab) end)
 HubsTab.MouseButton1Click:Connect(function() SwitchTab(HubsTab) end)
+BuildBoatTab.MouseButton1Click:Connect(function() SwitchTab(BuildBoatTab) end)
+NinjaLegendsTab.MouseButton1Click:Connect(function() SwitchTab(NinjaLegendsTab) end)
+ForsakenTab.MouseButton1Click:Connect(function() SwitchTab(ForsakenTab) end)
+MM2Tab.MouseButton1Click:Connect(function() SwitchTab(MM2Tab) end)
+TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
 
 -- Configurar fechamento e minimização
 CloseButton.MouseButton1Click:Connect(function()
@@ -439,4 +545,4 @@ end)
 
 -- Iniciar com a aba Universal
 SwitchTab(UniversalTab)
-Notify("Robloki Hub Premium V3.0", "Hub carregado com sucesso!", 5)
+Notify("Robloki Hub Premium V4.0", "Todas as 15 abas carregadas com sucesso!", 5)

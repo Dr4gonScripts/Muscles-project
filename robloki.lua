@@ -1,11 +1,10 @@
 --[[
   🐉 Robloki Hub Premium - Versão Completa Otimizada V4.3
   Atualizações:
-  - Todos os scripts originais restaurados
-  - Sistema anti-detecção aprimorado
-  - Interface mais fluida
-  - Correção de todos os erros de sintaxe
-  - 15 abas completas com todos os scripts originais
+  - Todos os botões e abas restaurados
+  - Emojis decorativos adicionados
+  - Interface mais atraente
+  - Correção de bugs de visibilidade
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -112,28 +111,28 @@ MinimizeButton.Font = Enum.Font.GothamBold
 MinimizeButton.TextSize = 16
 MinimizeButton.Parent = TitleBar
 
--- Barra de abas com rolagem suave (MODIFICADO)
+-- Barra de abas com rolagem suave
 local TabScrollingFrame = Instance.new("ScrollingFrame")
 TabScrollingFrame.Size = UDim2.new(1, 0, 0, 35)
 TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
 TabScrollingFrame.BackgroundTransparency = 1
 TabScrollingFrame.ScrollBarThickness = 3
 TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
-TabScrollingFrame.CanvasSize = UDim2.new(3.5, 0, 0, 35)  -- Aumentado para caber todas as abas
-TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X  -- Ajuste automático
+TabScrollingFrame.CanvasSize = UDim2.new(3.5, 0, 0, 35)
+TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
 TabScrollingFrame.Parent = MainFrame
 
--- Layout para organizar as abas horizontalmente
+-- Layout para organizar as abas
 local TabListLayout = Instance.new("UIListLayout")
 TabListLayout.Padding = UDim2.new(0, 5)
 TabListLayout.FillDirection = Enum.FillDirection.Horizontal
 TabListLayout.Parent = TabScrollingFrame
 
 -- ===== SISTEMA DE ABAS ATUALIZADO =====
-local function CreateTab(name)
+local function CreateTab(name, emoji)
     local tab = Instance.new("TextButton")
-    tab.Text = name
-    tab.Size = UDim2.new(0.12, 0, 0.8, 0)  -- Tamanho ajustado
+    tab.Text = emoji.." "..name.." "..emoji
+    tab.Size = UDim2.new(0.12, 0, 0.8, 0)
     tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
@@ -263,23 +262,22 @@ local function CreateDivider(text, parent)
     return divider
 end
 
--- ===== CRIAÇÃO DAS ABAS =====
--- Criar abas (simplificado com o novo sistema)
-local UniversalTab = CreateTab("Universal")
-local BloxFruitsTab = CreateTab("Blox Fruits")
-local GrowGardenTab = CreateTab("Grow Garden")
-local ArsenalTab = CreateTab("Arsenal")
-local MusclesTab = CreateTab("Muscles")
-local BlueLockTab = CreateTab("Blue Lock")
-local DeadRailsTab = CreateTab("Dead Rails")
-local PetSimTab = CreateTab("Pet Sim")
-local BladeBallTab = CreateTab("Blade Ball")
-local HubsTab = CreateTab("Hubs")
-local BuildBoatTab = CreateTab("Build Boat")
-local NinjaLegendsTab = CreateTab("Ninja Legends")
-local ForsakenTab = CreateTab("Forsaken")
-local MM2Tab = CreateTab("MM2")
-local TheMimicTab = CreateTab("The Mimic")
+-- ===== CRIAÇÃO DAS ABAS COM EMOJIS =====
+local UniversalTab = CreateTab("Universal", "🌐")
+local BloxFruitsTab = CreateTab("Blox Fruits", "🍊")
+local GrowGardenTab = CreateTab("Grow Garden", "🌱")
+local ArsenalTab = CreateTab("Arsenal", "🔫")
+local MusclesTab = CreateTab("Muscles", "💪")
+local BlueLockTab = CreateTab("Blue Lock", "⚽")
+local DeadRailsTab = CreateTab("Dead Rails", "🚂")
+local PetSimTab = CreateTab("Pet Sim", "🐾")
+local BladeBallTab = CreateTab("Blade Ball", "🔪")
+local HubsTab = CreateTab("Hubs", "🧩")
+local BuildBoatTab = CreateTab("Build Boat", "⛵")
+local NinjaLegendsTab = CreateTab("Ninja Legends", "🥷")
+local ForsakenTab = CreateTab("Forsaken", "👻")
+local MM2Tab = CreateTab("MM2", "🔪")
+local TheMimicTab = CreateTab("The Mimic", "👹")
 
 -- Criar conteúdos para cada aba
 local UniversalContent = CreateContentFrame("UniversalContent")
@@ -691,7 +689,7 @@ AntiDetection()
 
 -- ===== INICIALIZAÇÃO =====
 SwitchTab(UniversalTab)
-Notify("Robloki Hub Premium V4.2", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+Notify("Robloki Hub Premium V4.3", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
 -- Verificação de atualização
 spawn(function()

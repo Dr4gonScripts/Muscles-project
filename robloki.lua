@@ -174,10 +174,10 @@ local function CreateContentFrame(name)
     layout.Padding = UDim.new(0, 8)
     layout.Parent = frame
     
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 5)
-    padding.PaddingLeft = UDim.new(0.05, 0)
-    padding.Parent = frame
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 5)
+padding.PaddingLeft = UDim.new(0, 10)  -- Alterado para UDim com valor fixo
+padding.Parent = frame
     
     return frame
 end

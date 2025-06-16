@@ -1,11 +1,12 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.2
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.4
   Atualizações:
   - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
   - Interface mais fluida
   - Correção de todos os erros de sintaxe
   - 15 abas completas com todos os scripts originais
+  - Sistema de rolagem automático nas abas
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -82,7 +83,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.2 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.4 🐉"
 Title.TextColor3 = Theme.Accent
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
@@ -112,28 +113,41 @@ MinimizeButton.Font = Enum.Font.GothamBold
 MinimizeButton.TextSize = 16
 MinimizeButton.Parent = TitleBar
 
--- Barra de abas com rolagem suave
+-- Barra de abas com rolagem automática
 local TabScrollingFrame = Instance.new("ScrollingFrame")
 TabScrollingFrame.Size = UDim2.new(1, 0, 0, 35)
 TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
 TabScrollingFrame.BackgroundTransparency = 1
 TabScrollingFrame.ScrollBarThickness = 3
 TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
-TabScrollingFrame.CanvasSize = UDim2.new(2.25, 0, 0, 35)
+TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
+TabScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.X
 TabScrollingFrame.Parent = MainFrame
 
+-- Layout para organização automática das abas
+local TabListLayout = Instance.new("UIListLayout")
+TabListLayout.FillDirection = Enum.FillDirection.Horizontal
+TabListLayout.Padding = UDim.new(0, 5)
+TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabListLayout.Parent = TabScrollingFrame
+
+-- Atualizar CanvasSize automaticamente
+TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, 35)
+end)
+
 -- ===== SISTEMA DE ABAS ATUALIZADO =====
-local function CreateTab(name, position)
+local function CreateTab(name)
     local tab = Instance.new("TextButton")
     tab.Text = name
     tab.Size = UDim2.new(0.15, 0, 0.8, 0)
-    tab.Position = position
     tab.AnchorPoint = Vector2.new(0, 0.5)
     tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
     tab.TextSize = 12
     tab.TextWrapped = true
+    tab.LayoutOrder = #TabScrollingFrame:GetChildren()
     tab.Parent = TabScrollingFrame
     
     local corner = Instance.new("UICorner")
@@ -259,21 +273,21 @@ local function CreateDivider(text, parent)
 end
 
 -- ===== CRIAÇÃO DAS ABAS =====
-local UniversalTab = CreateTab("Universal", UDim2.new(0, 5, 0.5, 0))
-local BloxFruitsTab = CreateTab("Blox Fruits", UDim2.new(0.16, 0, 0.5, 0))
-local GrowGardenTab = CreateTab("Grow Garden", UDim2.new(0.31, 0, 0.5, 0))
-local ArsenalTab = CreateTab("Arsenal", UDim2.new(0.46, 0, 0.5, 0))
-local MusclesTab = CreateTab("Muscles", UDim2.new(0.61, 0, 0.5, 0))
-local BlueLockTab = CreateTab("Blue Lock", UDim2.new(0.76, 0, 0.5, 0))
-local DeadRailsTab = CreateTab("Dead Rails", UDim2.new(0.91, 0, 0.5, 0))
-local PetSimTab = CreateTab("Pet Sim", UDim2.new(1.06, 0, 0.5, 0))
-local BladeBallTab = CreateTab("Blade Ball", UDim2.new(1.21, 0, 0.5, 0))
-local HubsTab = CreateTab("Hubs", UDim2.new(1.36, 0, 0.5, 0))
-local BuildBoatTab = CreateTab("Build Boat", UDim2.new(1.51, 0, 0.5, 0))
-local NinjaLegendsTab = CreateTab("Ninja Legends", UDim2.new(1.66, 0, 0.5, 0))
-local ForsakenTab = CreateTab("Forsaken", UDim2.new(1.81, 0, 0.5, 0))
-local MM2Tab = CreateTab("MM2", UDim2.new(1.96, 0, 0.5, 0))
-local TheMimicTab = CreateTab("The Mimic", UDim2.new(2.11, 0, 0.5, 0))
+local UniversalTab = CreateTab("Universal")
+local BloxFruitsTab = CreateTab("Blox Fruits")
+local GrowGardenTab = CreateTab("Grow Garden")
+local ArsenalTab = CreateTab("Arsenal")
+local MusclesTab = CreateTab("Muscles")
+local BlueLockTab = CreateTab("Blue Lock")
+local DeadRailsTab = CreateTab("Dead Rails")
+local PetSimTab = CreateTab("Pet Sim")
+local BladeBallTab = CreateTab("Blade Ball")
+local HubsTab = CreateTab("Hubs")
+local BuildBoatTab = CreateTab("Build Boat")
+local NinjaLegendsTab = CreateTab("Ninja Legends")
+local ForsakenTab = CreateTab("Forsaken")
+local MM2Tab = CreateTab("MM2")
+local TheMimicTab = CreateTab("The Mimic")
 
 -- Criar conteúdos para cada aba
 local UniversalContent = CreateContentFrame("UniversalContent")
@@ -693,7 +707,7 @@ spawn(function()
         return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
     end)
     
-    if success and latestVersion ~= "V4.2" then
+    if success and latestVersion ~= "V4.4" then
         Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
     end
 end)

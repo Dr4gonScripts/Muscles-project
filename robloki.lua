@@ -57,106 +57,98 @@ local function SafeLoad(url)
 end
 
 -- ===== CONSTRUÇÃO DA INTERFACE =====
--- ===== CONSTRUÇÃO DA INTERFACE (VERSÃO DEFINITIVA) =====
+-- Detecção de dispositivo
+local isMobile = game:GetService("UserInputService").TouchEnabled
+local screenSize = workspace.CurrentCamera.ViewportSize
 
--- Detecção segura de dispositivo
-local isMobile
-pcall(function()
-    isMobile = game:GetService("UserInputService").TouchEnabled
-end)
-isMobile = isMobile == true -- Garante que seja booleano
-
--- Configurações dinâmicas com fallback seguro
-local frameWidth = isMobile and 0.85 or 0.35  -- 85% no mobile / 35% no PC
-local frameHeight = isMobile and 0.75 or 0.55 -- 75% no mobile / 55% no PC
+-- Configurações dinâmicas
+local frameWidth = isMobile and 0.9 or 0.35  -- 90% da tela no mobile / 35% no PC
+local frameHeight = isMobile and 0.7 or 0.5  -- 70% no mobile / 50% no PC
 local framePosition = isMobile and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0.05, 0, 0.25, 0)
 
--- Frame principal com proteção contra erros
+-- Frame principal responsivo
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(
-    math.clamp(frameWidth, 0.3, 0.9), 
-    0, 
-    math.clamp(frameHeight, 0.4, 0.8), 
-    0
-)
+MainFrame.Size = UDim2.new(frameWidth, 0, frameHeight, 0)
 MainFrame.Position = framePosition
-MainFrame.AnchorPoint = isMobile and Vector2.new(0.5, 0.5) or Vector2.new(0, 0)
+MainFrame.AnchorPoint = isMobile and Vector2.new(0.5, 0.5) or Vector2.new(0, 0)  -- Centraliza no mobile
 MainFrame.BackgroundColor3 = Theme.Background
-MainFrame.BackgroundTransparency = 0.15
+MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 
--- Efeitos visuais (com valores seguros)
+-- Efeitos visuais atualizados
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.CornerRadius = UDim.new(0, 8)
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
 UIStroke.Color = Theme.Primary
-UIStroke.Thickness = isMobile and 2.5 or 2
+UIStroke.Thickness = 2
 UIStroke.Parent = MainFrame
 
--- Barra de título otimizada
+-- Barra de título premium (ajustada para mobile)
 local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, isMobile and 42 or 32)
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+TitleBar.Size = UDim2.new(1, 0, 0, isMobile and 40 or 30)  -- Mais alta no mobile
+TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
 TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
 Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.4 🐉"
 Title.TextColor3 = Theme.Accent
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = isMobile and 17 or 14
-Title.Size = UDim2.new(0.75, 0, 1, 0)
-Title.Position = UDim2.new(0.125, 0, 0, 0)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = isMobile and 16 or 14  -- Texto maior no mobile
+Title.Size = UDim2.new(0.7, 0, 1, 0)
+Title.Position = UDim2.new(0.15, 0, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Parent = TitleBar
 
--- Botões de controle otimizados
-local controlButtonSize = isMobile and 38 or 30
-local closeButton = Instance.new("TextButton")
-closeButton.Text = "✕"
-closeButton.Size = UDim2.new(0, controlButtonSize, 0, controlButtonSize)
-closeButton.Position = UDim2.new(1, -controlButtonSize-5, 0, 0)
-closeButton.BackgroundColor3 = Theme.Error
-closeButton.TextColor3 = Color3.new(1,1,1)
-closeButton.Font = Enum.Font.GothamBlack
-closeButton.TextSize = isMobile and 20 or 16
-closeButton.Parent = TitleBar
+-- Botões de controle atualizados (maiores no mobile)
+local buttonSize = isMobile and 40 or 30
+local buttonPosX = isMobile and -45 or -35
 
--- Barra de abas com rolagem suave
-local tabScrollFrame = Instance.new("ScrollingFrame")
-tabScrollFrame.Size = UDim2.new(1, 0, 0, isMobile and 44 or 36)
-tabScrollFrame.Position = UDim2.new(0, 0, 0, TitleBar.Size.Y.Offset)
-tabScrollFrame.BackgroundTransparency = 1
-tabScrollFrame.ScrollBarThickness = isMobile and 5 or 3
-tabScrollFrame.ScrollBarImageColor3 = Theme.Secondary
-tabScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
-tabScrollFrame.Parent = MainFrame
+local CloseButton = Instance.new("TextButton")
+CloseButton.Text = "✕"
+CloseButton.Size = UDim2.new(0, buttonSize, 0, buttonSize)
+CloseButton.Position = UDim2.new(1, buttonPosX, 0, 0)
+CloseButton.BackgroundColor3 = Theme.Error
+CloseButton.TextColor3 = Theme.Text
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = isMobile and 18 or 16
+CloseButton.Parent = TitleBar
 
--- Sistema de notificação seguro
-local function SafeNotify()
-    local deviceInfo = string.format("%s %s",
-        isMobile and "📱" or "💻",
-        isMobile and "MOBILE" or "PC"
-    )
-    
-    local uiSizeInfo = string.format("%d%% × %d%%",
-        math.floor(frameWidth * 100),
-        math.floor(frameHeight * 100)
-    )
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Text = "─"
+MinimizeButton.Size = UDim2.new(0, buttonSize, 0, buttonSize)
+MinimizeButton.Position = UDim2.new(1, buttonPosX * 2, 0, 0)
+MinimizeButton.BackgroundColor3 = Theme.Primary
+MinimizeButton.TextColor3 = Theme.Text
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextSize = isMobile and 18 or 16
+MinimizeButton.Parent = TitleBar
 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "ROBLOKI HUB INICIADO",
-        Text = deviceInfo.." | "..uiSizeInfo,
-        Duration = 5,
-        Icon = "rbxassetid://6726579484"
-    })
-end
+-- Barra de abas com rolagem automática (ajustada para mobile)
+local TabScrollingFrame = Instance.new("ScrollingFrame")
+TabScrollingFrame.Size = UDim2.new(1, 0, 0, isMobile and 45 or 35)  -- Mais alta no mobile
+TabScrollingFrame.Position = UDim2.new(0, 0, 0, isMobile and 40 or 30)
+TabScrollingFrame.BackgroundTransparency = 1
+TabScrollingFrame.ScrollBarThickness = isMobile and 6 or 3  -- Barra mais grossa no mobile
+TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
+TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
+TabScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.X
+TabScrollingFrame.Parent = MainFrame
 
--- Chame a notificação após a UI estar pronta
-task.defer(SafeNotify)
+-- Layout para organização automática das abas
+local TabListLayout = Instance.new("UIListLayout")
+TabListLayout.FillDirection = Enum.FillDirection.Horizontal
+TabListLayout.Padding = UDim.new(0, isMobile and 8 or 5)  -- Mais espaçamento no mobile
+TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabListLayout.Parent = TabScrollingFrame
+
+-- Atualizar CanvasSize automaticamente
+TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, isMobile and 45 or 35)
+end)
 -- ===== SISTEMA DE ABAS ATUALIZADO =====
 local function CreateTab(name)
     local tab = Instance.new("TextButton")

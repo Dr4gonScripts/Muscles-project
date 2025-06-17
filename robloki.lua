@@ -149,6 +149,17 @@ TabListLayout.Parent = TabScrollingFrame
 TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, isMobile and 45 or 35)
 end)
+
+-- === ADICIONE A NOTIFICAÇÃO AQUI === --
+Notify(
+    "🐉 Robloki Hub Premium",
+    string.format("Dispositivo: %s\nTamanho da UI: %dx%d", 
+        isMobile and "Mobile" or "PC", 
+        math.floor(frameWidth * 100).."%", 
+        math.floor(frameHeight * 100).."%"
+    ), 
+    5
+)
 -- ===== SISTEMA DE ABAS ATUALIZADO =====
 local function CreateTab(name)
     local tab = Instance.new("TextButton")

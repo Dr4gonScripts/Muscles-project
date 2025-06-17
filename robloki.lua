@@ -151,12 +151,13 @@ TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 end)
 
 -- === ADICIONE A NOTIFICAÇÃO AQUI === --
+-- Notificação corrigida (versão segura)
 Notify(
     "🐉 Robloki Hub Premium",
-    string.format("Dispositivo: %s\nTamanho da UI: %dx%d", 
+    string.format("Dispositivo: %s\nTamanho da UI: %sx%s", 
         isMobile and "Mobile" or "PC", 
-        math.floor(frameWidth * 100).."%", 
-        math.floor(frameHeight * 100).."%"
+        tostring(math.floor(frameWidth * 100)).."%", 
+        tostring(math.floor(frameHeight * 100)).."%"
     ), 
     5
 )

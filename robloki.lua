@@ -601,6 +601,7 @@ local BrainrotScripts = {
     {Name = "Tora Hub", URL = "https://raw.githubusercontent.com/gumanba/Scripts/main/StealaBrainrotMOD"},
     {Name = "Arbix Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/nabaruBrainrot"},
     {Name = "Moskvv Hub", URL = "https://raw.githubusercontent.com/forkT3/Steal-a-Brianrot/main/Steal-A-Brianrot.lua"},
+    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/main/Script%20Brainrot"},
 }
 
 for _, script in ipairs(BrainrotScripts) do

@@ -1,5 +1,5 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.4
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.5
   Atualizações:
   - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
@@ -83,7 +83,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.4 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.5 🐉"
 Title.TextColor3 = Theme.Accent
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
@@ -288,6 +288,9 @@ local NinjaLegendsTab = CreateTab("Ninja Legends")
 local ForsakenTab = CreateTab("Forsaken")
 local MM2Tab = CreateTab("MM2")
 local TheMimicTab = CreateTab("The Mimic")
+local BrainrotTab = CreateTab("Roube Brainrot")
+local BrookhavenTab = CreateTab("Brookhaven")
+
 
 -- Criar conteúdos para cada aba
 local UniversalContent = CreateContentFrame("UniversalContent")
@@ -305,6 +308,8 @@ local NinjaLegendsContent = CreateContentFrame("NinjaLegendsContent")
 local ForsakenContent = CreateContentFrame("ForsakenContent")
 local MM2Content = CreateContentFrame("MM2Content")
 local TheMimicContent = CreateContentFrame("TheMimicContent")
+local BrainrotContent = CreateContentFrame("BrainrotContent")
+local BrookhavenContent = CreateContentFrame("BrookhavenContent")
 
 -- ===== CONTEÚDO DAS ABAS COMPLETO =====
 
@@ -589,20 +594,56 @@ for _, script in ipairs(TheMimicScripts) do
     end, TheMimicContent)
 end
 
+-- ABA ROUBE UM BRAINROT
+CreateDivider("Scripts Brainrot", BrainrotContent)
+
+local BrainrotScripts = {
+    {Name = "Tora Hub", URL = "https://raw.githubusercontent.com/gumanba/Scripts/main/StealaBrainrotMOD"},
+    {Name = "Arbix Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/nabaruBrainrot"},
+    {Name = "Moskvv Hub", URL = "https://raw.githubusercontent.com/forkT3/Steal-a-Brianrot/main/Steal-A-Brianrot.lua"},
+}
+
+for _, script in ipairs(BrainrotScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Brainrot", script.Name.." carregado!")
+        end
+    end, BrainrotContent)
+end
+
+-- Aba brookhaven
+
+-- ABA BROOKHAVEN
+CreateDivider("Hacks Brookhaven", BrookhavenContent)
+
+local BrookhavenScripts = {
+    {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
+    {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
+    {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
+}
+
+for _, script in ipairs(BrookhavenScripts) do
+    CreateButton(script.Name, function()
+        if SafeLoad(script.URL) then
+            Notify("Brookhaven", script.Name.." carregado!")
+        end
+    end, BrookhavenContent)
+end
+
 -- ===== SISTEMA DE ABAS =====
 local function SwitchTab(selectedTab)
     local tabs = {
         UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
         MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
         BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
-        ForsakenTab, MM2Tab, TheMimicTab
+        ForsakenTab, MM2Tab, TheMimicTab, BrainrotTab, BrookhavenTab
     }
     
     local contents = {
         UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
         MusclesContent, BlueLockContent, DeadRailsContent, PetSimContent,
         BladeBallContent, HubsContent, BuildBoatContent, NinjaLegendsContent,
-        ForsakenContent, MM2Content, TheMimicContent
+        ForsakenContent, MM2Content, TheMimicContent, BrainrotContent, BrookhavenContent
     }
     
     for i, tab in ipairs(tabs) do
@@ -635,6 +676,8 @@ NinjaLegendsTab.MouseButton1Click:Connect(function() SwitchTab(NinjaLegendsTab) 
 ForsakenTab.MouseButton1Click:Connect(function() SwitchTab(ForsakenTab) end)
 MM2Tab.MouseButton1Click:Connect(function() SwitchTab(MM2Tab) end)
 TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
+BrainrotTab.MouseButton1Click:Connect(function() SwitchTab(BrainrotTab) end)
+BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
 
 -- ===== CONTROLES DA INTERFACE =====
 local minimized = false
@@ -700,7 +743,7 @@ AntiDetection()
 
 -- ===== INICIALIZAÇÃO =====
 SwitchTab(UniversalTab)
-Notify("Robloki Hub Premium V4.2", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+Notify("Robloki Hub Premium V4.5", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
 -- Verificação de atualização
 spawn(function()
@@ -708,7 +751,7 @@ spawn(function()
         return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
     end)
     
-    if success and latestVersion ~= "V4.4" then
+    if success and latestVersion ~= "V4.5" then
         Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
     end
 end)

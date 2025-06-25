@@ -1055,37 +1055,61 @@ game:GetService("UserInputService").InputChanged:Connect(UpdateInput)
 
 -- ===== PROTEÇÃO CONTRA DETECÇÃO =====
 local function AntiDetection()
-    -- Randomizar identificadores
-    if not getgenv then 
-        getgenv = function() 
-            return setmetatable({}, {__index = _G}) 
-        end 
-    end
-    
-    -- Ambiente falso mais robusto
-    getgenv().secureMode = true
-    getgenv().__index = nil
-    getgenv().__newindex = nil
-    
-    -- Nomes aleatórios
-    local randomNames = {
-        ["Instance"] = "Inst"..math.random(100,999),
-        ["new"] = "create"..math.random(10,99),
-        ["Script"] = "Scr"..math.random(1000,9999),
-        ["HttpGet"] = "Get"..math.random(100,999)
-    }
-    
-    for original, newName in pairs(randomNames) do
-        if not getgenv()[newName] then
-            getgenv()[newName] = getgenv()[original]
+    -- Verificar se getgenv existe, caso contrário criar uma versão simulada
+    if type(getgenv) ~= "function" then
+        getgenv = function()
+            local env = {}
+            local mt = {
+                __index = _G,
+                __newindex = function(t, k, v)
+                    rawset(env, k, v)
+                end
+            }
+            return setmetatable(env, mt)
         end
     end
     
-    -- Proteção adicional
-    debug.setupvalue = nil
-    getfenv = nil
+    -- Criar ambiente falso seguro
+    local secureEnv = getgenv()
+    
+    -- Adicionar algumas proteções básicas
+    secureEnv.secureMode = true
+    
+    -- Randomizar nomes de funções (versão segura)
+    local function RandomizeName(base)
+        return base.."_"..math.random(1000,9999).."_"..string.char(math.random(97,122))
+    end
+    
+    -- Nomes alternativos para funções comuns
+    secureEnv[RandomizeName("Instance")] = Instance
+    secureEnv[RandomizeName("new")] = function(...) return Instance.new(...) end
+    secureEnv[RandomizeName("Script")] = script
+    
+    -- Proteções adicionais (sem tentar anular funções protegidas)
+    secureEnv.debug = nil
+    secureEnv.getfenv = nil
+    secureEnv.setfenv = nil
+    
+    -- Métodos alternativos para requisições
+    secureEnv[RandomizeName("HttpGet")] = function(url)
+        local attempts = {
+            function() return game:HttpGet(url, true) end,
+            function() return game:HttpGet(url.."?bypass="..tostring(math.random(1,9999)), true) end
+        }
+        
+        for _, attempt in ipairs(attempts) do
+            local success, result = pcall(attempt)
+            if success then return result end
+        end
+        return ""
+    end
 end
-AntiDetection()
+
+-- Chamar a função de proteção
+local success, err = pcall(AntiDetection)
+if not success then
+    warn("AntiDetection falhou: "..tostring(err))
+end
 
 -- ===== INICIALIZAÇÃO =====
 SwitchTab(InicioTab)

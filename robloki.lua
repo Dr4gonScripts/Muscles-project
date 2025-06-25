@@ -37,18 +37,41 @@ local function Notify(title, text, duration)
     })
 end
 
--- Carregador seguro de scripts
+-- Carregador seguro de scripts AVANÇADO
 local function SafeLoad(url)
     local success, response = pcall(function()
-        local content = game:HttpGet(url, true)
-        if content:find("404") or content:find("Not Found") then
-            error("Script não encontrado (404)")
+        -- Tenta múltiplos métodos para carregar
+        local content
+        local attempts = {
+            function() return game:HttpGet(url, true) end,
+            function() return game:HttpGet(url.."?bypass="..tostring(math.random(1,9999)), true) end,
+            function() return game:HttpGet(url:gsub("https://", "http://"), true) end
+        }
+        
+        for _, attempt in ipairs(attempts) do
+            local ok, result = pcall(attempt)
+            if ok and result and not (result:find("404") or result:find("Not Found")) then
+                content = result
+                break
+            end
         end
+        
+        if not content then error("Falha ao carregar conteúdo") end
+        
+        -- Verificação básica de segurança
+        if content:find("while true do end") then
+            error("Loop infinito detectado no script")
+        end
+        
         return content
     end)
     
     if success then
-        loadstring(response)()
+        local loadSuccess, err = pcall(loadstring(response))
+        if not loadSuccess then
+            Notify("Erro", "Erro ao executar: "..tostring(err), 5)
+            return false
+        end
         return true
     else
         Notify("Erro", "Falha ao carregar: "..tostring(response), 5)
@@ -361,7 +384,7 @@ local BFScripts = {
     {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
     {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
     {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"},
-    {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/Mukuro.lua"},
+    {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/MukuroV2.lua"},
     {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/bf.lua"}
 }
 
@@ -395,7 +418,7 @@ CreateDivider("Hacks", ArsenalContent)
 local ArsenalScripts = {
     {Name = "Soluna Hub", URL = "https://soluna-script.vercel.app/arsenal.lua"},
     {Name = "Aether hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/main/Arsenal"},
-    {Name = "Vynixius", URL = "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Arsenal.lua"},
+    {Name = "Vynixius", URL = "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Arsenal/Arsenal.lua"},
     {Name = "Aim Assist", URL = "https://raw.githubusercontent.com/DocYogurt/Arsenal/main/ArsenalAimbot.lua"}
 }
 
@@ -464,7 +487,7 @@ CreateDivider("Auto Farm", PetSimContent)
 local PSScripts = {
     {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/main/loader.lua"},
     {Name = "Project WD", URL = "https://raw.githubusercontent.com/Muhammad6196/Tests/main/wd_Arise/loader.lua"},
-    {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/psx.lua"}
+    {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/psx.lua?token="..math.random(1,9999)},
 }
 
 for _, script in ipairs(PSScripts) do
@@ -723,23 +746,36 @@ game:GetService("UserInputService").InputChanged:Connect(UpdateInput)
 
 -- ===== PROTEÇÃO CONTRA DETECÇÃO =====
 local function AntiDetection()
-    if not getgenv then getgenv = function() return _G end end
-    getgenv().secureMode = true
+    -- Randomizar identificadores
+    if not getgenv then 
+        getgenv = function() 
+            return setmetatable({}, {__index = _G}) 
+        end 
+    end
     
-    -- Ofuscar nomes
-    local obfuscated = {
-        ["Instance"] = "Inst",
-        ["new"] = "create",
-        ["Script"] = "Scr"
+    -- Ambiente falso mais robusto
+    getgenv().secureMode = true
+    getgenv().__index = nil
+    getgenv().__newindex = nil
+    
+    -- Nomes aleatórios
+    local randomNames = {
+        ["Instance"] = "Inst"..math.random(100,999),
+        ["new"] = "create"..math.random(10,99),
+        ["Script"] = "Scr"..math.random(1000,9999),
+        ["HttpGet"] = "Get"..math.random(100,999)
     }
     
-    for original, obfuscated in pairs(obfuscated) do
-        if not getgenv()[obfuscated] then
-            getgenv()[obfuscated] = getgenv()[original]
+    for original, newName in pairs(randomNames) do
+        if not getgenv()[newName] then
+            getgenv()[newName] = getgenv()[original]
         end
     end
+    
+    -- Proteção adicional
+    debug.setupvalue = nil
+    getfenv = nil
 end
-
 AntiDetection()
 
 -- ===== INICIALIZAÇÃO =====

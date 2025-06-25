@@ -1,5 +1,5 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.5
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.7
   Atualizações:
   - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
@@ -106,7 +106,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.5 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.7 🐉"
 Title.TextColor3 = Theme.Accent
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
@@ -780,7 +780,7 @@ AntiDetection()
 
 -- ===== INICIALIZAÇÃO =====
 SwitchTab(UniversalTab)
-Notify("Robloki Hub Premium V4.5", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+Notify("Robloki Hub Premium V4.7", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
 -- Verificação de atualização
 spawn(function()
@@ -788,7 +788,7 @@ spawn(function()
         return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
     end)
     
-    if success and latestVersion ~= "V4.5" then
+    if success and latestVersion ~= "V4.7" then
         Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
     end
 end)

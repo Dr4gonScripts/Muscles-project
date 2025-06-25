@@ -296,6 +296,7 @@ local function CreateDivider(text, parent)
 end
 
 -- ===== CRIAÇÃO DAS ABAS =====
+local InicioTab = CreateTab("Inicio")
 local UniversalTab = CreateTab("Universal")
 local BloxFruitsTab = CreateTab("Blox Fruits")
 local GrowGardenTab = CreateTab("Grow Garden")
@@ -316,6 +317,7 @@ local BrookhavenTab = CreateTab("Brookhaven")
 
 
 -- Criar conteúdos para cada aba
+local InicioContent = CreateContentFrame("InicioContent")
 local UniversalContent = CreateContentFrame("UniversalContent")
 local BloxFruitsContent = CreateContentFrame("BloxFruitsContent")
 local GrowGardenContent = CreateContentFrame("GrowGardenContent")
@@ -336,6 +338,333 @@ local BrookhavenContent = CreateContentFrame("BrookhavenContent")
 
 -- ===== CONTEÚDO DAS ABAS COMPLETO =====
 
+-- ABA INICIO
+-- Adicionar a aba no início da lista (antes da Universal)
+InicioTab.LayoutOrder = 0
+UniversalTab.LayoutOrder = 1
+
+-- Frame do perfil do jogador
+local ProfileFrame = Instance.new("Frame")
+ProfileFrame.Size = UDim2.new(0.9, 0, 0, 120)
+ProfileFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+ProfileFrame.Parent = InicioContent
+
+local UICornerProfile = Instance.new("UICorner")
+UICornerProfile.CornerRadius = UDim.new(0, 8)
+UICornerProfile.Parent = ProfileFrame
+
+-- Avatar do jogador
+local PlayerThumbnail = Instance.new("ImageLabel")
+PlayerThumbnail.Size = UDim2.new(0, 80, 0, 80)
+PlayerThumbnail.Position = UDim2.new(0, 15, 0, 15)
+PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+PlayerThumbnail.BorderSizePixel = 0
+PlayerThumbnail.Parent = ProfileFrame
+
+local UICornerThumb = Instance.new("UICorner")
+UICornerThumb.CornerRadius = UDim.new(0, 8)
+UICornerThumb.Parent = PlayerThumbnail
+
+-- Carregar thumbnail do jogador
+local userId = Player.UserId
+local thumbType = Enum.ThumbnailType.HeadShot
+local thumbSize = Enum.ThumbnailSize.Size420x420
+
+game:GetService("Players"):GetUserThumbnailAsync(userId, thumbType, thumbSize, function(content)
+    PlayerThumbnail.Image = content
+end)
+
+-- Informações do jogador
+local PlayerName = Instance.new("TextLabel")
+PlayerName.Text = Player.Name
+PlayerName.TextColor3 = Theme.Accent
+PlayerName.Font = Enum.Font.GothamBold
+PlayerName.TextSize = 18
+PlayerName.TextXAlignment = Enum.TextXAlignment.Left
+PlayerName.BackgroundTransparency = 1
+PlayerName.Size = UDim2.new(0.6, 0, 0, 25)
+PlayerName.Position = UDim2.new(0, 110, 0, 20)
+PlayerName.Parent = ProfileFrame
+
+local PlayerId = Instance.new("TextLabel")
+PlayerId.Text = "ID: "..userId
+PlayerId.TextColor3 = Theme.Text
+PlayerId.Font = Enum.Font.Gotham
+PlayerId.TextSize = 14
+PlayerId.TextXAlignment = Enum.TextXAlignment.Left
+PlayerId.BackgroundTransparency = 1
+PlayerId.Size = UDim2.new(0.6, 0, 0, 20)
+PlayerId.Position = UDim2.new(0, 110, 0, 45)
+PlayerId.Parent = ProfileFrame
+
+local GameName = Instance.new("TextLabel")
+GameName.Text = "Jogo: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+GameName.TextColor3 = Theme.Text
+GameName.Font = Enum.Font.Gotham
+GameName.TextSize = 14
+GameName.TextXAlignment = Enum.TextXAlignment.Left
+GameName.BackgroundTransparency = 1
+GameName.Size = UDim2.new(0.8, 0, 0, 20)
+GameName.Position = UDim2.new(0, 110, 0, 70)
+GameName.TextTruncate = Enum.TextTruncate.AtEnd
+GameName.Parent = ProfileFrame
+
+-- Barra de pesquisa
+local SearchBar = Instance.new("TextBox")
+SearchBar.Size = UDim2.new(0.9, 0, 0, 35)
+SearchBar.Position = UDim2.new(0.05, 0, 0, 130)
+SearchBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+SearchBar.TextColor3 = Theme.Text
+SearchBar.Font = Enum.Font.Gotham
+SearchBar.TextSize = 14
+SearchBar.PlaceholderText = "Pesquisar scripts (ex: Tomato Hub)"
+SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 180)
+SearchBar.Text = ""
+SearchBar.Parent = InicioContent
+
+local UICornerSearch = Instance.new("UICorner")
+UICornerSearch.CornerRadius = UDim.new(0, 6)
+UICornerSearch.Parent = SearchBar
+
+local SearchIcon = Instance.new("ImageLabel")
+SearchIcon.Size = UDim2.new(0, 20, 0, 20)
+SearchIcon.Position = UDim2.new(1, -30, 0.5, -10)
+SearchIcon.BackgroundTransparency = 1
+SearchIcon.Image = "rbxassetid://3926305904"
+SearchIcon.ImageRectOffset = Vector2.new(964, 324)
+SearchIcon.ImageRectSize = Vector2.new(36, 36)
+SearchIcon.Parent = SearchBar
+
+-- Frame de resultados
+local ResultsFrame = Instance.new("ScrollingFrame")
+ResultsFrame.Size = UDim2.new(0.9, 0, 0.5, -180)
+ResultsFrame.Position = UDim2.new(0.05, 0, 0, 180)
+ResultsFrame.BackgroundTransparency = 1
+ResultsFrame.ScrollBarThickness = 5
+ResultsFrame.ScrollBarImageColor3 = Theme.Primary
+ResultsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ResultsFrame.Parent = InicioContent
+
+local ResultsLayout = Instance.new("UIListLayout")
+ResultsLayout.Padding = UDim.new(0, 8)
+ResultsLayout.Parent = ResultsFrame
+
+-- Atualizar tamanho do canvas
+ResultsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, ResultsLayout.AbsoluteContentSize.Y)
+end)
+
+-- Função de pesquisa avançada
+local function SearchScripts(query)
+    -- Limpar resultados anteriores
+    for _, child in ipairs(ResultsFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+    
+    if query == "" then return end
+    
+    -- Coletar todos os scripts de todas as abas
+    local allScripts = {}
+    
+    -- Função para adicionar scripts de uma aba
+    local function AddScriptsFromContent(contentFrame, category)
+        for _, child in ipairs(contentFrame:GetChildren()) do
+            if child:IsA("TextButton") and child.Text ~= "" then
+                table.insert(allScripts, {
+                    Name = child.Text,
+                    Category = category,
+                    Callback = child.MouseButton1Click
+                })
+            end
+        end
+    end
+    
+    -- Adicionar scripts de todas as abas
+    AddScriptsFromContent(UniversalContent, "Universal")
+    AddScriptsFromContent(BloxFruitsContent, "Blox Fruits")
+    AddScriptsFromContent(GrowGardenContent, "Grow Garden")
+    AddScriptsFromContent(ArsenalContent, "Arsenal")
+    AddScriptsFromContent(MusclesContent, "Muscles Legends")
+    AddScriptsFromContent(BlueLockContent, "Blue Lock")
+    AddScriptsFromContent(DeadRailsContent, "Dead Rails")
+    AddScriptsFromContent(PetSimContent, "Pet Simulator")
+    AddScriptsFromContent(BladeBallContent, "Blade Ball")
+    AddScriptsFromContent(HubsContent, "Hubs")
+    AddScriptsFromContent(BuildBoatContent, "Build Boat")
+    AddScriptsFromContent(NinjaLegendsContent, "Ninja Legends")
+    AddScriptsFromContent(ForsakenContent, "Forsaken")
+    AddScriptsFromContent(MM2Content, "Murder Mystery 2")
+    AddScriptsFromContent(TheMimicContent, "The Mimic")
+    AddScriptsFromContent(BrainrotContent, "Roube Brainrot")
+    AddScriptsFromContent(BrookhavenContent, "Brookhaven")
+    
+    -- Ordenar por relevância (quanto mais parecido, maior a pontuação)
+    local scoredScripts = {}
+    query = query:lower()
+    
+    for _, script in ipairs(allScripts) do
+        local nameLower = script.Name:lower()
+        local score = 0
+        
+        -- Verificar correspondência exata
+        if nameLower == query then
+            score = 100
+        -- Verificar se começa com a query
+        elseif nameLower:sub(1, #query) == query then
+            score = 80
+        -- Verificar se contém a query
+        elseif nameLower:find(query, 1, true) then
+            score = 50 + (#query / #nameLower * 30)
+        -- Verificar similaridade (busca difusa)
+        else
+            -- Algoritmo simples de similaridade
+            local matches = 0
+            for i = 1, #query do
+                if nameLower:find(query:sub(i, i), 1, true) then
+                    matches = matches + 1
+                end
+            end
+            score = (matches / #query) * 40
+        end
+        
+        if score > 20 then
+            table.insert(scoredScripts, {
+                Name = script.Name,
+                Category = script.Category,
+                Callback = script.Callback,
+                Score = score
+            })
+        end
+    end
+    
+    -- Ordenar por pontuação
+    table.sort(scoredScripts, function(a, b)
+        return a.Score > b.Score
+    end)
+    
+    -- Mostrar resultados (máximo 15)
+    local maxResults = math.min(15, #scoredScripts)
+    
+    if maxResults == 0 then
+        local noResults = Instance.new("TextLabel")
+        noResults.Text = "Nenhum resultado encontrado para: '"..query.."'"
+        noResults.TextColor3 = Theme.Text
+        noResults.Font = Enum.Font.Gotham
+        noResults.TextSize = 14
+        noResults.BackgroundTransparency = 1
+        noResults.Size = UDim2.new(1, 0, 0, 30)
+        noResults.Parent = ResultsFrame
+    else
+        for i = 1, maxResults do
+            local script = scoredScripts[i]
+            
+            local resultButton = Instance.new("TextButton")
+            resultButton.Text = script.Name
+            resultButton.Size = UDim2.new(1, 0, 0, 40)
+            resultButton.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+            resultButton.TextColor3 = Theme.Text
+            resultButton.Font = Enum.Font.Gotham
+            resultButton.TextSize = 14
+            resultButton.TextXAlignment = Enum.TextXAlignment.Left
+            resultButton.Parent = ResultsFrame
+            
+            local categoryLabel = Instance.new("TextLabel")
+            categoryLabel.Text = "Categoria: "..script.Category
+            categoryLabel.TextColor3 = Theme.Secondary
+            categoryLabel.Font = Enum.Font.Gotham
+            categoryLabel.TextSize = 12
+            categoryLabel.BackgroundTransparency = 1
+            categoryLabel.Size = UDim2.new(0.5, 0, 0, 15)
+            categoryLabel.Position = UDim2.new(0, 10, 0, 20)
+            categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+            categoryLabel.Parent = resultButton
+            
+            local padding = Instance.new("UIPadding")
+            padding.PaddingLeft = UDim.new(0, 10)
+            padding.Parent = resultButton
+            
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 6)
+            corner.Parent = resultButton
+            
+            resultButton.MouseButton1Click:Connect(function()
+                -- Fechar a aba atual e abrir a aba relevante
+                ResultsFrame.Visible = false
+                SearchBar.Text = ""
+                
+                -- Chamar a função original do script
+                pcall(script.Callback)
+                
+                -- Mostrar em qual aba está o script
+                Notify("Pesquisa", "Script encontrado na aba: "..script.Category, 3)
+            end)
+            
+            resultButton.MouseEnter:Connect(function()
+                game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
+                    BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+                }):Play()
+            end)
+            
+            resultButton.MouseLeave:Connect(function()
+                game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
+                    BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+                }):Play()
+            end)
+        end
+    end
+end
+
+-- Conectar eventos de pesquisa
+SearchBar.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        SearchScripts(SearchBar.Text)
+    end
+end)
+
+SearchBar:GetPropertyChangedSignal("Text"):Connect(function()
+    if SearchBar.Text == "" then
+        -- Limpar resultados quando a pesquisa estiver vazia
+        for _, child in ipairs(ResultsFrame:GetChildren()) do
+            if child:IsA("TextButton") or child:IsA("TextLabel") then
+                child:Destroy()
+            end
+        end
+    end
+end)
+
+-- Adicionar dica de pesquisa
+local SearchHint = Instance.new("TextLabel")
+SearchHint.Text = "Digite o nome de um script e pressione Enter para pesquisar"
+SearchHint.TextColor3 = Color3.fromRGB(150, 150, 180)
+SearchHint.Font = Enum.Font.Gotham
+SearchHint.TextSize = 12
+SearchHint.BackgroundTransparency = 1
+SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
+SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
+SearchHint.Parent = InicioContent
+
+-- Conectar a aba Início ao sistema de abas
+InicioTab.MouseButton1Click:Connect(function() SwitchTab(InicioTab) end)
+
+-- Atualizar a ordem das abas para colocar Início primeiro
+local function ReorderTabs()
+    local tabs = {
+        InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
+        MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
+        BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
+        ForsakenTab, MM2Tab, TheMimicTab, BrainrotTab, BrookhavenTab
+    }
+    
+    for i, tab in ipairs(tabs) do
+        tab.LayoutOrder = i-1
+    end
+end
+ReorderTabs()
+
+-- Definir a aba Início como padrão ao abrir
+SwitchTab(InicioTab)
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
 

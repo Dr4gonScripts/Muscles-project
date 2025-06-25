@@ -644,26 +644,6 @@ SearchHint.BackgroundTransparency = 1
 SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
 SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
 SearchHint.Parent = InicioContent
-
--- Conectar a aba Início ao sistema de abas
-InicioTab.MouseButton1Click:Connect(function() SwitchTab(InicioTab) end)
-
--- Atualizar a ordem das abas para colocar Início primeiro
-local function ReorderTabs()
-    local tabs = {
-        InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
-        MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
-        BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
-        ForsakenTab, MM2Tab, TheMimicTab, BrainrotTab, BrookhavenTab
-    }
-    
-    for i, tab in ipairs(tabs) do
-        tab.LayoutOrder = i-1
-    end
-end
-ReorderTabs()
-
-
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
@@ -985,14 +965,14 @@ end
 -- ===== SISTEMA DE ABAS =====
 local function SwitchTab(selectedTab)
     local tabs = {
-        UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
+        InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
         MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
         BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
         ForsakenTab, MM2Tab, TheMimicTab, BrainrotTab, BrookhavenTab
     }
     
     local contents = {
-        UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
+        InicioContent, UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
         MusclesContent, BlueLockContent, DeadRailsContent, PetSimContent,
         BladeBallContent, HubsContent, BuildBoatContent, NinjaLegendsContent,
         ForsakenContent, MM2Content, TheMimicContent, BrainrotContent, BrookhavenContent
@@ -1013,6 +993,7 @@ local function SwitchTab(selectedTab)
 end
 
 -- Conectar eventos das abas
+InicioTab.MouseButton1Click:Connect(function() SwitchTab(InicioTab) end)
 UniversalTab.MouseButton1Click:Connect(function() SwitchTab(UniversalTab) end)
 BloxFruitsTab.MouseButton1Click:Connect(function() SwitchTab(BloxFruitsTab) end)
 GrowGardenTab.MouseButton1Click:Connect(function() SwitchTab(GrowGardenTab) end)

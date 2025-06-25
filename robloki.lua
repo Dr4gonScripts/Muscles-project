@@ -80,8 +80,12 @@ local function SafeLoad(url)
 end
 
 -- ===== CONSTRUÇÃO DA INTERFACE =====
+-- Definir os dois tamanhos
+local smallSize = UDim2.new(0.35, 0, 0.5, 0)
+local largeSize = UDim2.new(0.6, 0, 0.8, 0)  -- Tamanho aumentado
+
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0.35, 0, 0.5, 0)
+MainFrame.Size = smallSize  -- Começa com o tamanho pequeno
 MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BackgroundTransparency = 0.1
@@ -157,6 +161,92 @@ TabListLayout.Parent = TabScrollingFrame
 -- Atualizar CanvasSize automaticamente
 TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, 35)
+end)
+
+-- Variáveis para controle de estado
+local minimized = false
+local isSmallSize = true  -- Começa com o tamanho pequeno
+local relativePosition = {X = 0.05, Y = 0.25}  -- Posição inicial relativa
+
+-- Função para ajustar a posição ao mudar de tamanho
+local function AdjustPosition()
+    local viewportSize = workspace.CurrentCamera.ViewportSize
+    local newX = relativePosition.X * viewportSize.X - (MainFrame.AbsoluteSize.X / 2)
+    local newY = relativePosition.Y * viewportSize.Y - (MainFrame.AbsoluteSize.Y / 2)
+    
+    MainFrame.Position = UDim2.new(
+        0, math.clamp(newX, 0, viewportSize.X - MainFrame.AbsoluteSize.X),
+        0, math.clamp(newY, 0, viewportSize.Y - MainFrame.AbsoluteSize.Y)
+    )
+end
+
+-- Sistema de arrastar para mover a janela
+local dragging = false
+local dragStart, startPos
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        -- Salva a posição relativa
+        local viewportSize = workspace.CurrentCamera.ViewportSize
+        relativePosition = {
+            X = (startPos.X.Offset + MainFrame.AbsoluteSize.X/2) / viewportSize.X,
+            Y = (startPos.Y.Offset + MainFrame.AbsoluteSize.Y/2) / viewportSize.Y
+        }
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+TitleBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+        
+        -- Atualiza a posição relativa
+        local viewportSize = workspace.CurrentCamera.ViewportSize
+        relativePosition = {
+            X = (MainFrame.Position.X.Offset + MainFrame.AbsoluteSize.X/2) / viewportSize.X,
+            Y = (MainFrame.Position.Y.Offset + MainFrame.AbsoluteSize.Y/2) / viewportSize.Y
+        }
+    end
+end)
+
+-- Função do botão Minimizar
+MinimizeButton.MouseButton1Click:Connect(function()
+    if minimized then
+        -- Restaurar (alternar entre tamanhos)
+        MainFrame.Visible = true
+        if isSmallSize then
+            MainFrame.Size = largeSize
+            MinimizeButton.Text = "◄"  -- Ícone diferente para indicar que pode voltar ao pequeno
+        else
+            MainFrame.Size = smallSize
+            MinimizeButton.Text = "─"  -- Ícone padrão
+        end
+        isSmallSize = not isSmallSize
+        minimized = false
+        AdjustPosition()  -- Ajusta a posição após mudar o tamanho
+    else
+        -- Minimizar (esconder)
+        MainFrame.Visible = false
+        minimized = true
+        MinimizeButton.Text = "►"  -- Ícone para indicar que está minimizado
+    end
+    Notify("Robloki Hub", minimized and "Minimizado" or (isSmallSize and "Tamanho normal" or "Tamanho aumentado"), 1)
+end)
+
+-- Função do botão Fechar
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+    Notify("Robloki Hub", "Interface fechada", 1)
 end)
 
 -- ===== SISTEMA DE ABAS ATUALIZADO =====

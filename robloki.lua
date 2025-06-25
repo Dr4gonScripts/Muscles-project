@@ -663,8 +663,7 @@ local function ReorderTabs()
 end
 ReorderTabs()
 
--- Definir a aba Início como padrão ao abrir
-SwitchTab(InicioTab)
+
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
@@ -1108,7 +1107,7 @@ end
 AntiDetection()
 
 -- ===== INICIALIZAÇÃO =====
-SwitchTab(UniversalTab)
+SwitchTab(InicioTab)
 Notify("Robloki Hub Premium V4.7", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
 -- Verificação de atualização

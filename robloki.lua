@@ -1,5 +1,5 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V4.7
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
   Atualizações:
   - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
@@ -7,6 +7,7 @@
   - Correção de todos os erros de sintaxe
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
+  - Sistema de temas personalizáveis
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -26,6 +27,216 @@ local Theme = {
     Text = Color3.fromRGB(240, 240, 255),
     Error = Color3.fromRGB(255, 50, 50)
 }
+
+-- Função para aplicar o tema
+local function ApplyTheme()
+    -- Frame principal
+    if MainFrame then
+        MainFrame.BackgroundColor3 = Theme.Background
+        if UIStroke then UIStroke.Color = Theme.Primary end
+    end
+    
+    -- Barra de título
+    if TitleBar then
+        TitleBar.BackgroundColor3 = Color3.fromRGB(
+            math.clamp(Theme.Background.R * 255 + 5, 0, 255),
+            math.clamp(Theme.Background.G * 255 + 5, 0, 255),
+            math.clamp(Theme.Background.B * 255 + 5, 0, 255)
+        )
+    end
+    
+    -- Textos
+    if Title then Title.TextColor3 = Theme.Accent end
+    if PlayerName then PlayerName.TextColor3 = Theme.Accent end
+    if PlayerId then PlayerId.TextColor3 = Theme.Text end
+    if GameName then GameName.TextColor3 = Theme.Text end
+    if SearchHint then 
+        SearchHint.TextColor3 = Color3.fromRGB(
+            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
+        )
+    end
+    
+    -- Botões das abas
+    if TabScrollingFrame then
+        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+            if tab:IsA("TextButton") then
+                tab.BackgroundColor3 = Color3.fromRGB(
+                    math.clamp(Theme.Background.R * 255 + 25, 0, 255),
+                    math.clamp(Theme.Background.G * 255 + 25, 0, 255),
+                    math.clamp(Theme.Background.B * 255 + 25, 0, 255)
+                )
+                tab.TextColor3 = Theme.Text
+            end
+        end
+    end
+    
+    -- Botões de controle
+    if CloseButton then
+        CloseButton.BackgroundColor3 = Theme.Error
+        CloseButton.TextColor3 = Theme.Text
+    end
+    if MinimizeButton then
+        MinimizeButton.BackgroundColor3 = Theme.Primary
+        MinimizeButton.TextColor3 = Theme.Text
+    end
+    
+    -- Barra de pesquisa
+    if SearchBar then
+        SearchBar.BackgroundColor3 = Color3.fromRGB(
+            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
+            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
+            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
+        )
+        SearchBar.TextColor3 = Theme.Text
+        SearchBar.PlaceholderColor3 = Color3.fromRGB(
+            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
+        )
+    end
+    
+    -- Conteúdo das abas
+    if MainFrame then
+        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+            if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
+                for _, element in ipairs(contentFrame:GetChildren()) do
+                    if element:IsA("TextButton") then
+                        element.BackgroundColor3 = Color3.fromRGB(
+                            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
+                            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
+                            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
+                        )
+                        element.TextColor3 = Theme.Text
+                        
+                        local stroke = element:FindFirstChild("UIStroke")
+                        if stroke then stroke.Color = Theme.Primary end
+                    end
+                end
+            end
+        end
+    end
+end--[[
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
+  Atualizações:
+  - Todos os scripts originais restaurados
+  - Sistema anti-detecção aprimorado
+  - Interface mais fluida
+  - Correção de todos os erros de sintaxe
+  - 15 abas completas com todos os scripts originais
+  - Sistema de rolagem automático nas abas
+  - Sistema de temas personalizáveis
+]]
+
+local Player = game:GetService("Players").LocalPlayer
+local Mouse = Player:GetMouse()
+
+-- ===== CONFIGURAÇÃO INICIAL SEGURA =====
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- Tema modernizado
+local Theme = {
+    Background = Color3.fromRGB(15, 15, 25),
+    Primary = Color3.fromRGB(80, 50, 180),
+    Secondary = Color3.fromRGB(0, 150, 255),
+    Accent = Color3.fromRGB(200, 200, 255),
+    Text = Color3.fromRGB(240, 240, 255),
+    Error = Color3.fromRGB(255, 50, 50)
+}
+
+-- Função para aplicar o tema
+local function ApplyTheme()
+    -- Frame principal
+    if MainFrame then
+        MainFrame.BackgroundColor3 = Theme.Background
+        if UIStroke then UIStroke.Color = Theme.Primary end
+    end
+    
+    -- Barra de título
+    if TitleBar then
+        TitleBar.BackgroundColor3 = Color3.fromRGB(
+            math.clamp(Theme.Background.R * 255 + 5, 0, 255),
+            math.clamp(Theme.Background.G * 255 + 5, 0, 255),
+            math.clamp(Theme.Background.B * 255 + 5, 0, 255)
+        )
+    end
+    
+    -- Textos
+    if Title then Title.TextColor3 = Theme.Accent end
+    if PlayerName then PlayerName.TextColor3 = Theme.Accent end
+    if PlayerId then PlayerId.TextColor3 = Theme.Text end
+    if GameName then GameName.TextColor3 = Theme.Text end
+    if SearchHint then 
+        SearchHint.TextColor3 = Color3.fromRGB(
+            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
+        )
+    end
+    
+    -- Botões das abas
+    if TabScrollingFrame then
+        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+            if tab:IsA("TextButton") then
+                tab.BackgroundColor3 = Color3.fromRGB(
+                    math.clamp(Theme.Background.R * 255 + 25, 0, 255),
+                    math.clamp(Theme.Background.G * 255 + 25, 0, 255),
+                    math.clamp(Theme.Background.B * 255 + 25, 0, 255)
+                )
+                tab.TextColor3 = Theme.Text
+            end
+        end
+    end
+    
+    -- Botões de controle
+    if CloseButton then
+        CloseButton.BackgroundColor3 = Theme.Error
+        CloseButton.TextColor3 = Theme.Text
+    end
+    if MinimizeButton then
+        MinimizeButton.BackgroundColor3 = Theme.Primary
+        MinimizeButton.TextColor3 = Theme.Text
+    end
+    
+    -- Barra de pesquisa
+    if SearchBar then
+        SearchBar.BackgroundColor3 = Color3.fromRGB(
+            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
+            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
+            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
+        )
+        SearchBar.TextColor3 = Theme.Text
+        SearchBar.PlaceholderColor3 = Color3.fromRGB(
+            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
+            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
+        )
+    end
+    
+    -- Conteúdo das abas
+    if MainFrame then
+        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+            if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
+                for _, element in ipairs(contentFrame:GetChildren()) do
+                    if element:IsA("TextButton") then
+                        element.BackgroundColor3 = Color3.fromRGB(
+                            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
+                            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
+                            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
+                        )
+                        element.TextColor3 = Theme.Text
+                        
+                        local stroke = element:FindFirstChild("UIStroke")
+                        if stroke then stroke.Color = Theme.Primary end
+                    end
+                end
+            end
+        end
+    end
+end
 
 -- Função de notificação melhorada
 local function Notify(title, text, duration)
@@ -110,7 +321,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V4.7 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
 Title.TextColor3 = Theme.Accent
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
@@ -735,6 +946,52 @@ SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
 SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
 SearchHint.Parent = InicioContent
 
+CreateDivider("Temas do Hub", InicioContent)
+
+-- Botão Tema Normal
+CreateButton("Tema Normal (Padrão)", function()
+    Theme = {
+        Background = Color3.fromRGB(15, 15, 25),
+        Primary = Color3.fromRGB(80, 50, 180),
+        Secondary = Color3.fromRGB(0, 150, 255),
+        Accent = Color3.fromRGB(200, 200, 255),
+        Text = Color3.fromRGB(240, 240, 255),
+        Error = Color3.fromRGB(255, 50, 50)
+    }
+    ApplyTheme()
+    Notify("Tema", "Tema normal aplicado!", 2)
+end, InicioContent)
+
+-- Botão Tema Branco
+CreateButton("Tema Branco", function()
+    Theme = {
+        Background = Color3.fromRGB(240, 240, 245),
+        Primary = Color3.fromRGB(180, 180, 190),
+        Secondary = Color3.fromRGB(150, 150, 160),
+        Accent = Color3.fromRGB(50, 50, 60),
+        Text = Color3.fromRGB(30, 30, 40),
+        Error = Color3.fromRGB(200, 50, 50)
+    }
+    ApplyTheme()
+    Notify("Tema", "Tema branco aplicado!", 2)
+end, InicioContent)
+
+-- Botão Tema Azul
+CreateButton("Tema Azul", function()
+    Theme = {
+        Background = Color3.fromRGB(10, 20, 40),
+        Primary = Color3.fromRGB(0, 100, 255),
+        Secondary = Color3.fromRGB(0, 150, 255),
+        Accent = Color3.fromRGB(180, 220, 255),
+        Text = Color3.fromRGB(220, 240, 255),
+        Error = Color3.fromRGB(255, 50, 100)
+    }
+    ApplyTheme()
+    Notify("Tema", "Tema azul aplicado!", 2)
+end, InicioContent)
+
+
+
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
@@ -958,6 +1215,7 @@ CreateDivider("Forsaken", ForsakenContent)
 
 local ForsakenScripts = {
     {Name = "Rift Hub", URL = "https://rifton.top/loader.lua"},
+    {Name = "Funny Hub", URL = "https://pastefy.app/qNeSwq6A/raw"},
     {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/SilkScripts/AppleStuff/refs/heads/main/AppleFSKV2"},
     {Name = "Esp, stamina ifn e etc", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"},
     {Name = "Saryn Hub", URL = "https://raw.githubusercontent.com/Saiky988/Saryn-Hub/refs/heads/main/Saryn%Hub%Beta.lua"}
@@ -978,6 +1236,7 @@ local MM2Scripts = {
     {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
     {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
     {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}
+    {Name = "MM2 Hub", URL = "https://raw.githubusercontent.com/FOGOTY/mm2-piano-reborn/refs/heads/main/scr"}
 }
 
 for _, script in ipairs(MM2Scripts) do
@@ -1007,10 +1266,10 @@ end
 CreateDivider("Scripts Brainrot", BrainrotContent)
 
 local BrainrotScripts = {
-    {Name = "Tora Hub", URL = "https://raw.githubusercontent.com/gumanba/Scripts/main/StealaBrainrotMOD"},
-    {Name = "Arbix Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/nabaruBrainrot"},
-    {Name = "Moskvv Hub", URL = "https://raw.githubusercontent.com/forkT3/Steal-a-Brianrot/main/Steal-A-Brianrot.lua"},
-    {Name = "Ghost Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/main/Script%20Brainrot"},
+    {Name = "Lurk Hub-key:K82OFK1-2 ", URL = "https://raw.githubusercontent.com/egor2078f/casual-stock/refs/heads/main/Key.lua"},
+    {Name = "FadHen Hub", URL = "https://pastefy.app/X1AZGnOC/raw"},
+    {Name = "XxLegendsxX Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/nabaruBrainrot"},
+    {Name = "Sw1ft X Brainrot Hub", URL = "https://oreofdev.github.io/Sw1ftSync/Raw/SSXBr/"},
 }
 
 for _, script in ipairs(BrainrotScripts) do
@@ -1030,6 +1289,7 @@ local BrookhavenScripts = {
     {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
     {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
     {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
+    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"))()"},
 }
 
 for _, script in ipairs(BrookhavenScripts) do
@@ -1191,7 +1451,10 @@ end
 
 -- ===== INICIALIZAÇÃO =====
 SwitchTab(InicioTab)
-Notify("Robloki Hub Premium V4.7", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+
+-- ▼▼▼ CHAMAR ApplyTheme() AQUI PARA APLICAR O TEMA INICIAL ▼▼▼
+ApplyTheme()
 
 -- Verificação de atualização
 spawn(function()
@@ -1199,7 +1462,7 @@ spawn(function()
         return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
     end)
     
-    if success and latestVersion ~= "V4.7" then
+    if success and latestVersion ~= "V5.0" then
         Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
     end
 end)

@@ -9,6 +9,7 @@
   - Sistema de rolagem automático nas abas
   - Sistema de temas personalizáveis
   - CORREÇÃO CRÍTICA: Corrigido o bug onde os temas não se aplicavam devido a eventos de mouse.
+  - DIAGNÓSTICO: Adicionado logs detalhados para encontrar o problema da cor.
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -29,38 +30,47 @@ local Theme = {
     Error = Color3.fromRGB(255, 50, 50)
 }
 
--- Função para aplicar o tema (REVISADA E OTIMIZADA)
+-- Função para aplicar o tema (REVISADA E OTIMIZADA COM LOGS)
 local function ApplyTheme()
-    print("Aplicando o tema com a cor de fundo:", Theme.Background)
+    print("----- INICIANDO APLICAÇÃO DO TEMA -----")
+    print("Tema a ser aplicado:")
+    print("  Background:", tostring(Theme.Background))
+    print("  Primary:", tostring(Theme.Primary))
     
     -- Frame principal e seus componentes
-    if MainFrame then
+    if MainFrame and MainFrame:IsA("Frame") then
+        print("Aplicando cor ao MainFrame. Cor antes:", tostring(MainFrame.BackgroundColor3))
         MainFrame.BackgroundColor3 = Theme.Background
-        if UIStroke then UIStroke.Color = Theme.Primary end
+        print("Cor do MainFrame depois:", tostring(MainFrame.BackgroundColor3))
+        
+        if UIStroke and UIStroke:IsA("UIStroke") then
+            UIStroke.Color = Theme.Primary
+            print("Cor do UIStroke aplicada.")
+        end
+    else
+        warn("AVISO: MainFrame não encontrado ou inválido!")
     end
     
     -- Barra de título e seus componentes
-    if TitleBar then
+    if TitleBar and TitleBar:IsA("Frame") then
+        print("Aplicando cor à TitleBar. Cor antes:", tostring(TitleBar.BackgroundColor3))
         TitleBar.BackgroundColor3 = Theme.Background
-        Title.TextColor3 = Theme.Accent
-        PlayerName.TextColor3 = Theme.Accent
-        PlayerId.TextColor3 = Theme.Text
-        GameName.TextColor3 = Theme.Text
+        print("Cor da TitleBar depois:", tostring(TitleBar.BackgroundColor3))
+
+        if Title and Title:IsA("TextLabel") then Title.TextColor3 = Theme.Accent end
+        if PlayerName and PlayerName:IsA("TextLabel") then PlayerName.TextColor3 = Theme.Accent end
+        if PlayerId and PlayerId:IsA("TextLabel") then PlayerId.TextColor3 = Theme.Text end
+        if GameName and GameName:IsA("TextLabel") then GameName.TextColor3 = Theme.Text end
+    else
+        warn("AVISO: TitleBar não encontrado ou inválido!")
     end
     
     -- Botões de controle
-    if CloseButton then
-        CloseButton.BackgroundColor3 = Theme.Error
-        CloseButton.TextColor3 = Theme.Text
-    end
-    if MinimizeButton then
-        MinimizeButton.BackgroundColor3 = Theme.Primary
-        MinimizeButton.TextColor3 = Theme.Text
-    end
-    
+    if CloseButton and CloseButton:IsA("TextButton") then CloseButton.BackgroundColor3 = Theme.Error end
+    if MinimizeButton and MinimizeButton:IsA("TextButton") then MinimizeButton.BackgroundColor3 = Theme.Primary end
+
     -- Barra de pesquisa
-    if SearchBar then
-        -- Usando lerp para uma transição de cores mais suave
+    if SearchBar and SearchBar:IsA("TextBox") then
         SearchBar.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.1)
         SearchBar.TextColor3 = Theme.Text
         SearchBar.PlaceholderColor3 = Theme.Text:lerp(Theme.Background, 0.5)
@@ -68,10 +78,9 @@ local function ApplyTheme()
     end
     
     -- Abas
-    if TabScrollingFrame then
+    if TabScrollingFrame and TabScrollingFrame:IsA("ScrollingFrame") then
         for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
             if tab:IsA("TextButton") then
-                -- Cor de fundo da aba um pouco mais clara que o fundo geral
                 tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
                 tab.TextColor3 = Theme.Text
             end
@@ -79,17 +88,16 @@ local function ApplyTheme()
     end
     
     -- Conteúdo dos frames (botões)
-    if MainFrame then
+    if MainFrame and MainFrame:IsA("Frame") then
         for _, contentFrame in ipairs(MainFrame:GetChildren()) do
             if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
                 for _, element in ipairs(contentFrame:GetChildren()) do
                     if element:IsA("TextButton") then
-                        -- Cor de fundo dos botões um pouco mais clara que o fundo geral
                         element.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08)
                         element.TextColor3 = Theme.Text
                         local stroke = element:FindFirstChild("UIStroke")
                         if stroke then stroke.Color = Theme.Primary end
-                    elseif element:IsA("Frame") and element:FindFirstChildOfClass("TextLabel") then -- Divisor
+                    elseif element:IsA("Frame") then
                         local label = element:FindFirstChildOfClass("TextLabel")
                         if label then label.TextColor3 = Theme.Primary end
                         for _, line in ipairs(element:GetChildren()) do
@@ -103,11 +111,12 @@ local function ApplyTheme()
     
     -- Aplicar o tema na aba ativa novamente para garantir a cor correta
     if CurrentTab then
+        print("Aplicando tema na aba ativa novamente:", CurrentTab.Name)
         SwitchTab(CurrentTab)
     end
     
-    -- Pequeno atraso para garantir que a interface seja renderizada
-    task.wait(0.05)
+    task.wait(0.1)
+    print("----- APLICAÇÃO DO TEMA CONCLUÍDA -----")
 end
 
 -- Função de notificação melhorada
@@ -338,7 +347,7 @@ local function CreateTab(name)
     tab.Text = name
     tab.Size = UDim2.new(0.15, 0, 0.8, 0)
     tab.AnchorPoint = Vector2.new(0, 0.5)
-    tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60) -- Cor inicial, será definida pelo tema
+    tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15) -- Cor inicial dinâmica
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
     tab.TextSize = 12
@@ -352,12 +361,14 @@ local function CreateTab(name)
     
     -- Eventos de mouse para efeito de hover
     tab.MouseEnter:Connect(function()
+        print("MouseEnter na aba:", tab.Name, "- Iniciando tween para highlight.")
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
             BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.3) -- Highlight dinâmico
         }):Play()
     end)
     
     tab.MouseLeave:Connect(function()
+        print("MouseLeave na aba:", tab.Name, "- Iniciando tween para voltar à cor normal.")
         if not tab.Selected then
             game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
                 -- Retorna à cor do tema atual para a aba não selecionada
@@ -418,6 +429,7 @@ local function CreateButton(name, callback, parent)
     stroke.Parent = button
     
     button.MouseEnter:Connect(function()
+        print("MouseEnter:", button.Name, "- Iniciando tween para highlight.")
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
             -- Usa cores do tema atual para o hover
             BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.2),
@@ -426,6 +438,7 @@ local function CreateButton(name, callback, parent)
     end)
     
     button.MouseLeave:Connect(function()
+        print("MouseLeave:", button.Name, "- Iniciando tween para voltar à cor normal.")
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
             -- Retorna para a cor do tema atual
             BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08),

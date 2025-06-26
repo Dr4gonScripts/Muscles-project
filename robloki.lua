@@ -1,4 +1,4 @@
---[[
+  --[[
   🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
   Atualizações:
   - Todos os scripts originais restaurados
@@ -28,12 +28,11 @@ local Theme = {
     Error = Color3.fromRGB(255, 50, 50)
 }
 
--- Função para aplicar o tema
+-- Função para aplicar o tema (REVISADA)
 local function ApplyTheme()
     -- Frame principal
     if MainFrame then
         MainFrame.BackgroundColor3 = Theme.Background
-        -- A verificação `if UIStroke` garante que esta linha não cause um erro
         if UIStroke then UIStroke.Color = Theme.Primary end
     end
     
@@ -117,6 +116,11 @@ local function ApplyTheme()
                 end
             end
         end
+    end
+
+    -- Garante que o tema da aba ativa seja atualizado
+    if CurrentTab then
+        SwitchTab(CurrentTab)
     end
 end
 
@@ -360,6 +364,7 @@ local function CreateTab(name)
     corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = tab
     
+    -- Eventos de mouse para efeito de hover
     tab.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
             BackgroundColor3 = Color3.fromRGB(60, 60, 80)
@@ -367,13 +372,15 @@ local function CreateTab(name)
     end)
     
     tab.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-        }):Play()
+        if not tab.Selected then
+            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
+                BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            }):Play()
+        end
     end)
     
     tab.MouseButton1Click:Connect(function()
-        pcall(callback)
+        -- Não é mais necessário o pcall aqui, a chamada é no switch.
     end)
     
     return tab
@@ -929,8 +936,8 @@ CreateDivider("Auto Farm", GrowGardenContent)
 
 local GGScripts = {
     {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
-    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}, -- Vírgula adicionada aqui
-    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"}, -- Vírgula adicionada aqui
+    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"},
+    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"},
     {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true}
 }
 
@@ -964,9 +971,9 @@ end
 -- ABA MUSCLES LEGENDS (corrigida)
 local MLScripts = {
     {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"}, -- Vírgula adicionada aqui
+    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"},
     {Name = "Nova hub key:NovaHubRework", URL = "https://raw.githubusercontent.com/EncryptedV2/Free/refs/heads/main/Key%20System"},
-    {Name = "Doca hub Free", URL = "https://raw.githubusercontent.com/CAXAP26BKyCH/MuscleLegensOnTop/refs/heads/main/my"} -- Removida a duplicação
+    {Name = "Doca hub Free", URL = "https://raw.githubusercontent.com/CAXAP26BKyCH/MuscleLegensOnTop/refs/heads/main/my"}
 }
 
 for _, script in ipairs(MLScripts) do
@@ -982,7 +989,7 @@ CreateDivider("Auto Farm & Hacks", BlueLockContent)
 
 local BLScripts = {
     {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
-    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}, -- Vírgula adicionada aqui
+    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"},
     {Name = "Express Hub", URL = "https://api.luarmor.net/files/v3/loaders/d8824b23a4d9f2e0d62b4e69397d206b.lua"},
 }
 
@@ -998,8 +1005,8 @@ end
 CreateDivider("Hacks", DeadRailsContent)
 
 local DRScripts = {
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}, -- Vírgula adicionada aqui
-    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"}, -- Vírgula adicionada aqui
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"},
     {Name = "Ringta Hub", URL = "https://raw.githubusercontent.com/fjruie/RINGTADEADRAILS.github.io/refs/heads/main/UIRAILS.LUA"}
 }
 
@@ -1066,8 +1073,8 @@ CreateDivider("Build a Boat", BuildBoatContent)
 local BuildBoatScripts = {
     {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
-    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}, -- Vírgula adicionada aqui
-    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"}, -- Vírgula adicionada aqui
+    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"},
+    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Sem nome2", URL = "https://rawscripts.net/raw/Build-A-Boat-For-Treasure-BBFT-Script-24996"}
 }
 
@@ -1121,7 +1128,7 @@ CreateDivider("Murder Mystery 2", MM2Content)
 local MM2Scripts = {
     {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
     {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
-    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}, -- Vírgula adicionada aqui
+    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"},
     {Name = "MM2 Hub", URL = "https://raw.githubusercontent.com/FOGOTY/mm2-piano-reborn/refs/heads/main/scr"}
 }
 
@@ -1175,7 +1182,7 @@ local BrookhavenScripts = {
     {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
     {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
     {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
-    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"} -- A chamada `))` ao final da linha foi removida, pois não é sintaxe Lua válida.
+    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"}
 }
 
 for _, script in ipairs(BrookhavenScripts) do
@@ -1187,6 +1194,8 @@ for _, script in ipairs(BrookhavenScripts) do
 end
 
 -- ===== SISTEMA DE ABAS =====
+local CurrentTab = nil
+
 local function SwitchTab(selectedTab)
     local tabs = {
         InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
@@ -1201,17 +1210,21 @@ local function SwitchTab(selectedTab)
         BladeBallContent, HubsContent, BuildBoatContent, NinjaLegendsContent,
         ForsakenContent, MM2Content, TheMimicContent, BrainrotContent, BrookhavenContent
     }
+
+    CurrentTab = selectedTab
     
     for i, tab in ipairs(tabs) do
+        local content = contents[i]
         if tab == selectedTab then
+            -- Mudar a cor da aba selecionada
             tab.BackgroundColor3 = Theme.Primary
-            contents[i].Visible = true
-            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.2), {
-                BackgroundColor3 = Theme.Primary
-            }):Play()
+            tab.Selected = true
+            content.Visible = true
         else
+            -- Restaurar a cor das abas não selecionadas
             tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-            contents[i].Visible = false
+            tab.Selected = false
+            content.Visible = false
         end
     end
 end
@@ -1235,6 +1248,7 @@ MM2Tab.MouseButton1Click:Connect(function() SwitchTab(MM2Tab) end)
 TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
 BrainrotTab.MouseButton1Click:Connect(function() SwitchTab(BrainrotTab) end)
 BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
+
 
 -- ===== CONTROLES DA INTERFACE =====
 local minimized = false
@@ -1289,7 +1303,9 @@ local function AntiDetection()
                     rawset(env, k, v)
                 end
             }
-            return setmetatable(env, mt)
+            return setmetatable(env, mt, {
+                __metatable = false
+            })
         end
     end
     
@@ -1337,10 +1353,12 @@ end
 
 -- ===== INICIALIZAÇÃO =====
 -- Garante que todos os elementos da UI existam antes de serem manipulados
-task.wait(1) -- Pequeno delay para garantir que a UI seja renderizada
+task.wait(1)
 
+-- Inicializa a primeira aba
 SwitchTab(InicioTab)
-Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
--- ▼▼▼ CHAMAR ApplyTheme() AQUI PARA APLICAR O TEMA INICIAL ▼▼▼
+-- Chama a função para aplicar o tema inicial APÓS a UI estar pronta
 ApplyTheme()
+
+Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)

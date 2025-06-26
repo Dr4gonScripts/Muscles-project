@@ -7,7 +7,6 @@
   - Correção de todos os erros de sintaxe
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
-  - Sistema de temas personalizáveis
 ]]
 
 local Player = game:GetService("Players").LocalPlayer

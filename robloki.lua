@@ -8,6 +8,7 @@
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
   - Sistema de temas personalizáveis
+  - **NOVO:** Botões para alternar entre diferentes versões do script
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -18,7 +19,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- Tema modernizado
+-- Tema modernizado (Padrão)
 local Theme = {
     Background = Color3.fromRGB(15, 15, 25),
     Primary = Color3.fromRGB(80, 50, 180),
@@ -742,6 +743,41 @@ CreateButton("Tema Azul", function()
     ApplyTheme()
     Notify("Tema", "Tema azul aplicado!", 2)
 end, InicioContent)
+
+-- NOVO: Tema Verde Neon
+CreateButton("Tema Verde Neon", function()
+    Theme = { Background = Color3.fromRGB(10, 20, 10), Primary = Color3.fromRGB(0, 255, 100), Secondary = Color3.fromRGB(150, 255, 200), Accent = Color3.fromRGB(220, 255, 220), Text = Color3.fromRGB(240, 255, 240), Error = Color3.fromRGB(255, 50, 50) }
+    ApplyTheme()
+    Notify("Tema", "Tema Verde Neon aplicado!", 2)
+end, InicioContent)
+
+-- NOVO: Botões para trocar o script completo
+CreateDivider("Mudar Versão / Script", InicioContent)
+
+-- **AVISO: Você precisará hospedar seus scripts em um Pastebin ou GitHub Gist**
+-- **e substituir o link 'https://pastebin.com/raw/SEU_LINK' abaixo.**
+-- **Este link é apenas um exemplo.**
+
+CreateButton("Carregar Versão Verde Neon", function()
+    -- Fechar a interface atual para evitar duplicatas
+    ScreenGui:Destroy()
+    
+    -- Carregar o novo script do Pastebin (SUBSTITUA ESTE LINK!)
+    SafeLoad("https://pastebin.com/raw/d8jPj2kL") 
+    
+    Notify("Mudando de Versão", "Carregando a versão Verde Neon... A interface será atualizada.", 5)
+end, InicioContent)
+
+CreateButton("Recarregar Versão Padrão", function()
+    -- Fechar a interface atual
+    ScreenGui:Destroy()
+    
+    -- Recarregar o script padrão (você pode colocar o link do seu script original aqui)
+    SafeLoad("https://pastebin.com/raw/pZ5x8r8s") -- SUBSTITUA ESTE LINK!
+    
+    Notify("Mudando de Versão", "Recarregando a versão padrão... A interface será atualizada.", 5)
+end, InicioContent)
+
 
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)

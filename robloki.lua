@@ -1,4 +1,3 @@
-
 --[[
   🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
   Atualizações:
@@ -9,6 +8,7 @@
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
   - Sistema de temas personalizáveis
+  - CORREÇÃO CRÍTICA: Corrigido o bug onde os temas não se aplicavam devido a eventos de mouse.
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -31,6 +31,8 @@ local Theme = {
 
 -- Função para aplicar o tema (REVISADA E OTIMIZADA)
 local function ApplyTheme()
+    print("Aplicando o tema com a cor de fundo:", Theme.Background)
+    
     -- Frame principal e seus componentes
     if MainFrame then
         MainFrame.BackgroundColor3 = Theme.Background
@@ -58,9 +60,10 @@ local function ApplyTheme()
     
     -- Barra de pesquisa
     if SearchBar then
-        SearchBar.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 15, Theme.Background.G * 255 + 15, Theme.Background.B * 255 + 15)
+        -- Usando lerp para uma transição de cores mais suave
+        SearchBar.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.1)
         SearchBar.TextColor3 = Theme.Text
-        SearchBar.PlaceholderColor3 = Color3.fromRGB(Theme.Text.R * 255 - 90, Theme.Text.G * 255 - 90, Theme.Text.B * 255 - 90)
+        SearchBar.PlaceholderColor3 = Theme.Text:lerp(Theme.Background, 0.5)
         if SearchHint then SearchHint.TextColor3 = SearchBar.PlaceholderColor3 end
     end
     
@@ -68,7 +71,8 @@ local function ApplyTheme()
     if TabScrollingFrame then
         for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
             if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 25, Theme.Background.G * 255 + 25, Theme.Background.B * 255 + 25)
+                -- Cor de fundo da aba um pouco mais clara que o fundo geral
+                tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
                 tab.TextColor3 = Theme.Text
             end
         end
@@ -80,7 +84,8 @@ local function ApplyTheme()
             if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
                 for _, element in ipairs(contentFrame:GetChildren()) do
                     if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 15, Theme.Background.G * 255 + 15, Theme.Background.B * 255 + 15)
+                        -- Cor de fundo dos botões um pouco mais clara que o fundo geral
+                        element.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08)
                         element.TextColor3 = Theme.Text
                         local stroke = element:FindFirstChild("UIStroke")
                         if stroke then stroke.Color = Theme.Primary end
@@ -100,6 +105,9 @@ local function ApplyTheme()
     if CurrentTab then
         SwitchTab(CurrentTab)
     end
+    
+    -- Pequeno atraso para garantir que a interface seja renderizada
+    task.wait(0.05)
 end
 
 -- Função de notificação melhorada
@@ -330,7 +338,7 @@ local function CreateTab(name)
     tab.Text = name
     tab.Size = UDim2.new(0.15, 0, 0.8, 0)
     tab.AnchorPoint = Vector2.new(0, 0.5)
-    tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60) -- Cor inicial, será definida pelo tema
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
     tab.TextSize = 12
@@ -345,14 +353,15 @@ local function CreateTab(name)
     -- Eventos de mouse para efeito de hover
     tab.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.3) -- Highlight dinâmico
         }):Play()
     end)
     
     tab.MouseLeave:Connect(function()
         if not tab.Selected then
             game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-                BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+                -- Retorna à cor do tema atual para a aba não selecionada
+                BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
             }):Play()
         end
     end)
@@ -392,7 +401,7 @@ local function CreateButton(name, callback, parent)
     local button = Instance.new("TextButton")
     button.Text = name
     button.Size = UDim2.new(0.9, 0, 0, 40)
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    button.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08) -- Cor inicial dinâmica
     button.TextColor3 = Theme.Text
     button.Font = Enum.Font.Gotham
     button.TextSize = 14
@@ -410,19 +419,22 @@ local function CreateButton(name, callback, parent)
     
     button.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(50, 50, 70),
+            -- Usa cores do tema atual para o hover
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.2),
             TextColor3 = Theme.Accent
         }):Play()
     end)
     
     button.MouseLeave:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(30, 30, 50),
+            -- Retorna para a cor do tema atual
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08),
             TextColor3 = Theme.Text
         }):Play()
     end)
     
     button.MouseButton1Click:Connect(function()
+        print("Botão '", name, "' clicado!")
         pcall(callback)
     end)
     
@@ -642,7 +654,7 @@ local function SearchScripts(query)
     
     -- Função para adicionar scripts de uma aba
     local function AddScriptsFromContent(contentFrame, category)
-        for _, child in ipairs(contentFrame:GetChildren()) do
+        for _, child in ipairs(ipairs(contentFrame:GetChildren())) do
             if child:IsA("TextButton") and child.Text ~= "" then
                 table.insert(allScripts, {
                     Name = child.Text,
@@ -780,7 +792,7 @@ local function SearchScripts(query)
             end)
             
             resultButton.MouseLeave:Connect(function()
-                game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
+                game:GetService("TweenService"):Create(resultInfo, TweenInfo.new(0.1), {
                     BackgroundColor3 = Color3.fromRGB(35, 35, 55)
                 }):Play()
             end)
@@ -821,6 +833,7 @@ CreateDivider("Temas do Hub", InicioContent)
 
 -- Botão Tema Normal
 CreateButton("Tema Normal (Padrão)", function()
+    print("Botão 'Tema Normal' clicado! - Aplicando tema.")
     Theme = {
         Background = Color3.fromRGB(15, 15, 25),
         Primary = Color3.fromRGB(80, 50, 180),
@@ -835,6 +848,7 @@ end, InicioContent)
 
 -- Botão Tema Branco
 CreateButton("Tema Branco", function()
+    print("Botão 'Tema Branco' clicado! - Aplicando tema.")
     Theme = {
         Background = Color3.fromRGB(240, 240, 245),
         Primary = Color3.fromRGB(180, 180, 190),
@@ -849,6 +863,7 @@ end, InicioContent)
 
 -- Botão Tema Azul
 CreateButton("Tema Azul", function()
+    print("Botão 'Tema Azul' clicado! - Aplicando tema.")
     Theme = {
         Background = Color3.fromRGB(10, 20, 40),
         Primary = Color3.fromRGB(0, 100, 255),
@@ -860,8 +875,6 @@ CreateButton("Tema Azul", function()
     ApplyTheme()
     Notify("Tema", "Tema azul aplicado!", 2)
 end, InicioContent)
-
-
 
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
@@ -1175,6 +1188,7 @@ end
 local CurrentTab = nil
 
 local function SwitchTab(selectedTab)
+    print("Mudando de aba para:", selectedTab.Name)
     local tabs = {
         InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
         MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
@@ -1199,8 +1213,8 @@ local function SwitchTab(selectedTab)
             tab.Selected = true
             content.Visible = true
         else
-            -- Restaurar a cor das abas não selecionadas
-            tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            -- Restaurar a cor das abas não selecionadas usando o tema
+            tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
             tab.Selected = false
             content.Visible = false
         end

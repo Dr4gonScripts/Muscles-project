@@ -8,8 +8,7 @@
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
   - Sistema de temas personalizáveis
-  - CORREÇÃO CRÍTICA: Corrigido o bug onde os temas não se aplicavam devido a eventos de mouse.
-  - DIAGNÓSTICO: Adicionado logs detalhados para encontrar o problema da cor.
+  - CORREÇÃO CRÍTICA: Corrigido o bug onde os temas não se aplicavam devido a ordem de inicialização do script.
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -30,96 +29,7 @@ local Theme = {
     Error = Color3.fromRGB(255, 50, 50)
 }
 
--- Função para aplicar o tema (REVISADA E OTIMIZADA COM LOGS)
-local function ApplyTheme()
-    print("----- INICIANDO APLICAÇÃO DO TEMA -----")
-    print("Tema a ser aplicado:")
-    print("  Background:", tostring(Theme.Background))
-    print("  Primary:", tostring(Theme.Primary))
-    
-    -- Frame principal e seus componentes
-    if MainFrame and MainFrame:IsA("Frame") then
-        print("Aplicando cor ao MainFrame. Cor antes:", tostring(MainFrame.BackgroundColor3))
-        MainFrame.BackgroundColor3 = Theme.Background
-        print("Cor do MainFrame depois:", tostring(MainFrame.BackgroundColor3))
-        
-        if UIStroke and UIStroke:IsA("UIStroke") then
-            UIStroke.Color = Theme.Primary
-            print("Cor do UIStroke aplicada.")
-        end
-    else
-        warn("AVISO: MainFrame não encontrado ou inválido!")
-    end
-    
-    -- Barra de título e seus componentes
-    if TitleBar and TitleBar:IsA("Frame") then
-        print("Aplicando cor à TitleBar. Cor antes:", tostring(TitleBar.BackgroundColor3))
-        TitleBar.BackgroundColor3 = Theme.Background
-        print("Cor da TitleBar depois:", tostring(TitleBar.BackgroundColor3))
-
-        if Title and Title:IsA("TextLabel") then Title.TextColor3 = Theme.Accent end
-        if PlayerName and PlayerName:IsA("TextLabel") then PlayerName.TextColor3 = Theme.Accent end
-        if PlayerId and PlayerId:IsA("TextLabel") then PlayerId.TextColor3 = Theme.Text end
-        if GameName and GameName:IsA("TextLabel") then GameName.TextColor3 = Theme.Text end
-    else
-        warn("AVISO: TitleBar não encontrado ou inválido!")
-    end
-    
-    -- Botões de controle
-    if CloseButton and CloseButton:IsA("TextButton") then CloseButton.BackgroundColor3 = Theme.Error end
-    if MinimizeButton and MinimizeButton:IsA("TextButton") then MinimizeButton.BackgroundColor3 = Theme.Primary end
-
-    -- Barra de pesquisa
-    if SearchBar and SearchBar:IsA("TextBox") then
-        SearchBar.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.1)
-        SearchBar.TextColor3 = Theme.Text
-        SearchBar.PlaceholderColor3 = Theme.Text:lerp(Theme.Background, 0.5)
-        if SearchHint then SearchHint.TextColor3 = SearchBar.PlaceholderColor3 end
-    end
-    
-    -- Abas
-    if TabScrollingFrame and TabScrollingFrame:IsA("ScrollingFrame") then
-        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
-            if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
-                tab.TextColor3 = Theme.Text
-            end
-        end
-    end
-    
-    -- Conteúdo dos frames (botões)
-    if MainFrame and MainFrame:IsA("Frame") then
-        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
-            if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
-                for _, element in ipairs(contentFrame:GetChildren()) do
-                    if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08)
-                        element.TextColor3 = Theme.Text
-                        local stroke = element:FindFirstChild("UIStroke")
-                        if stroke then stroke.Color = Theme.Primary end
-                    elseif element:IsA("Frame") then
-                        local label = element:FindFirstChildOfClass("TextLabel")
-                        if label then label.TextColor3 = Theme.Primary end
-                        for _, line in ipairs(element:GetChildren()) do
-                            if line:IsA("Frame") and line.Name:find("Line") then line.BackgroundColor3 = Theme.Primary end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    
-    -- Aplicar o tema na aba ativa novamente para garantir a cor correta
-    if CurrentTab then
-        print("Aplicando tema na aba ativa novamente:", CurrentTab.Name)
-        SwitchTab(CurrentTab)
-    end
-    
-    task.wait(0.1)
-    print("----- APLICAÇÃO DO TEMA CONCLUÍDA -----")
-end
-
--- Função de notificação melhorada
+-- Função de notificação melhorada (pode ficar aqui)
 local function Notify(title, text, duration)
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = title or "Robloki Hub",
@@ -129,7 +39,7 @@ local function Notify(title, text, duration)
     })
 end
 
--- Carregador seguro de scripts AVANÇADO
+-- Carregador seguro de scripts AVANÇADO (pode ficar aqui)
 local function SafeLoad(url)
     local success, response = pcall(function()
         -- Tenta múltiplos métodos para carregar
@@ -169,6 +79,148 @@ local function SafeLoad(url)
         Notify("Erro", "Falha ao carregar: "..tostring(response), 5)
         return false
     end
+end
+
+-- Funções de criação de botões e abas (pode ficar aqui)
+local function CreateButton(name, callback, parent)
+    local button = Instance.new("TextButton")
+    button.Text = name
+    button.Size = UDim2.new(0.9, 0, 0, 40)
+    button.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08) -- Cor inicial dinâmica
+    button.TextColor3 = Theme.Text
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 14
+    button.AutoButtonColor = false
+    button.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = button
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Theme.Primary
+    stroke.Thickness = 1
+    stroke.Parent = button
+    
+    button.MouseEnter:Connect(function()
+        game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
+            -- Usa cores do tema atual para o hover
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.2),
+            TextColor3 = Theme.Accent
+        }):Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
+            -- Retorna para a cor do tema atual
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08),
+            TextColor3 = Theme.Text
+        }):Play()
+    end)
+    
+    button.MouseButton1Click:Connect(function()
+        print("Botão '", name, "' clicado!")
+        pcall(callback)
+    end)
+    
+    return button
+end
+
+local function CreateTab(name)
+    local tab = Instance.new("TextButton")
+    tab.Text = name
+    tab.Size = UDim2.new(0.15, 0, 0.8, 0)
+    tab.AnchorPoint = Vector2.new(0, 0.5)
+    tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15) -- Cor inicial dinâmica
+    tab.TextColor3 = Theme.Text
+    tab.Font = Enum.Font.GothamMedium
+    tab.TextSize = 12
+    tab.TextWrapped = true
+    tab.LayoutOrder = #TabScrollingFrame:GetChildren()
+    tab.Parent = TabScrollingFrame
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = tab
+    
+    -- Eventos de mouse para efeito de hover
+    tab.MouseEnter:Connect(function()
+        game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
+            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.3) -- Highlight dinâmico
+        }):Play()
+    end)
+    
+    tab.MouseLeave:Connect(function()
+        if not tab.Selected then
+            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
+                -- Retorna à cor do tema atual para a aba não selecionada
+                BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
+            }):Play()
+        end
+    end)
+    
+    return tab
+end
+
+local function CreateContentFrame(name)
+    local frame = Instance.new("ScrollingFrame")
+    frame.Name = name
+    frame.Size = UDim2.new(1, 0, 1, -70)
+    frame.Position = UDim2.new(0, 0, 0, 70)
+    frame.BackgroundTransparency = 1
+    frame.ScrollBarThickness = 5
+    frame.ScrollBarImageColor3 = Theme.Primary
+    frame.Visible = false
+    frame.Parent = MainFrame
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 8)
+    layout.Parent = frame
+    
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 5)
+    padding.PaddingLeft = UDim.new(0.05, 0)
+    padding.Parent = frame
+    
+    return frame
+end
+
+local function CreateDivider(text, parent)
+    local divider = Instance.new("Frame")
+    divider.Size = UDim2.new(0.9, 0, 0, 25)
+    divider.BackgroundTransparency = 1
+    divider.Parent = parent
+    
+    local label = Instance.new("TextLabel")
+    label.Text = " "..text.." "
+    label.TextColor3 = Theme.Primary
+    label.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+    label.Size = UDim2.new(0.5, 0, 0.8, 0)
+    label.Position = UDim2.new(0.25, 0, 0.1, 0)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Center
+    label.Parent = divider
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = label
+    
+    local leftLine = Instance.new("Frame")
+    leftLine.Size = UDim2.new(0.2, 0, 0, 1)
+    leftLine.Position = UDim2.new(0.05, 0, 0.5, 0)
+    leftLine.BackgroundColor3 = Theme.Primary
+    leftLine.BorderSizePixel = 0
+    leftLine.Parent = divider
+    
+    local rightLine = Instance.new("Frame")
+    rightLine.Size = UDim2.new(0.2, 0, 0, 1)
+    rightLine.Position = UDim2.new(0.75, 0, 0.5, 0)
+    rightLine.BackgroundColor3 = Theme.Primary
+    rightLine.BorderSizePixel = 0
+    rightLine.Parent = divider
+    
+    return divider
 end
 
 -- ===== CONSTRUÇÃO DA INTERFACE =====
@@ -341,178 +393,7 @@ CloseButton.MouseButton1Click:Connect(function()
     Notify("Robloki Hub", "Interface fechada", 1)
 end)
 
--- ===== SISTEMA DE ABAS ATUALIZADO =====
-local function CreateTab(name)
-    local tab = Instance.new("TextButton")
-    tab.Text = name
-    tab.Size = UDim2.new(0.15, 0, 0.8, 0)
-    tab.AnchorPoint = Vector2.new(0, 0.5)
-    tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15) -- Cor inicial dinâmica
-    tab.TextColor3 = Theme.Text
-    tab.Font = Enum.Font.GothamMedium
-    tab.TextSize = 12
-    tab.TextWrapped = true
-    tab.LayoutOrder = #TabScrollingFrame:GetChildren()
-    tab.Parent = TabScrollingFrame
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = tab
-    
-    -- Eventos de mouse para efeito de hover
-    tab.MouseEnter:Connect(function()
-        print("MouseEnter na aba:", tab.Name, "- Iniciando tween para highlight.")
-        game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.3) -- Highlight dinâmico
-        }):Play()
-    end)
-    
-    tab.MouseLeave:Connect(function()
-        print("MouseLeave na aba:", tab.Name, "- Iniciando tween para voltar à cor normal.")
-        if not tab.Selected then
-            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-                -- Retorna à cor do tema atual para a aba não selecionada
-                BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
-            }):Play()
-        end
-    end)
-    
-    tab.MouseButton1Click:Connect(function()
-        -- Não é mais necessário o pcall aqui, a chamada é no switch.
-    end)
-    
-    return tab
-end
-
-local function CreateContentFrame(name)
-    local frame = Instance.new("ScrollingFrame")
-    frame.Name = name
-    frame.Size = UDim2.new(1, 0, 1, -70)
-    frame.Position = UDim2.new(0, 0, 0, 70)
-    frame.BackgroundTransparency = 1
-    frame.ScrollBarThickness = 5
-    frame.ScrollBarImageColor3 = Theme.Primary
-    frame.Visible = false
-    frame.Parent = MainFrame
-    
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 8)
-    layout.Parent = frame
-    
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 5)
-    padding.PaddingLeft = UDim.new(0.05, 0)
-    padding.Parent = frame
-    
-    return frame
-end
-
--- ===== ELEMENTOS DA INTERFACE =====
-local function CreateButton(name, callback, parent)
-    local button = Instance.new("TextButton")
-    button.Text = name
-    button.Size = UDim2.new(0.9, 0, 0, 40)
-    button.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08) -- Cor inicial dinâmica
-    button.TextColor3 = Theme.Text
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 14
-    button.AutoButtonColor = false
-    button.Parent = parent
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = button
-    
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Theme.Primary
-    stroke.Thickness = 1
-    stroke.Parent = button
-    
-    button.MouseEnter:Connect(function()
-        print("MouseEnter:", button.Name, "- Iniciando tween para highlight.")
-        game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            -- Usa cores do tema atual para o hover
-            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.2),
-            TextColor3 = Theme.Accent
-        }):Play()
-    end)
-    
-    button.MouseLeave:Connect(function()
-        print("MouseLeave:", button.Name, "- Iniciando tween para voltar à cor normal.")
-        game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            -- Retorna para a cor do tema atual
-            BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08),
-            TextColor3 = Theme.Text
-        }):Play()
-    end)
-    
-    button.MouseButton1Click:Connect(function()
-        print("Botão '", name, "' clicado!")
-        pcall(callback)
-    end)
-    
-    return button
-end
-
-local function CreateDivider(text, parent)
-    local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(0.9, 0, 0, 25)
-    divider.BackgroundTransparency = 1
-    divider.Parent = parent
-    
-    local label = Instance.new("TextLabel")
-    label.Text = " "..text.." "
-    label.TextColor3 = Theme.Primary
-    label.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-    label.Size = UDim2.new(0.5, 0, 0.8, 0)
-    label.Position = UDim2.new(0.25, 0, 0.1, 0)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 14
-    label.TextXAlignment = Enum.TextXAlignment.Center
-    label.Parent = divider
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = label
-    
-    local leftLine = Instance.new("Frame")
-    leftLine.Size = UDim2.new(0.2, 0, 0, 1)
-    leftLine.Position = UDim2.new(0.05, 0, 0.5, 0)
-    leftLine.BackgroundColor3 = Theme.Primary
-    leftLine.BorderSizePixel = 0
-    leftLine.Parent = divider
-    
-    local rightLine = Instance.new("Frame")
-    rightLine.Size = UDim2.new(0.2, 0, 0, 1)
-    rightLine.Position = UDim2.new(0.75, 0, 0.5, 0)
-    rightLine.BackgroundColor3 = Theme.Primary
-    rightLine.BorderSizePixel = 0
-    rightLine.Parent = divider
-    
-    return divider
-end
-
 -- ===== CRIAÇÃO DAS ABAS =====
-local InicioTab = CreateTab("Inicio")
-local UniversalTab = CreateTab("Universal")
-local BloxFruitsTab = CreateTab("Blox Fruits")
-local GrowGardenTab = CreateTab("Grow Garden")
-local ArsenalTab = CreateTab("Arsenal")
-local MusclesTab = CreateTab("Muscles")
-local BlueLockTab = CreateTab("Blue Lock")
-local DeadRailsTab = CreateTab("Dead Rails")
-local PetSimTab = CreateTab("Pet Sim")
-local BladeBallTab = CreateTab("Blade Ball")
-local HubsTab = CreateTab("Hubs")
-local BuildBoatTab = CreateTab("Build Boat")
-local NinjaLegendsTab = CreateTab("Ninja Legends")
-local ForsakenTab = CreateTab("Forsaken")
-local MM2Tab = CreateTab("MM2")
-local TheMimicTab = CreateTab("The Mimic")
-local BrainrotTab = CreateTab("Roube Brainrot")
-local BrookhavenTab = CreateTab("Brookhaven")
-
-
 -- Criar conteúdos para cada aba
 local InicioContent = CreateContentFrame("InicioContent")
 local UniversalContent = CreateContentFrame("UniversalContent")
@@ -533,8 +414,27 @@ local TheMimicContent = CreateContentFrame("TheMimicContent")
 local BrainrotContent = CreateContentFrame("BrainrotContent")
 local BrookhavenContent = CreateContentFrame("BrookhavenContent")
 
--- ===== CONTEÚDO DAS ABAS COMPLETO =====
+-- Agora que o TabScrollingFrame existe, podemos criar as abas
+local InicioTab = CreateTab("Inicio")
+local UniversalTab = CreateTab("Universal")
+local BloxFruitsTab = CreateTab("Blox Fruits")
+local GrowGardenTab = CreateTab("Grow Garden")
+local ArsenalTab = CreateTab("Arsenal")
+local MusclesTab = CreateTab("Muscles")
+local BlueLockTab = CreateTab("Blue Lock")
+local DeadRailsTab = CreateTab("Dead Rails")
+local PetSimTab = CreateTab("Pet Sim")
+local BladeBallTab = CreateTab("Blade Ball")
+local HubsTab = CreateTab("Hubs")
+local BuildBoatTab = CreateTab("Build Boat")
+local NinjaLegendsTab = CreateTab("Ninja Legends")
+local ForsakenTab = CreateTab("Forsaken")
+local MM2Tab = CreateTab("MM2")
+local TheMimicTab = CreateTab("The Mimic")
+local BrainrotTab = CreateTab("Roube Brainrot")
+local BrookhavenTab = CreateTab("Brookhaven")
 
+-- ===== CONTEÚDO DAS ABAS COMPLETO =====
 -- ABA INICIO
 -- Adicionar a aba no início da lista (antes da Universal)
 InicioTab.LayoutOrder = 0
@@ -805,7 +705,7 @@ local function SearchScripts(query)
             end)
             
             resultButton.MouseLeave:Connect(function()
-                game:GetService("TweenService"):Create(resultInfo, TweenInfo.new(0.1), {
+                game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
                     BackgroundColor3 = Color3.fromRGB(35, 35, 55)
                 }):Play()
             end)
@@ -1197,6 +1097,96 @@ for _, script in ipairs(BrookhavenScripts) do
     end, BrookhavenContent)
 end
 
+-- Funções de manipulação do tema e abas (MOVIDAS PARA CÁ)
+-- AGORA QUE TODOS OS ELEMENTOS DA UI FORAM CRIADOS E ATRIBUÍDOS ÀS VARIÁVEIS LOCAIS.
+local function ApplyTheme()
+    print("----- INICIANDO APLICAÇÃO DO TEMA -----")
+    print("Tema a ser aplicado:")
+    print("  Background:", tostring(Theme.Background))
+    print("  Primary:", tostring(Theme.Primary))
+    
+    -- Frame principal e seus componentes
+    if MainFrame and MainFrame:IsA("Frame") then
+        print("Aplicando cor ao MainFrame. Cor antes:", tostring(MainFrame.BackgroundColor3))
+        MainFrame.BackgroundColor3 = Theme.Background
+        print("Cor do MainFrame depois:", tostring(MainFrame.BackgroundColor3))
+        
+        if UIStroke and UIStroke:IsA("UIStroke") then
+            UIStroke.Color = Theme.Primary
+            print("Cor do UIStroke aplicada.")
+        end
+    else
+        warn("AVISO: MainFrame não encontrado ou inválido!")
+    end
+    
+    -- Barra de título e seus componentes
+    if TitleBar and TitleBar:IsA("Frame") then
+        print("Aplicando cor à TitleBar. Cor antes:", tostring(TitleBar.BackgroundColor3))
+        TitleBar.BackgroundColor3 = Theme.Background
+        print("Cor da TitleBar depois:", tostring(TitleBar.BackgroundColor3))
+
+        if Title and Title:IsA("TextLabel") then Title.TextColor3 = Theme.Accent end
+        if PlayerName and PlayerName:IsA("TextLabel") then PlayerName.TextColor3 = Theme.Accent end
+        if PlayerId and PlayerId:IsA("TextLabel") then PlayerId.TextColor3 = Theme.Text end
+        if GameName and GameName:IsA("TextLabel") then GameName.TextColor3 = Theme.Text end
+    else
+        warn("AVISO: TitleBar não encontrado ou inválido!")
+    end
+    
+    -- Botões de controle
+    if CloseButton and CloseButton:IsA("TextButton") then CloseButton.BackgroundColor3 = Theme.Error end
+    if MinimizeButton and MinimizeButton:IsA("TextButton") then MinimizeButton.BackgroundColor3 = Theme.Primary end
+
+    -- Barra de pesquisa
+    if SearchBar and SearchBar:IsA("TextBox") then
+        SearchBar.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.1)
+        SearchBar.TextColor3 = Theme.Text
+        SearchBar.PlaceholderColor3 = Theme.Text:lerp(Theme.Background, 0.5)
+        if SearchHint then SearchHint.TextColor3 = SearchBar.PlaceholderColor3 end
+    end
+    
+    -- Abas
+    if TabScrollingFrame and TabScrollingFrame:IsA("ScrollingFrame") then
+        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+            if tab:IsA("TextButton") then
+                tab.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.15)
+                tab.TextColor3 = Theme.Text
+            end
+        end
+    end
+    
+    -- Conteúdo dos frames (botões)
+    if MainFrame and MainFrame:IsA("Frame") then
+        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+            if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
+                for _, element in ipairs(contentFrame:GetChildren()) do
+                    if element:IsA("TextButton") then
+                        element.BackgroundColor3 = Theme.Background:lerp(Theme.Text, 0.08)
+                        element.TextColor3 = Theme.Text
+                        local stroke = element:FindFirstChild("UIStroke")
+                        if stroke then stroke.Color = Theme.Primary end
+                    elseif element:IsA("Frame") then
+                        local label = element:FindFirstChildOfClass("TextLabel")
+                        if label then label.TextColor3 = Theme.Primary end
+                        for _, line in ipairs(element:GetChildren()) do
+                            if line:IsA("Frame") and line.Name:find("Line") then line.BackgroundColor3 = Theme.Primary end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Aplicar o tema na aba ativa novamente para garantir a cor correta
+    if CurrentTab then
+        print("Aplicando tema na aba ativa novamente:", CurrentTab.Name)
+        SwitchTab(CurrentTab)
+    end
+    
+    task.wait(0.1)
+    print("----- APLICAÇÃO DO TEMA CONCLUÍDA -----")
+end
+
 -- ===== SISTEMA DE ABAS =====
 local CurrentTab = nil
 
@@ -1253,7 +1243,6 @@ MM2Tab.MouseButton1Click:Connect(function() SwitchTab(MM2Tab) end)
 TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
 BrainrotTab.MouseButton1Click:Connect(function() SwitchTab(BrainrotTab) end)
 BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
-
 
 -- ===== CONTROLES DA INTERFACE =====
 local minimized = false

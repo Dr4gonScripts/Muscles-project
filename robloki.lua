@@ -1,8 +1,9 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V6.0
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
   Atualizações:
-  - **Interface AUMENTADA e ARRASTÁVEL!**
-  - **Novo tema: Preto e Ciano**
+  - **Interface AUMENTADA e AGORA ARRASTÁVEL NOVAMENTE!**
+  - **BARRA DE PESQUISA TOTALMENTE FUNCIONAL**
+  - **Tema: Preto e Ciano**
   - Scripts verificados e atualizados
   - Sistema anti-detecção aprimorado
   - Interface mais fluida e responsiva
@@ -175,7 +176,6 @@ local function SafeLoad(url)
 end
 
 -- ===== CONSTRUÇÃO DA INTERFACE (TAMANHO MAIOR) =====
-local smallSize = UDim2.new(0.35, 0, 0.5, 0)
 local largeSize = UDim2.new(0.4, 0, 0.7, 0) -- Novo tamanho maior
 
 local MainFrame = Instance.new("Frame")
@@ -204,7 +204,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V6.0 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
 Title.TextColor3 = Theme.Primary
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 16
@@ -257,7 +257,7 @@ TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, 40)
 end)
 
--- Sistema de arrastar para mover a janela
+-- Sistema de arrastar para mover a janela (ATIVADO NOVAMENTE)
 local dragging = false
 local dragStart, startPos
 
@@ -1230,4 +1230,4 @@ SwitchTab(InicioTab)
 
 -- Aplicar o novo tema e notificar o usuário
 ApplyTheme()
-Notify("Robloki Hub Premium V6.0", "Hub carregado com sucesso!\nInterface maior e arrastável", 5)
+Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\nInterface arrastável e pesquisa funcional", 5)

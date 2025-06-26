@@ -734,26 +734,13 @@ SearchHint.BackgroundTransparency = 1
 SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
 SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
 SearchHint.Parent = InicioContent
+
 -- ABA UNIVERSAL
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
-CreateButton("Ativar Noclip", function()
-    local noclip = false
-    local character = Player.Character or Player.CharacterAdded:Wait()
-    local function noclipLoop()
-        if character and character:FindFirstChild("Humanoid") then
-            for _, part in pairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = noclip
-                end
-            end
-        end
-    end
-    
-    noclip = not noclip
-    Notify("Noclip", noclip and "Ativado" or "Desativado")
-    
-    game:GetService("RunService").Stepped:Connect(noclipLoop)
+CreateButton("Noclip", function()
+    SafeLoad("https://pastebin.com/raw/B5xRxTnk",true)
+    Notify("Noclip", "Script de atravessar paredes carregado!")
 end, UniversalContent)
 
 CreateButton("Voo Universal", function()
@@ -780,10 +767,10 @@ CreateDivider("Hubs Completos", BloxFruitsContent)
 
 local BFScripts = {
     {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true},
     {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"},
     {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/MukuroV2.lua"},
-    {Name = "Turtle Hub", URL = "https://raw.githubusercontent.com/Turtle-0x/TurtleHub/main/bf.lua"}
+    {Name = "Cokka Hub", URL = "https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"}
 }
 
 for _, script in ipairs(BFScripts) do
@@ -800,6 +787,8 @@ CreateDivider("Auto Farm", GrowGardenContent)
 local GGScripts = {
     {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
     {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}
+    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"}
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true}
 }
 
 for _, script in ipairs(GGScripts) do
@@ -828,7 +817,7 @@ for _, script in ipairs(ArsenalScripts) do
     end, ArsenalContent)
 end
 
--- ABA MUSCLES LEGENDS
+
 -- ABA MUSCLES LEGENDS (corrigida)
 local MLScripts = {
     {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
@@ -851,6 +840,7 @@ CreateDivider("Auto Farm & Hacks", BlueLockContent)
 local BLScripts = {
     {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
     {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}
+    {Name = "Express Hub", URL = "https://api.luarmor.net/files/v3/loaders/d8824b23a4d9f2e0d62b4e69397d206b.lua"},
 }
 
 for _, script in ipairs(BLScripts) do
@@ -865,10 +855,9 @@ end
 CreateDivider("Hacks", DeadRailsContent)
 
 local DRScripts = {
-    {Name = "Dead Rails OP", URL = "https://raw.githubusercontent.com/m00ndiety/Stillwater/main/obf_Prisonteleport.lua.txt"},
-    {Name = "Zephyr Hub", URL = "https://raw.githubusercontent.com/Unknownlodfc/Zephyr/main/DeadRails/Main"},
-    {Name = "Micro Hub", URL = "https://raw.githubusercontent.com/TrustsenseDev/MicroHub/main/loader.lua"},
     {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
+    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"}
+    {Name = "Ringta Hub", URL = "https://raw.githubusercontent.com/fjruie/RINGTADEADRAILS.github.io/refs/heads/main/UIRAILS.LUA"}
 }
 
 for _, script in ipairs(DRScripts) do
@@ -880,7 +869,7 @@ for _, script in ipairs(DRScripts) do
 end
 
 -- ABA PET SIMULATOR
-CreateDivider("Auto Farm", PetSimContent)
+CreateDivider("SCRIPTS OFF - PET 99", PetSimContent)
 
 local PSScripts = {
     {Name = "Reaper Hub", URL = "https://raw.githubusercontent.com/AyoReaper/Reaper-Hub/main/loader.lua"},
@@ -900,10 +889,7 @@ end
 CreateDivider("Hacks", BladeBallContent)
 
 local BBScripts = {
-    {Name = "Auto Parry", URL = "https://nicuse.xyz/MainHub.lua"},
-    {Name = "Soluna Hub", URL = "https://raw.githubusercontent.com/Patheticcs/Soluna-API/main/bladeball.lua"},
-    {Name = "XNEOFF Script", URL = "https://raw.githubusercontent.com/XNEOFF/BladeBallScript/main/BladeBall.lua"},
-    {Name = "Aimbot", URL = "https://raw.githubusercontent.com/DocYogurt/BladeBall/main/Aimbot.lua"}
+    {Name = "Auto Parry", URL = "https://raw.githubusercontent.com/NodeX-Enc/NodeX/refs/heads/main/Main.lua"},
 }
 
 for _, script in ipairs(BBScripts) do
@@ -938,6 +924,8 @@ local BuildBoatScripts = {
     {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
     {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}
+    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"}
+    {Name = "Sem nome2", URL = "https://rawscripts.net/raw/Build-A-Boat-For-Treasure-BBFT-Script-24996"}
 }
 
 for _, script in ipairs(BuildBoatScripts) do
@@ -972,7 +960,7 @@ local ForsakenScripts = {
     {Name = "Rift Hub", URL = "https://rifton.top/loader.lua"},
     {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/SilkScripts/AppleStuff/refs/heads/main/AppleFSKV2"},
     {Name = "Esp, stamina ifn e etc", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"},
-    {Name = "Rift Hub (Alt)", URL = "https://raw.githubusercontent.com/Rift-Hub/Rift-Hub/main/loader.lua"}
+    {Name = "Saryn Hub", URL = "https://raw.githubusercontent.com/Saiky988/Saryn-Hub/refs/heads/main/Saryn%Hub%Beta.lua"}
 }
 
 for _, script in ipairs(ForsakenScripts) do

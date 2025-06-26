@@ -1,5 +1,5 @@
 --[
-  🐉 Robloki Hub Premium - Versão Otimizada V5.0
+  🐉 Robloki Hub Premium - Versão Otimizada V5.0.
   -- Código otimizado e mais compacto --
 ]]
 

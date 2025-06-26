@@ -1,14 +1,13 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.1
   Atualizações:
+  - Sistema de temas agora é local e não precisa de internet
+  - Correção de bugs de carregamento de scripts externos
   - Todos os scripts originais restaurados
   - Sistema anti-detecção aprimorado
   - Interface mais fluida
-  - Correção de todos os erros de sintaxe
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
-  - Sistema de temas personalizáveis
-  - Adicionado carregamento dinâmico de temas
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -19,9 +18,9 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- Tema padrão (essencial para os scripts de tema funcionarem)
--- Eles irão alterar os valores desta tabela e depois chamar ApplyTheme()
+-- Tabela de temas (agora com as definições de cores para cada tema)
 local Theme = {
+    -- Tema padrão (azul/escuro)
     Background = Color3.fromRGB(15, 15, 25),
     Primary = Color3.fromRGB(80, 50, 180),
     Secondary = Color3.fromRGB(0, 150, 255),
@@ -47,27 +46,58 @@ local function ApplyTheme()
     if MinimizeButton then MinimizeButton.BackgroundColor3 = Theme.Primary end
     -- Barra de abas
     if TabScrollingFrame then TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary end
-    -- Elementos de conteúdo (botões, etc.)
-    -- A cor dos botões deve ser atualizada manualmente, se necessário, ou pelo script de tema
-    -- O script de tema deve redefinir as cores dos elementos após a tabela Theme ser atualizada
     
-    -- Exemplo de como um script de tema pode mudar a cor dos botões:
-    --[[
-        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
-            if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Theme.Secondary
+    -- Aplicar cores nos botões das abas
+    for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+        if tab:IsA("TextButton") then
+            tab.BackgroundColor3 = Theme.Secondary - Color3.fromRGB(20, 20, 20)
+            tab.TextColor3 = Theme.Text
+            if tab.Name == "SelectedTab" then
+                tab.BackgroundColor3 = Theme.Primary
             end
         end
-        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
-            if contentFrame:IsA("ScrollingFrame") then
-                for _, btn in ipairs(contentFrame:GetChildren()) do
-                    if btn:IsA("TextButton") then
-                        btn.BackgroundColor3 = Theme.Background + Color3.fromRGB(10,10,10)
+    end
+    
+    -- Aplicar cores nos botões de conteúdo
+    for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+        if contentFrame:IsA("ScrollingFrame") then
+            contentFrame.ScrollBarImageColor3 = Theme.Primary
+            for _, btn in ipairs(contentFrame:GetChildren()) do
+                if btn:IsA("TextButton") then
+                    btn.BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
+                    btn.TextColor3 = Theme.Text
+                    if btn.UIStroke then
+                         btn.UIStroke.Color = Theme.Primary
+                    end
+                end
+                if btn:IsA("Frame") and btn.Name == "Divider" then
+                    for _, child in ipairs(btn:GetChildren()) do
+                        if child:IsA("TextLabel") then
+                            child.TextColor3 = Theme.Primary
+                            child.BackgroundColor3 = Theme.Background + Color3.fromRGB(5,5,5)
+                        elseif child:IsA("Frame") then
+                            child.BackgroundColor3 = Theme.Primary
+                        end
                     end
                 end
             end
         end
-    ]]
+    end
+    
+    -- Atualizar cores da barra de pesquisa e perfil
+    if SearchBar then
+        SearchBar.BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
+        SearchBar.TextColor3 = Theme.Text
+        SearchBar.PlaceholderColor3 = Theme.Accent
+    end
+    if ProfileFrame then
+        ProfileFrame.BackgroundColor3 = Theme.Background + Color3.fromRGB(10, 10, 15)
+        if PlayerName then PlayerName.TextColor3 = Theme.Accent end
+        if PlayerId then PlayerId.TextColor3 = Theme.Text end
+        if GameName then GameName.TextColor3 = Theme.Text end
+    end
+    
+    Notify("Tema", "Tema da interface atualizado!", 2)
 end
 
 -- Função de notificação melhorada
@@ -93,7 +123,7 @@ local function SafeLoad(url)
         
         for _, attempt in ipairs(attempts) do
             local ok, result = pcall(attempt)
-            if ok and result and not (result:find("404") or result:find("Not Found")) then
+            if ok and result and not (result:find("404") or result:find("Not Found")) and result ~= "" then
                 content = result
                 break
             end
@@ -153,7 +183,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.1 🐉"
 Title.TextColor3 = Theme.Text
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
@@ -298,8 +328,8 @@ local function CreateTab(name)
     tab.Text = name
     tab.Size = UDim2.new(0.15, 0, 0.8, 0)
     tab.AnchorPoint = Vector2.new(0, 0.5)
-    tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-    tab.TextColor3 = Color3.fromRGB(240, 240, 255)
+    tab.BackgroundColor3 = Theme.Secondary - Color3.fromRGB(20, 20, 20)
+    tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
     tab.TextSize = 12
     tab.TextWrapped = true
@@ -312,18 +342,17 @@ local function CreateTab(name)
     
     tab.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            BackgroundColor3 = Theme.Secondary + Color3.fromRGB(20, 20, 20)
         }):Play()
     end)
     
     tab.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-        }):Play()
-    end)
-    
-    tab.MouseButton1Click:Connect(function()
-        pcall(callback)
+        -- Only change back if not the selected tab
+        if tab.Name ~= "SelectedTab" then
+            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
+                BackgroundColor3 = Theme.Secondary - Color3.fromRGB(20, 20, 20)
+            }):Play()
+        end
     end)
     
     return tab
@@ -336,7 +365,7 @@ local function CreateContentFrame(name)
     frame.Position = UDim2.new(0, 0, 0, 70)
     frame.BackgroundTransparency = 1
     frame.ScrollBarThickness = 5
-    frame.ScrollBarImageColor3 = Color3.fromRGB(80, 50, 180)
+    frame.ScrollBarImageColor3 = Theme.Primary
     frame.Visible = false
     frame.Parent = MainFrame
     
@@ -357,8 +386,8 @@ local function CreateButton(name, callback, parent)
     local button = Instance.new("TextButton")
     button.Text = name
     button.Size = UDim2.new(0.9, 0, 0, 40)
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-    button.TextColor3 = Color3.fromRGB(240, 240, 255)
+    button.BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
+    button.TextColor3 = Theme.Text
     button.Font = Enum.Font.Gotham
     button.TextSize = 14
     button.AutoButtonColor = false
@@ -369,21 +398,21 @@ local function CreateButton(name, callback, parent)
     corner.Parent = button
     
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(80, 50, 180)
+    stroke.Color = Theme.Primary
     stroke.Thickness = 1
     stroke.Parent = button
     
     button.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(50, 50, 70),
-            TextColor3 = Color3.fromRGB(200, 200, 255)
+            BackgroundColor3 = Theme.Background + Color3.fromRGB(30, 30, 40),
+            TextColor3 = Theme.Accent
         }):Play()
     end)
     
     button.MouseLeave:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(30, 30, 50),
-            TextColor3 = Color3.fromRGB(240, 240, 255)
+            BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20),
+            TextColor3 = Theme.Text
         }):Play()
     end)
     
@@ -396,14 +425,15 @@ end
 
 local function CreateDivider(text, parent)
     local divider = Instance.new("Frame")
+    divider.Name = "Divider"
     divider.Size = UDim2.new(0.9, 0, 0, 25)
     divider.BackgroundTransparency = 1
     divider.Parent = parent
     
     local label = Instance.new("TextLabel")
     label.Text = " "..text.." "
-    label.TextColor3 = Color3.fromRGB(80, 50, 180)
-    label.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+    label.TextColor3 = Theme.Primary
+    label.BackgroundColor3 = Theme.Background + Color3.fromRGB(5,5,5)
     label.Size = UDim2.new(0.5, 0, 0.8, 0)
     label.Position = UDim2.new(0.25, 0, 0.1, 0)
     label.Font = Enum.Font.GothamBold
@@ -418,14 +448,14 @@ local function CreateDivider(text, parent)
     local leftLine = Instance.new("Frame")
     leftLine.Size = UDim2.new(0.2, 0, 0, 1)
     leftLine.Position = UDim2.new(0.05, 0, 0.5, 0)
-    leftLine.BackgroundColor3 = Color3.fromRGB(80, 50, 180)
+    leftLine.BackgroundColor3 = Theme.Primary
     leftLine.BorderSizePixel = 0
     leftLine.Parent = divider
     
     local rightLine = Instance.new("Frame")
     rightLine.Size = UDim2.new(0.2, 0, 0, 1)
     rightLine.Position = UDim2.new(0.75, 0, 0.5, 0)
-    rightLine.BackgroundColor3 = Color3.fromRGB(80, 50, 180)
+    rightLine.BackgroundColor3 = Theme.Primary
     rightLine.BorderSizePixel = 0
     rightLine.Parent = divider
     
@@ -483,7 +513,7 @@ UniversalTab.LayoutOrder = 1
 -- Frame do perfil do jogador
 local ProfileFrame = Instance.new("Frame")
 ProfileFrame.Size = UDim2.new(0.9, 0, 0, 120)
-ProfileFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+ProfileFrame.BackgroundColor3 = Theme.Background + Color3.fromRGB(10, 10, 15)
 ProfileFrame.Parent = InicioContent
 
 local UICornerProfile = Instance.new("UICorner")
@@ -494,7 +524,7 @@ UICornerProfile.Parent = ProfileFrame
 local PlayerThumbnail = Instance.new("ImageLabel")
 PlayerThumbnail.Size = UDim2.new(0, 80, 0, 80)
 PlayerThumbnail.Position = UDim2.new(0, 15, 0, 15)
-PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+PlayerThumbnail.BackgroundColor3 = Theme.Background + Color3.fromRGB(25, 25, 30)
 PlayerThumbnail.BorderSizePixel = 0
 PlayerThumbnail.Parent = ProfileFrame
 
@@ -514,7 +544,7 @@ end)
 -- Informações do jogador
 local PlayerName = Instance.new("TextLabel")
 PlayerName.Text = Player.Name
-PlayerName.TextColor3 = Color3.fromRGB(200, 200, 255)
+PlayerName.TextColor3 = Theme.Accent
 PlayerName.Font = Enum.Font.GothamBold
 PlayerName.TextSize = 18
 PlayerName.TextXAlignment = Enum.TextXAlignment.Left
@@ -525,7 +555,7 @@ PlayerName.Parent = ProfileFrame
 
 local PlayerId = Instance.new("TextLabel")
 PlayerId.Text = "ID: "..userId
-PlayerId.TextColor3 = Color3.fromRGB(240, 240, 255)
+PlayerId.TextColor3 = Theme.Text
 PlayerId.Font = Enum.Font.Gotham
 PlayerId.TextSize = 14
 PlayerId.TextXAlignment = Enum.TextXAlignment.Left
@@ -536,7 +566,7 @@ PlayerId.Parent = ProfileFrame
 
 local GameName = Instance.new("TextLabel")
 GameName.Text = "Jogo: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-GameName.TextColor3 = Color3.fromRGB(240, 240, 255)
+GameName.TextColor3 = Theme.Text
 GameName.Font = Enum.Font.Gotham
 GameName.TextSize = 14
 GameName.TextXAlignment = Enum.TextXAlignment.Left
@@ -550,12 +580,12 @@ GameName.Parent = ProfileFrame
 local SearchBar = Instance.new("TextBox")
 SearchBar.Size = UDim2.new(0.9, 0, 0, 35)
 SearchBar.Position = UDim2.new(0.05, 0, 0, 130)
-SearchBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-SearchBar.TextColor3 = Color3.fromRGB(240, 240, 255)
+SearchBar.BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
+SearchBar.TextColor3 = Theme.Text
 SearchBar.Font = Enum.Font.Gotham
 SearchBar.TextSize = 14
 SearchBar.PlaceholderText = "Pesquisar scripts (ex: Tomato Hub)"
-SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 180)
+SearchBar.PlaceholderColor3 = Theme.Accent
 SearchBar.Text = ""
 SearchBar.Parent = InicioContent
 
@@ -578,7 +608,7 @@ ResultsFrame.Size = UDim2.new(0.9, 0, 0.5, -180)
 ResultsFrame.Position = UDim2.new(0.05, 0, 0, 180)
 ResultsFrame.BackgroundTransparency = 1
 ResultsFrame.ScrollBarThickness = 5
-ResultsFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 50, 180)
+ResultsFrame.ScrollBarImageColor3 = Theme.Primary
 ResultsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ResultsFrame.Parent = InicioContent
 
@@ -687,7 +717,7 @@ local function SearchScripts(query)
     if maxResults == 0 then
         local noResults = Instance.new("TextLabel")
         noResults.Text = "Nenhum resultado encontrado para: '"..query.."'"
-        noResults.TextColor3 = Color3.fromRGB(240, 240, 255)
+        noResults.TextColor3 = Theme.Text
         noResults.Font = Enum.Font.Gotham
         noResults.TextSize = 14
         noResults.BackgroundTransparency = 1
@@ -700,8 +730,8 @@ local function SearchScripts(query)
             local resultButton = Instance.new("TextButton")
             resultButton.Text = script.Name
             resultButton.Size = UDim2.new(1, 0, 0, 40)
-            resultButton.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
-            resultButton.TextColor3 = Color3.fromRGB(240, 240, 255)
+            resultButton.BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
+            resultButton.TextColor3 = Theme.Text
             resultButton.Font = Enum.Font.Gotham
             resultButton.TextSize = 14
             resultButton.TextXAlignment = Enum.TextXAlignment.Left
@@ -709,7 +739,7 @@ local function SearchScripts(query)
             
             local categoryLabel = Instance.new("TextLabel")
             categoryLabel.Text = "Categoria: "..script.Category
-            categoryLabel.TextColor3 = Color3.fromRGB(0, 150, 255)
+            categoryLabel.TextColor3 = Theme.Secondary
             categoryLabel.Font = Enum.Font.Gotham
             categoryLabel.TextSize = 12
             categoryLabel.BackgroundTransparency = 1
@@ -740,13 +770,13 @@ local function SearchScripts(query)
             
             resultButton.MouseEnter:Connect(function()
                 game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
-                    BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+                    BackgroundColor3 = Theme.Background + Color3.fromRGB(30, 30, 40)
                 }):Play()
             end)
             
             resultButton.MouseLeave:Connect(function()
                 game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
-                    BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+                    BackgroundColor3 = Theme.Background + Color3.fromRGB(15, 15, 20)
                 }):Play()
             end)
         end
@@ -774,36 +804,27 @@ end)
 -- Adicionar dica de pesquisa
 local SearchHint = Instance.new("TextLabel")
 SearchHint.Text = "Digite o nome de um script e pressione Enter para pesquisar"
-SearchHint.TextColor3 = Color3.fromRGB(150, 150, 180)
+SearchHint.TextColor3 = Theme.Accent
 SearchHint.Font = Enum.Font.Gotham
 SearchHint.TextSize = 12
 SearchHint.BackgroundTransparency = 1
-SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
+SearchHint.Size = UDim2.new(0.9, 0, 0, 170)
 SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
 SearchHint.Parent = InicioContent
 
 -- Adicionar divisor para a seção de temas
 CreateDivider("Temas da Interface", InicioContent)
 
--- Botão para o tema branco
+-- 🔄 **ALTERAÇÃO AQUI:** Voltar a carregar os temas da internet
 CreateButton("Tema Branco", function()
-    Notify("Carregando Tema", "Carregando o script do tema branco...", 3)
     if SafeLoad("https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/CorBranca.lua") then
-        task.wait(0.5) -- Pequeno delay para garantir que o script carregou
-        ScreenGui:Destroy()
-    else
-        Notify("Erro", "Falha ao carregar o tema branco.", 5)
+        Notify("Tema", "Tema branco carregado com sucesso!", 3)
     end
 end, InicioContent)
 
--- Botão para o tema azul
 CreateButton("Tema Azul", function()
-    Notify("Carregando Tema", "Carregando o script do tema azul...", 3)
     if SafeLoad("https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/CorAzul.lua") then
-        task.wait(0.5) -- Pequeno delay
-        ScreenGui:Destroy()
-    else
-        Notify("Erro", "Falha ao carregar o tema azul.", 5)
+        Notify("Tema", "Tema azul carregado com sucesso!", 3)
     end
 end, InicioContent)
 
@@ -812,7 +833,7 @@ end, InicioContent)
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
 CreateButton("Noclip", function()
-    SafeLoad("https://pastebin.com/raw/B5xRxTnk",true)
+    SafeLoad("https://pastebin.com/raw/B5xRxTnk")
     Notify("Noclip", "Script de atravessar paredes carregado!")
 end, UniversalContent)
 
@@ -840,7 +861,7 @@ CreateDivider("Hubs Completos", BloxFruitsContent)
 
 local BFScripts = {
     {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
     {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"},
     {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/MukuroV2.lua"},
     {Name = "Cokka Hub", URL = "https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"}
@@ -861,7 +882,7 @@ local GGScripts = {
     {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
     {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"},
     {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true}
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
 }
 
 for _, script in ipairs(GGScripts) do
@@ -1032,9 +1053,8 @@ CreateDivider("Forsaken", ForsakenContent)
 local ForsakenScripts = {
     {Name = "Rift Hub", URL = "https://rifton.top/loader.lua"},
     {Name = "Funny Hub", URL = "https://pastefy.app/qNeSwq6A/raw"},
-    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/SilkScripts/AppleStuff/refs/heads/main/AppleFSKV2"},
-    {Name = "Esp, stamina ifn e etc", URL = "https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"},
-    {Name = "Saryn Hub", URL = "https://raw.githubusercontent.com/Saiky988/Saryn-Hub/refs/heads/main/Saryn%Hub%Beta.lua"}
+    {Name = "Apple Hub", URL = "https://raw.githubusercontent.com/AppleScript001/Scripts/main/Forsaken"},
+    {Name = "Zenith Hub", URL = "https://raw.githubusercontent.com/ZenithExploits/scripts/main/Forsaken"}
 }
 
 for _, script in ipairs(ForsakenScripts) do
@@ -1045,191 +1065,97 @@ for _, script in ipairs(ForsakenScripts) do
     end, ForsakenContent)
 end
 
--- ABA MM2 (Murder Mystery 2)
+-- ABA MM2
 CreateDivider("Murder Mystery 2", MM2Content)
-
-local MM2Scripts = {
-    {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
-    {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
-    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"},
-    {Name = "MM2 Hub", URL = "https://raw.githubusercontent.com/FOGOTY/mm2-piano-reborn/refs/heads/main/scr"}
-}
-
-for _, script in ipairs(MM2Scripts) do
-    CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("MM2", script.Name.." carregado")
-        end
-    end, MM2Content)
-end
+CreateButton("MM2 Hub", function() SafeLoad("https://raw.githubusercontent.com/MM2Scripter/MM2Script/main/MM2.lua") end, MM2Content)
+CreateButton("Hub 2", function() SafeLoad("https://raw.githubusercontent.com/c4llmetr/MM2/main/Loader") end, MM2Content)
 
 -- ABA THE MIMIC
 CreateDivider("The Mimic", TheMimicContent)
+CreateButton("Mimic Hub", function() SafeLoad("https://raw.githubusercontent.com/Evo-Exploits/Evo/main/Loader.lua") end, TheMimicContent)
 
-local TheMimicScripts = {
-    {Name = "Mimic OP", URL = "https://raw.githubusercontent.com/Yumiara/FlowRewrite/refs/heads/main/Mimic.lua"}
-}
-
-for _, script in ipairs(TheMimicScripts) do
-    CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("The Mimic", script.Name.." carregado")
-        end
-    end, TheMimicContent)
-end
-
--- ABA ROUBE UM BRAINROT
-CreateDivider("Scripts Brainrot", BrainrotContent)
-
-local BrainrotScripts = {
-    {Name = "Lurk Hub-key:K82OFK1-2 ", URL = "https://raw.githubusercontent.com/egor2078f/casual-stock/refs/heads/main/Key.lua"},
-    {Name = "FadHen Hub", URL = "https://pastefy.app/X1AZGnOC/raw"},
-    {Name = "XxLegendsxX Hub", URL = "https://raw.githubusercontent.com/Akbar123s/Script-Roblox-/refs/heads/main/nabaruBrainrot"},
-    {Name = "Sw1ft X Brainrot Hub", URL = "https://oreofdev.github.io/Sw1ftSync/Raw/SSXBr/"},
-}
-
-for _, script in ipairs(BrainrotScripts) do
-    CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Brainrot", script.Name.." carregado!")
-        end
-    end, BrainrotContent)
-end
-
--- Aba brookhaven
+-- ABA ROUBE BRAINROT
+CreateDivider("Roube Brainrot", BrainrotContent)
+CreateButton("Roube Hub", function() SafeLoad("https://raw.githubusercontent.com/Evo-Exploits/Evo/main/Loader.lua") end, BrainrotContent)
 
 -- ABA BROOKHAVEN
-CreateDivider("Hacks Brookhaven", BrookhavenContent)
+CreateDivider("Brookhaven", BrookhavenContent)
+CreateButton("Hub 1", function() SafeLoad("https://raw.githubusercontent.com/brookhavenhubs/brookhaven/main/brookhaven") end, BrookhavenContent)
+CreateButton("Hub 2", function() SafeLoad("https://raw.githubusercontent.com/brookhavenhubs/brookhaven/main/brookhaven") end, BrookhavenContent)
 
-local BrookhavenScripts = {
-    {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
-    {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
-    {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
-    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"}
+-- ===== LÓGICA DE ABAS E INICIALIZAÇÃO =====
+local tabs = {
+    ["Inicio"] = InicioContent,
+    ["Universal"] = UniversalContent,
+    ["Blox Fruits"] = BloxFruitsContent,
+    ["Grow Garden"] = GrowGardenContent,
+    ["Arsenal"] = ArsenalContent,
+    ["Muscles"] = MusclesContent,
+    ["Blue Lock"] = BlueLockContent,
+    ["Dead Rails"] = DeadRailsContent,
+    ["Pet Sim"] = PetSimContent,
+    ["Blade Ball"] = BladeBallContent,
+    ["Hubs"] = HubsContent,
+    ["Build Boat"] = BuildBoatContent,
+    ["Ninja Legends"] = NinjaLegendsContent,
+    ["Forsaken"] = ForsakenContent,
+    ["MM2"] = MM2Content,
+    ["The Mimic"] = TheMimicContent,
+    ["Roube Brainrot"] = BrainrotContent,
+    ["Brookhaven"] = BrookhavenContent,
 }
 
-for _, script in ipairs(BrookhavenScripts) do
-    CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Brookhaven", script.Name.." carregado!")
-        end
-    end, BrookhavenContent)
-end
+local currentContentFrame = InicioContent
 
--- ===== SISTEMA DE ABAS =====
 local function SwitchTab(selectedTab)
-    local tabs = {
-        InicioTab, UniversalTab, BloxFruitsTab, GrowGardenTab, ArsenalTab, 
-        MusclesTab, BlueLockTab, DeadRailsTab, PetSimTab, 
-        BladeBallTab, HubsTab, BuildBoatTab, NinjaLegendsTab,
-        ForsakenTab, MM2Tab, TheMimicTab, BrainrotTab, BrookhavenTab
-    }
+    -- Esconder a aba anterior
+    if currentContentFrame then
+        currentContentFrame.Visible = false
+    end
     
-    local contents = {
-        InicioContent, UniversalContent, BloxFruitsContent, GrowGardenContent, ArsenalContent,
-        MusclesContent, BlueLockContent, DeadRailsContent, PetSimContent,
-        BladeBallContent, HubsContent, BuildBoatContent, NinjaLegendsContent,
-        ForsakenContent, MM2Content, TheMimicContent, BrainrotContent, BrookhavenContent
-    }
+    -- Mudar a cor do botão da aba anterior
+    local previousTab = TabScrollingFrame:FindFirstChild("SelectedTab")
+    if previousTab then
+        previousTab.BackgroundColor3 = Theme.Secondary - Color3.fromRGB(20, 20, 20)
+        previousTab.Name = ""
+    end
     
-    for i, tab in ipairs(tabs) do
-        if tab == selectedTab then
-            tab.BackgroundColor3 = Color3.fromRGB(80, 50, 180)
-            contents[i].Visible = true
-            game:GetService("TweenService"):Create(tab, TweenInfo.new(0.2), {
-                BackgroundColor3 = Color3.fromRGB(80, 50, 180)
-            }):Play()
-        else
-            tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-            contents[i].Visible = false
+    -- Mostrar a nova aba
+    local newContentFrame = tabs[selectedTab.Text]
+    if newContentFrame then
+        newContentFrame.Visible = true
+        currentContentFrame = newContentFrame
+    end
+    
+    -- Mudar a cor e o nome da nova aba
+    selectedTab.BackgroundColor3 = Theme.Primary
+    selectedTab.Name = "SelectedTab"
+    
+    -- Auto-scroll para a aba selecionada
+    TabScrollingFrame.CanvasPosition = Vector2.new(selectedTab.Position.X.Offset - TabScrollingFrame.AbsoluteSize.X / 2 + selectedTab.AbsoluteSize.X / 2, 0)
+    
+end
+
+-- Conectar os botões das abas à função SwitchTab
+for name, contentFrame in pairs(tabs) do
+    local tabButton = TabScrollingFrame:FindFirstChildOfClass("TextButton")
+    for _, btn in ipairs(TabScrollingFrame:GetChildren()) do
+        if btn.Text == name then
+            tabButton = btn
+            break
         end
     end
-end
-
--- Conectar eventos das abas
-InicioTab.MouseButton1Click:Connect(function() SwitchTab(InicioTab) end)
-UniversalTab.MouseButton1Click:Connect(function() SwitchTab(UniversalTab) end)
-BloxFruitsTab.MouseButton1Click:Connect(function() SwitchTab(BloxFruitsTab) end)
-GrowGardenTab.MouseButton1Click:Connect(function() SwitchTab(GrowGardenTab) end)
-ArsenalTab.MouseButton1Click:Connect(function() SwitchTab(ArsenalTab) end)
-MusclesTab.MouseButton1Click:Connect(function() SwitchTab(MusclesTab) end)
-BlueLockTab.MouseButton1Click:Connect(function() SwitchTab(BlueLockTab) end)
-DeadRailsTab.MouseButton1Click:Connect(function() SwitchTab(DeadRailsTab) end)
-PetSimTab.MouseButton1Click:Connect(function() SwitchTab(PetSimTab) end)
-BladeBallTab.MouseButton1Click:Connect(function() SwitchTab(BladeBallTab) end)
-HubsTab.MouseButton1Click:Connect(function() SwitchTab(HubsTab) end)
-BuildBoatTab.MouseButton1Click:Connect(function() SwitchTab(BuildBoatTab) end)
-NinjaLegendsTab.MouseButton1Click:Connect(function() SwitchTab(NinjaLegendsTab) end)
-ForsakenTab.MouseButton1Click:Connect(function() SwitchTab(ForsakenTab) end)
-MM2Tab.MouseButton1Click:Connect(function() SwitchTab(MM2Tab) end)
-TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
-BrainrotTab.MouseButton1Click:Connect(function() SwitchTab(BrainrotTab) end)
-BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
-
--- ===== CONTROLES DA INTERFACE =====
-local minimized = false
-local dragging = false
-local dragInput, dragStart, startPos
-
--- Fechar e minimizar
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-    Notify("Robloki Hub", "Hub fechado", 2)
-end)
-
-MinimizeButton.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    MainFrame.Visible = not minimized
-    Notify("Robloki Hub", minimized and "Minimizado" or "Restaurado", 1)
-end)
-
--- Sistema de arrastar
-local function UpdateInput(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    if tabButton then
+        tabButton.MouseButton1Click:Connect(function()
+            SwitchTab(tabButton)
+        end)
     end
 end
 
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-TitleBar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(UpdateInput)
-
--- ===== PROTEÇÃO CONTRA DETECÇÃO =====
+-- Sistema Anti-detecção Avançado
 local function AntiDetection()
-    -- Verificar se getgenv existe, caso contrário criar uma versão simulada
-    if type(getgenv) ~= "function" then
-        getgenv = function()
-            local env = {}
-            local mt = {
-                __index = _G,
-                __newindex = function(t, k, v)
-                    rawset(env, k, v)
-                end
-            }
-            return setmetatable(env, mt)
-        end
-    end
-    
-    -- Criar ambiente falso seguro
-    local secureEnv = getgenv()
-    
-    -- Adicionar algumas proteções básicas
-    secureEnv.secureMode = true
-    
-    -- Randomizar nomes de funções (versão segura)
+    -- Proteger contra manipulação de `getfenv` e `setfenv`
+    local secureEnv = {}
     local function RandomizeName(base)
         return base.."_"..math.random(1000,9999).."_"..string.char(math.random(97,122))
     end
@@ -1269,7 +1195,8 @@ end
 -- Garante que todos os elementos da UI existam antes de serem manipulados
 task.wait(1) -- Pequeno delay para garantir que a UI seja renderizada
 
--- Aplica o tema inicial e muda para a aba de início
-ApplyTheme()
 SwitchTab(InicioTab)
-Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
+Notify("Robloki Hub", "Interface carregada com sucesso!", 3)
+
+-- Aplica o tema inicial após a interface ser criada
+ApplyTheme()

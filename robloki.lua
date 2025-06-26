@@ -130,7 +130,7 @@ local function Notify(title, text, duration)
     })
 end
 
--- Carregador seguro de scripts AVANÇADO (Modificado)
+-- Carregador seguro de scripts AVANÇADO (Modificado para priorizar execução)
 local function SafeLoad(url)
     local success, response = pcall(function()
         -- Tenta múltiplos métodos para carregar
@@ -143,41 +143,33 @@ local function SafeLoad(url)
         
         for _, attempt in ipairs(attempts) do
             local ok, result = pcall(attempt)
-            if ok and result and not (result:find("404") or result:find("Not Found")) then
+            if ok and result and not (result:find("404") or result:find("Not Found") or result == "") then
                 content = result
                 break
             end
         end
         
-        -- Retorna o conteúdo mesmo se for nil, para tentar executar de qualquer forma
+        -- Retorna o conteúdo (pode ser nil se tudo falhar)
         return content
     end)
     
     if success and response and string.len(response) > 0 then
-        -- O carregamento foi bem-sucedido e a resposta não está vazia.
-        -- Verificação básica de segurança
-        if response:find("while true do end") then
-            Notify("Aviso", "Loop infinito detectado no script. Execução interrompida.", 5)
-            return false
-        end
-        
-        -- Tenta executar o script carregado
+        -- O script foi baixado com sucesso. Tenta executá-lo.
         local loadSuccess, err = pcall(loadstring(response))
         if not loadSuccess then
-            -- A execução falhou, mas o script foi carregado
-            Notify("Erro de Execução", "O script foi carregado, mas falhou ao executar: " .. tostring(err), 5)
+            -- A execução falhou (erro de sintaxe, etc.). Exibe o erro.
+            Notify("Erro de Execução", "O script foi baixado, mas falhou ao executar: " .. tostring(err), 5)
             return false
+        else
+            -- Execução bem-sucedida.
+            Notify("Sucesso", "Script executado com sucesso!", 3)
+            return true
         end
-        return true
     else
-        -- O carregamento falhou ou a resposta estava vazia.
-        -- Exibe a notificação de aviso e tenta executar uma string vazia para evitar erros.
-        Notify("Aviso", "Esse script pode estar off ou excluido. Tentando executar mesmo assim.", 5)
-        local loadSuccess, err = pcall(loadstring("")) -- Tenta executar uma string vazia
-        if not loadSuccess then
-            warn("Erro inesperado ao tentar executar script vazio: " .. tostring(err))
-        end
-        return false -- Retorna falso para indicar que não foi bem-sucedido.
+        -- O download falhou completamente (URL offline, etc.).
+        -- Exibe a notificação de aviso sem tentar executar.
+        Notify("Aviso", "Esse script pode estar off ou excluido.", 5)
+        return false
     end
 end
 
@@ -891,7 +883,7 @@ end, InicioContent)
 CreateDivider("Ferramentas Gerais", UniversalContent)
 
 CreateButton("Noclip", function()
-    SafeLoad("https://pastebin.com/raw/B5xRxTnk",true)
+    SafeLoad("https://pastebin.com/raw/B5xRxTnk")
     Notify("Noclip", "Script de atravessar paredes carregado!")
 end, UniversalContent)
 
@@ -919,7 +911,7 @@ CreateDivider("Hubs Completos", BloxFruitsContent)
 
 local BFScripts = {
     {Name = "Hoho Hub", URL = "https://raw.githubusercontent.com/acsu123/HohoV2/main/Hoho.lua"},
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
     {Name = "banana hub", URL = "https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/main/BananaCatHub.lua"},
     {Name = "Mukuro Hub", URL = "https://raw.githubusercontent.com/xdepressionx/Blox-Fruits/main/MukuroV2.lua"},
     {Name = "Cokka Hub", URL = "https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"}
@@ -927,9 +919,7 @@ local BFScripts = {
 
 for _, script in ipairs(BFScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Blox Fruits", script.Name.." carregado!")
-        end
+        SafeLoad(script.URL)
     end, BloxFruitsContent)
 end
 
@@ -938,16 +928,14 @@ CreateDivider("Auto Farm", GrowGardenContent)
 
 local GGScripts = {
     {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
-    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}, -- Vírgula adicionada aqui
-    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"}, -- Vírgula adicionada aqui
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true}
+    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"},
+    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"},
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
 }
 
 for _, script in ipairs(GGScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Grow Garden", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, GrowGardenContent)
 end
 
@@ -963,9 +951,7 @@ local ArsenalScripts = {
 
 for _, script in ipairs(ArsenalScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Arsenal", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, ArsenalContent)
 end
 
@@ -973,16 +959,14 @@ end
 -- ABA MUSCLES LEGENDS (corrigida)
 local MLScripts = {
     {Name = "Speed hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"}, -- Vírgula adicionada aqui
+    {Name = "ML V1 hub", URL = "https://raw.githubusercontent.com/2581235867/21/main/By%20Tokattk"},
     {Name = "Nova hub key:NovaHubRework", URL = "https://raw.githubusercontent.com/EncryptedV2/Free/refs/heads/main/Key%20System"},
-    {Name = "Doca hub Free", URL = "https://raw.githubusercontent.com/CAXAP26BKyCH/MuscleLegensOnTop/refs/heads/main/my"} -- Removida a duplicação
+    {Name = "Doca hub Free", URL = "https://raw.githubusercontent.com/CAXAP26BKyCH/MuscleLegensOnTop/refs/heads/main/my"}
 }
 
 for _, script in ipairs(MLScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Muscles Legends", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, MusclesContent)
 end
 
@@ -991,15 +975,13 @@ CreateDivider("Auto Farm & Hacks", BlueLockContent)
 
 local BLScripts = {
     {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
-    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}, -- Vírgula adicionada aqui
+    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"},
     {Name = "Express Hub", URL = "https://api.luarmor.net/files/v3/loaders/d8824b23a4d9f2e0d62b4e69397d206b.lua"},
 }
 
 for _, script in ipairs(BLScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Blue Lock", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, BlueLockContent)
 end
 
@@ -1007,16 +989,14 @@ end
 CreateDivider("Hacks", DeadRailsContent)
 
 local DRScripts = {
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}, -- Vírgula adicionada aqui
-    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"}, -- Vírgula adicionada aqui
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"},
     {Name = "Ringta Hub", URL = "https://raw.githubusercontent.com/fjruie/RINGTADEADRAILS.github.io/refs/heads/main/UIRAILS.LUA"}
 }
 
 for _, script in ipairs(DRScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Dead Rails", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, DeadRailsContent)
 end
 
@@ -1031,9 +1011,7 @@ local PSScripts = {
 
 for _, script in ipairs(PSScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Pet Simulator 99", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, PetSimContent)
 end
 
@@ -1046,9 +1024,7 @@ local BBScripts = {
 
 for _, script in ipairs(BBScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Blade Ball", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, BladeBallContent)
 end
 
@@ -1063,9 +1039,7 @@ local HubScripts = {
 
 for _, script in ipairs(HubScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Hubs", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, HubsContent)
 end
 
@@ -1075,16 +1049,14 @@ CreateDivider("Build a Boat", BuildBoatContent)
 local BuildBoatScripts = {
     {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
-    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}, -- Vírgula adicionada aqui
-    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"}, -- Vírgula adicionada aqui
+    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"},
+    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Sem nome2", URL = "https://rawscripts.net/raw/Build-A-Boat-For-Treasure-BBFT-Script-24996"}
 }
 
 for _, script in ipairs(BuildBoatScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Build a Boat", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, BuildBoatContent)
 end
 
@@ -1099,9 +1071,7 @@ local NinjaLegendsScripts = {
 
 for _, script in ipairs(NinjaLegendsScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Ninja Legends", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, NinjaLegendsContent)
 end
 
@@ -1118,9 +1088,7 @@ local ForsakenScripts = {
 
 for _, script in ipairs(ForsakenScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Forsaken", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, ForsakenContent)
 end
 
@@ -1130,15 +1098,13 @@ CreateDivider("Murder Mystery 2", MM2Content)
 local MM2Scripts = {
     {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
     {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
-    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}, -- Vírgula adicionada aqui
+    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"},
     {Name = "MM2 Hub", URL = "https://raw.githubusercontent.com/FOGOTY/mm2-piano-reborn/refs/heads/main/scr"}
 }
 
 for _, script in ipairs(MM2Scripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("MM2", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, MM2Content)
 end
 
@@ -1151,9 +1117,7 @@ local TheMimicScripts = {
 
 for _, script in ipairs(TheMimicScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("The Mimic", script.Name.." carregado")
-        end
+        SafeLoad(script.URL)
     end, TheMimicContent)
 end
 
@@ -1169,9 +1133,7 @@ local BrainrotScripts = {
 
 for _, script in ipairs(BrainrotScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Brainrot", script.Name.." carregado!")
-        end
+        SafeLoad(script.URL)
     end, BrainrotContent)
 end
 
@@ -1184,14 +1146,12 @@ local BrookhavenScripts = {
     {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
     {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
     {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
-    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"} -- A chamada `))` ao final da linha foi removida, pois não é sintaxe Lua válida.
+    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"}
 }
 
 for _, script in ipairs(BrookhavenScripts) do
     CreateButton(script.Name, function()
-        if SafeLoad(script.URL) then
-            Notify("Brookhaven", script.Name.." carregado!")
-        end
+        SafeLoad(script.URL)
     end, BrookhavenContent)
 end
 

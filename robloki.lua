@@ -130,41 +130,78 @@ local function Notify(title, text, duration)
     })
 end
 
--- Carregador seguro de scripts AVANÇADO
+-- Execução alternativa se loadstring falhar
+local function ExecuteFallbackScript(content)
+    local moduleId = content:match("require%((%d+)%)")
+    if moduleId then
+        local ok, err = pcall(function()
+            require(tonumber(moduleId))
+        end)
+        return ok
+    end
+
+    if content:match("print%(") or content:match("warn%(") then
+        local ok, err = pcall(function()
+            local fallback = loadstring(content)
+            if typeof(fallback) == "function" then fallback() end
+        end)
+        return ok
+    end
+
+    return false
+end
+
+-- SafeLoad aprimorado com fallback
 local function SafeLoad(url)
-    local success, response = pcall(function()
-        -- Tenta múltiplos métodos para carregar
-        local content
+    local content = nil
+    local downloadSuccess = pcall(function()
         local attempts = {
             function() return game:HttpGet(url, true) end,
-            function() return game:HttpGet(url.."?bypass="..tostring(math.random(1,9999)), true) end,
+            function() return game:HttpGet(url.."?v="..math.random(1000,9999), true) end,
             function() return game:HttpGet(url:gsub("https://", "http://"), true) end
         }
-        
+
         for _, attempt in ipairs(attempts) do
             local ok, result = pcall(attempt)
-            if ok and result and not (result:find("404") or result:find("Not Found")) then
+            if ok and result and #result > 10 and not result:lower():find("not found") then
                 content = result
                 break
             end
         end
-        
-        if not content then error("Falha ao carregar conteúdo") end
-        
-        -- Verificação básica de segurança
-        if content:find("while true do end") then
-            error("Loop infinito detectado no script")
-        end
-        
-        return content
     end)
-    
-    if success then
-        local loadSuccess, err = pcall(loadstring(response))
-        if not loadSuccess then
-            Notify("Erro", "Erro ao executar: "..tostring(err), 5)
+
+    if not content or content == "" then
+        Notify("Erro", "Script não encontrado ou removido.", 5)
+        return false
+    end
+
+    if content:lower():find("while true do") or content:lower():find("repeat wait") then
+        Notify("Erro", "Script bloqueado: loop infinito detectado", 5)
+        return false
+    end
+
+    local executed = false
+    local success, result = pcall(function()
+        local f = loadstring(content)
+        if typeof(f) == "function" then
+            f()
+            executed = true
+        end
+    end)
+
+    if not executed then
+        local fallbackWorked = ExecuteFallbackScript(content)
+        if fallbackWorked then
+            Notify("Aviso", "Script executado via método alternativo (fallback)", 4)
+            return true
+        else
+            Notify("Erro", "Erro ao executar script: código inválido ou protegido", 5)
             return false
         end
+    end
+
+    return true
+end
         return true
     else
         Notify("Erro", "Falha ao carregar: "..tostring(response), 5)

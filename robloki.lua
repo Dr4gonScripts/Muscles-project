@@ -1,4 +1,5 @@
-  --[[
+
+--[[
   🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
   Atualizações:
   - Todos os scripts originais restaurados
@@ -28,48 +29,21 @@ local Theme = {
     Error = Color3.fromRGB(255, 50, 50)
 }
 
--- Função para aplicar o tema (REVISADA)
+-- Função para aplicar o tema (REVISADA E OTIMIZADA)
 local function ApplyTheme()
-    -- Frame principal
+    -- Frame principal e seus componentes
     if MainFrame then
         MainFrame.BackgroundColor3 = Theme.Background
         if UIStroke then UIStroke.Color = Theme.Primary end
     end
     
-    -- Barra de título
+    -- Barra de título e seus componentes
     if TitleBar then
-        TitleBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 5, 0, 255)
-        )
-    end
-    
-    -- Textos
-    if Title then Title.TextColor3 = Theme.Accent end
-    if PlayerName then PlayerName.TextColor3 = Theme.Accent end
-    if PlayerId then PlayerId.TextColor3 = Theme.Text end
-    if GameName then GameName.TextColor3 = Theme.Text end
-    if SearchHint then 
-        SearchHint.TextColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
-    end
-    
-    -- Botões das abas
-    if TabScrollingFrame then
-        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
-            if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Color3.fromRGB(
-                    math.clamp(Theme.Background.R * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.G * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.B * 255 + 25, 0, 255)
-                )
-                tab.TextColor3 = Theme.Text
-            end
-        end
+        TitleBar.BackgroundColor3 = Theme.Background
+        Title.TextColor3 = Theme.Accent
+        PlayerName.TextColor3 = Theme.Accent
+        PlayerId.TextColor3 = Theme.Text
+        GameName.TextColor3 = Theme.Text
     end
     
     -- Botões de controle
@@ -84,41 +58,45 @@ local function ApplyTheme()
     
     -- Barra de pesquisa
     if SearchBar then
-        SearchBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-        )
+        SearchBar.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 15, Theme.Background.G * 255 + 15, Theme.Background.B * 255 + 15)
         SearchBar.TextColor3 = Theme.Text
-        SearchBar.PlaceholderColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
+        SearchBar.PlaceholderColor3 = Color3.fromRGB(Theme.Text.R * 255 - 90, Theme.Text.G * 255 - 90, Theme.Text.B * 255 - 90)
+        if SearchHint then SearchHint.TextColor3 = SearchBar.PlaceholderColor3 end
     end
     
-    -- Conteúdo das abas
+    -- Abas
+    if TabScrollingFrame then
+        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+            if tab:IsA("TextButton") then
+                tab.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 25, Theme.Background.G * 255 + 25, Theme.Background.B * 255 + 25)
+                tab.TextColor3 = Theme.Text
+            end
+        end
+    end
+    
+    -- Conteúdo dos frames (botões)
     if MainFrame then
         for _, contentFrame in ipairs(MainFrame:GetChildren()) do
             if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
                 for _, element in ipairs(contentFrame:GetChildren()) do
                     if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Color3.fromRGB(
-                            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-                        )
+                        element.BackgroundColor3 = Color3.fromRGB(Theme.Background.R * 255 + 15, Theme.Background.G * 255 + 15, Theme.Background.B * 255 + 15)
                         element.TextColor3 = Theme.Text
-                        
                         local stroke = element:FindFirstChild("UIStroke")
                         if stroke then stroke.Color = Theme.Primary end
+                    elseif element:IsA("Frame") and element:FindFirstChildOfClass("TextLabel") then -- Divisor
+                        local label = element:FindFirstChildOfClass("TextLabel")
+                        if label then label.TextColor3 = Theme.Primary end
+                        for _, line in ipairs(element:GetChildren()) do
+                            if line:IsA("Frame") and line.Name:find("Line") then line.BackgroundColor3 = Theme.Primary end
+                        end
                     end
                 end
             end
         end
     end
-
-    -- Garante que o tema da aba ativa seja atualizado
+    
+    -- Aplicar o tema na aba ativa novamente para garantir a cor correta
     if CurrentTab then
         SwitchTab(CurrentTab)
     end

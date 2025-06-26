@@ -1,6 +1,6 @@
 --[
   🐉 Robloki Hub Premium - Versão Otimizada V5.0
-  -- Código otimizado e mais compacto --
+  -- Código otimizado e mais compacto (ARRUMADO O ARRASTAR)--
 ]]
 
 local Players = game:GetService("Players")
@@ -412,21 +412,21 @@ end
 
 -- Dragging logic
 local isDragging = false
-local dragStartPos
+local dragStartOffset
 local dragStartMousePos
 
 TitleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         isDragging = true
-        dragStartPos = MainFrame.Position
-        dragStartMousePos = UserInputService:GetMouseLocation()
+        dragStartOffset = MainFrame.Position - UDim2.new(0, input.Position.X, 0, input.Position.Y)
+        -- `input.Position` is relative to the screen, which is what we need here.
     end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input, gameProcessedEvent)
     if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStartMousePos
-        MainFrame.Position = UDim2.new(dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X, dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y)
+        local newPos = UDim2.new(0, input.Position.X, 0, input.Position.Y) + dragStartOffset
+        MainFrame.Position = newPos
     end
 end)
 

@@ -7,6 +7,8 @@
   - Correção de todos os erros de sintaxe
   - 15 abas completas com todos os scripts originais
   - Sistema de rolagem automático nas abas
+  - Sistema de temas personalizáveis
+  - Adicionado carregamento dinâmico de temas
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -728,6 +730,31 @@ SearchHint.BackgroundTransparency = 1
 SearchHint.Size = UDim2.new(0.9, 0, 0, 20)
 SearchHint.Position = UDim2.new(0.05, 0, 0, 170)
 SearchHint.Parent = InicioContent
+
+-- Adicionar divisor para a seção de temas
+CreateDivider("Temas da Interface", InicioContent)
+
+-- Botão para o tema branco
+CreateButton("Tema Branco", function()
+    Notify("Carregando Tema", "Carregando o script do tema branco...", 3)
+    if SafeLoad("https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/CorBranca.lua") then
+        task.wait(0.5) -- Pequeno delay para garantir que o script carregou
+        ScreenGui:Destroy()
+    else
+        Notify("Erro", "Falha ao carregar o tema branco.", 5)
+    end
+end, InicioContent)
+
+-- Botão para o tema azul
+CreateButton("Tema Azul", function()
+    Notify("Carregando Tema", "Carregando o script do tema azul...", 3)
+    if SafeLoad("https://raw.githubusercontent.com/Dr4gonScripts/Muscles-project/refs/heads/main/CorAzul.lua") then
+        task.wait(0.5) -- Pequeno delay
+        ScreenGui:Destroy()
+    else
+        Notify("Erro", "Falha ao carregar o tema azul.", 5)
+    end
+end, InicioContent)
 
 
 -- ABA UNIVERSAL

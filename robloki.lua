@@ -117,125 +117,6 @@ local function ApplyTheme()
             end
         end
     end
-end--[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
-  Atualizações:
-  - Todos os scripts originais restaurados
-  - Sistema anti-detecção aprimorado
-  - Interface mais fluida
-  - Correção de todos os erros de sintaxe
-  - 15 abas completas com todos os scripts originais
-  - Sistema de rolagem automático nas abas
-  - Sistema de temas personalizáveis
-]]
-
-local Player = game:GetService("Players").LocalPlayer
-local Mouse = Player:GetMouse()
-
--- ===== CONFIGURAÇÃO INICIAL SEGURA =====
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
-ScreenGui.Parent = game:GetService("CoreGui")
-
--- Tema modernizado
-local Theme = {
-    Background = Color3.fromRGB(15, 15, 25),
-    Primary = Color3.fromRGB(80, 50, 180),
-    Secondary = Color3.fromRGB(0, 150, 255),
-    Accent = Color3.fromRGB(200, 200, 255),
-    Text = Color3.fromRGB(240, 240, 255),
-    Error = Color3.fromRGB(255, 50, 50)
-}
-
--- Função para aplicar o tema
-local function ApplyTheme()
-    -- Frame principal
-    if MainFrame then
-        MainFrame.BackgroundColor3 = Theme.Background
-        if UIStroke then UIStroke.Color = Theme.Primary end
-    end
-    
-    -- Barra de título
-    if TitleBar then
-        TitleBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 5, 0, 255)
-        )
-    end
-    
-    -- Textos
-    if Title then Title.TextColor3 = Theme.Accent end
-    if PlayerName then PlayerName.TextColor3 = Theme.Accent end
-    if PlayerId then PlayerId.TextColor3 = Theme.Text end
-    if GameName then GameName.TextColor3 = Theme.Text end
-    if SearchHint then 
-        SearchHint.TextColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
-    end
-    
-    -- Botões das abas
-    if TabScrollingFrame then
-        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
-            if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Color3.fromRGB(
-                    math.clamp(Theme.Background.R * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.G * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.B * 255 + 25, 0, 255)
-                )
-                tab.TextColor3 = Theme.Text
-            end
-        end
-    end
-    
-    -- Botões de controle
-    if CloseButton then
-        CloseButton.BackgroundColor3 = Theme.Error
-        CloseButton.TextColor3 = Theme.Text
-    end
-    if MinimizeButton then
-        MinimizeButton.BackgroundColor3 = Theme.Primary
-        MinimizeButton.TextColor3 = Theme.Text
-    end
-    
-    -- Barra de pesquisa
-    if SearchBar then
-        SearchBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-        )
-        SearchBar.TextColor3 = Theme.Text
-        SearchBar.PlaceholderColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
-    end
-    
-    -- Conteúdo das abas
-    if MainFrame then
-        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
-            if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
-                for _, element in ipairs(contentFrame:GetChildren()) do
-                    if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Color3.fromRGB(
-                            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-                        )
-                        element.TextColor3 = Theme.Text
-                        
-                        local stroke = element:FindFirstChild("UIStroke")
-                        if stroke then stroke.Color = Theme.Primary end
-                    end
-                end
-            end
-        end
-    end
 end
 
 -- Função de notificação melhorada
@@ -488,6 +369,10 @@ local function CreateTab(name)
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
             BackgroundColor3 = Color3.fromRGB(40, 40, 60)
         }):Play()
+    end)
+    
+    tab.MouseButton1Click:Connect(function()
+        pcall(callback)
     end)
     
     return tab
@@ -1043,8 +928,8 @@ CreateDivider("Auto Farm", GrowGardenContent)
 
 local GGScripts = {
     {Name = "No-lag Hub", URL = "https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/main/Loader/LoaderV1.lua"},
-    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}
-    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"}
+    {Name = "Solix Hub", URL = "https://raw.githubusercontent.com/debunked69/solixloader/main/solix%20v2%20new%20loader.lua"}, -- Vírgula adicionada aqui
+    {Name = "Mozil Hub", URL = "https://raw.githubusercontent.com/MoziIOnTop/MoziIHub/refs/heads/main/GrowaGarden"}, -- Vírgula adicionada aqui
     {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true}
 }
 
@@ -1096,7 +981,7 @@ CreateDivider("Auto Farm & Hacks", BlueLockContent)
 
 local BLScripts = {
     {Name = "Alchemy Hub", URL = "https://scripts.alchemyhub.xyz"},
-    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}
+    {Name = "Shiro X hub", URL = "https://raw.githubusercontent.com/DarkFusionSSS/SHIRO-X-BLUE-LOCK-SIGMA/main/Protected_3467848847610666.txt"}, -- Vírgula adicionada aqui
     {Name = "Express Hub", URL = "https://api.luarmor.net/files/v3/loaders/d8824b23a4d9f2e0d62b4e69397d206b.lua"},
 }
 
@@ -1112,8 +997,8 @@ end
 CreateDivider("Hacks", DeadRailsContent)
 
 local DRScripts = {
-    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}
-    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"}
+    {Name = "Speed Hub X", URL = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"}, -- Vírgula adicionada aqui
+    {Name = "Capri Hub", URL = "https://raw.githubusercontent.com/aceurss/AcxScripter/refs/heads/main/CapriHub-DeadRails"}, -- Vírgula adicionada aqui
     {Name = "Ringta Hub", URL = "https://raw.githubusercontent.com/fjruie/RINGTADEADRAILS.github.io/refs/heads/main/UIRAILS.LUA"}
 }
 
@@ -1180,8 +1065,8 @@ CreateDivider("Build a Boat", BuildBoatContent)
 local BuildBoatScripts = {
     {Name = "Cat Hub", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"},
     {Name = "Weshky Hub", URL = "https://raw.githubusercontent.com/suntisalts/BetaTesting/refs/heads/main/WeshkyAutoBuild.lua"},
-    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}
-    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"}
+    {Name = "Lexus Hub", URL = "https://pastebin.com/raw/2NjKRALJ"}, -- Vírgula adicionada aqui
+    {Name = "Sem nome", URL = "https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1"}, -- Vírgula adicionada aqui
     {Name = "Sem nome2", URL = "https://rawscripts.net/raw/Build-A-Boat-For-Treasure-BBFT-Script-24996"}
 }
 
@@ -1235,7 +1120,7 @@ CreateDivider("Murder Mystery 2", MM2Content)
 local MM2Scripts = {
     {Name = "Aether Hub", URL = "https://raw.githubusercontent.com/vzyxer/Aether-Hub-Global-Roblox-Script-Hub/refs/heads/main/Murder%20Mystery%202"},
     {Name = "Space Hub", URL = "https://raw.githubusercontent.com/ago106/SpaceHub/refs/heads/main/Multi"},
-    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}
+    {Name = "Tbao Hub", URL = "https://raw.githubusercontent.com/tbao143/thaibao/main/TbaoHubMurdervssheriff"}, -- Vírgula adicionada aqui
     {Name = "MM2 Hub", URL = "https://raw.githubusercontent.com/FOGOTY/mm2-piano-reborn/refs/heads/main/scr"}
 }
 
@@ -1289,7 +1174,7 @@ local BrookhavenScripts = {
     {Name = "Mango Hub", URL = "https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub"},
     {Name = "Rael Hub", URL = "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
     {Name = "Coquette Hub", URL = "https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"},
-    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"))()"},
+    {Name = "Chaos Hub", URL = "https://raw.githubusercontent.com/Luscaa22/Calabocaa/refs/heads/main/ChaosHub"} -- A chamada `))` ao final da linha foi removida, pois não é sintaxe Lua válida.
 }
 
 for _, script in ipairs(BrookhavenScripts) do
@@ -1455,14 +1340,3 @@ Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponí
 
 -- ▼▼▼ CHAMAR ApplyTheme() AQUI PARA APLICAR O TEMA INICIAL ▼▼▼
 ApplyTheme()
-
--- Verificação de atualização
-spawn(function()
-    local success, latestVersion = pcall(function()
-        return game:HttpGet("https://pastebin.com/raw/ExampleVersionCheck", true)
-    end)
-    
-    if success and latestVersion ~= "V5.0" then
-        Notify("Atualização Disponível", "Nova versão do hub disponível!", 10)
-    end
-end)

@@ -130,7 +130,7 @@ local function Notify(title, text, duration)
     })
 end
 
--- Carregador seguro de scripts AVANÇADO
+-- Carregador seguro de scripts AVANÇADO (Modificado)
 local function SafeLoad(url)
     local success, response = pcall(function()
         -- Tenta múltiplos métodos para carregar
@@ -149,26 +149,35 @@ local function SafeLoad(url)
             end
         end
         
-        if not content then error("Falha ao carregar conteúdo") end
-        
-        -- Verificação básica de segurança
-        if content:find("while true do end") then
-            error("Loop infinito detectado no script")
-        end
-        
+        -- Retorna o conteúdo mesmo se for nil, para tentar executar de qualquer forma
         return content
     end)
     
-    if success then
+    if success and response and string.len(response) > 0 then
+        -- O carregamento foi bem-sucedido e a resposta não está vazia.
+        -- Verificação básica de segurança
+        if response:find("while true do end") then
+            Notify("Aviso", "Loop infinito detectado no script. Execução interrompida.", 5)
+            return false
+        end
+        
+        -- Tenta executar o script carregado
         local loadSuccess, err = pcall(loadstring(response))
         if not loadSuccess then
-            Notify("Erro", "Erro ao executar: "..tostring(err), 5)
+            -- A execução falhou, mas o script foi carregado
+            Notify("Erro de Execução", "O script foi carregado, mas falhou ao executar: " .. tostring(err), 5)
             return false
         end
         return true
     else
-        Notify("Erro", "Falha ao carregar: "..tostring(response), 5)
-        return false
+        -- O carregamento falhou ou a resposta estava vazia.
+        -- Exibe a notificação de aviso e tenta executar uma string vazia para evitar erros.
+        Notify("Aviso", "Esse script pode estar off ou excluido. Tentando executar mesmo assim.", 5)
+        local loadSuccess, err = pcall(loadstring("")) -- Tenta executar uma string vazia
+        if not loadSuccess then
+            warn("Erro inesperado ao tentar executar script vazio: " .. tostring(err))
+        end
+        return false -- Retorna falso para indicar que não foi bem-sucedido.
     end
 end
 

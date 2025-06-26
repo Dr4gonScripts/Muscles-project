@@ -19,6 +19,57 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
 ScreenGui.Parent = game:GetService("CoreGui")
 
+-- Tema padrão (essencial para os scripts de tema funcionarem)
+-- Eles irão alterar os valores desta tabela e depois chamar ApplyTheme()
+local Theme = {
+    Background = Color3.fromRGB(15, 15, 25),
+    Primary = Color3.fromRGB(80, 50, 180),
+    Secondary = Color3.fromRGB(0, 150, 255),
+    Accent = Color3.fromRGB(200, 200, 255),
+    Text = Color3.fromRGB(240, 240, 255),
+    Error = Color3.fromRGB(255, 50, 50)
+}
+
+-- Função para aplicar o tema em todos os elementos da UI (ESSENCIAL)
+local function ApplyTheme()
+    -- Frame principal
+    if MainFrame then
+        MainFrame.BackgroundColor3 = Theme.Background
+        if UIStroke then UIStroke.Color = Theme.Primary end
+    end
+    -- Barra de título
+    if TitleBar then
+        TitleBar.BackgroundColor3 = Theme.Primary
+    end
+    -- Título e texto
+    if Title then Title.TextColor3 = Theme.Text end
+    if CloseButton then CloseButton.BackgroundColor3 = Theme.Error end
+    if MinimizeButton then MinimizeButton.BackgroundColor3 = Theme.Primary end
+    -- Barra de abas
+    if TabScrollingFrame then TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary end
+    -- Elementos de conteúdo (botões, etc.)
+    -- A cor dos botões deve ser atualizada manualmente, se necessário, ou pelo script de tema
+    -- O script de tema deve redefinir as cores dos elementos após a tabela Theme ser atualizada
+    
+    -- Exemplo de como um script de tema pode mudar a cor dos botões:
+    --[[
+        for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
+            if tab:IsA("TextButton") then
+                tab.BackgroundColor3 = Theme.Secondary
+            end
+        end
+        for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+            if contentFrame:IsA("ScrollingFrame") then
+                for _, btn in ipairs(contentFrame:GetChildren()) do
+                    if btn:IsA("TextButton") then
+                        btn.BackgroundColor3 = Theme.Background + Color3.fromRGB(10,10,10)
+                    end
+                end
+            end
+        end
+    ]]
+end
+
 -- Função de notificação melhorada
 local function Notify(title, text, duration)
     game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -79,7 +130,7 @@ local largeSize = UDim2.new(0.6, 0, 0.8, 0)  -- Tamanho aumentado
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = smallSize  -- Começa com o tamanho pequeno
 MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
@@ -90,20 +141,20 @@ UICorner.CornerRadius = UDim.new(0, 8)
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(80, 50, 180)
+UIStroke.Color = Theme.Primary
 UIStroke.Thickness = 2
 UIStroke.Parent = MainFrame
 
 -- Barra de título premium
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1, 0, 0, 30)
-TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+TitleBar.BackgroundColor3 = Theme.Primary
 TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
 Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
-Title.TextColor3 = Color3.fromRGB(200, 200, 255)
+Title.TextColor3 = Theme.Text
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 14
 Title.Size = UDim2.new(0.7, 0, 1, 0)
@@ -116,8 +167,8 @@ local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "✕"
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
 CloseButton.Position = UDim2.new(1, -35, 0, 0)
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-CloseButton.TextColor3 = Color3.fromRGB(240, 240, 255)
+CloseButton.BackgroundColor3 = Theme.Error
+CloseButton.TextColor3 = Theme.Text
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.TextSize = 16
 CloseButton.Parent = TitleBar
@@ -126,8 +177,8 @@ local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Text = "─"
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -70, 0, 0)
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(80, 50, 180)
-MinimizeButton.TextColor3 = Color3.fromRGB(240, 240, 255)
+MinimizeButton.BackgroundColor3 = Theme.Accent
+MinimizeButton.TextColor3 = Theme.Text
 MinimizeButton.Font = Enum.Font.GothamBold
 MinimizeButton.TextSize = 16
 MinimizeButton.Parent = TitleBar
@@ -138,7 +189,7 @@ TabScrollingFrame.Size = UDim2.new(1, 0, 0, 35)
 TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
 TabScrollingFrame.BackgroundTransparency = 1
 TabScrollingFrame.ScrollBarThickness = 3
-TabScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 50, 180)
+TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
 TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
 TabScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.X
 TabScrollingFrame.Parent = MainFrame
@@ -1218,5 +1269,7 @@ end
 -- Garante que todos os elementos da UI existam antes de serem manipulados
 task.wait(1) -- Pequeno delay para garantir que a UI seja renderizada
 
+-- Aplica o tema inicial e muda para a aba de início
+ApplyTheme()
 SwitchTab(InicioTab)
 Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)

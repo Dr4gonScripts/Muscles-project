@@ -33,6 +33,7 @@ local function ApplyTheme()
     -- Frame principal
     if MainFrame then
         MainFrame.BackgroundColor3 = Theme.Background
+        -- A verificação `if UIStroke` garante que esta linha não cause um erro
         if UIStroke then UIStroke.Color = Theme.Primary end
     end
     
@@ -1335,6 +1336,9 @@ if not success then
 end
 
 -- ===== INICIALIZAÇÃO =====
+-- Garante que todos os elementos da UI existam antes de serem manipulados
+task.wait(1) -- Pequeno delay para garantir que a UI seja renderizada
+
 SwitchTab(InicioTab)
 Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 

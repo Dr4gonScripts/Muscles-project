@@ -1,13 +1,14 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
+  🐉 Robloki Hub Premium - Versão Completa Otimizada V6.0
   Atualizações:
-  - Todos os scripts originais restaurados
+  - **Interface AUMENTADA e ARRASTÁVEL!**
+  - **Novo tema: Preto e Ciano**
+  - Scripts verificados e atualizados
   - Sistema anti-detecção aprimorado
-  - Interface mais fluida
-  - Correção de todos os erros de sintaxe
+  - Interface mais fluida e responsiva
   - 15 abas completas com todos os scripts originais
+  - Correção de todos os erros de sintaxe
   - Sistema de rolagem automático nas abas
-  - Sistema de temas personalizáveis
 ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -18,14 +19,14 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PremiumHub_"..math.random(1000,9999)
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- Tema modernizado
+-- ===== TEMA PERSONALIZADO (PRETO E CIANO) =====
 local Theme = {
-    Background = Color3.fromRGB(15, 15, 25),
-    Primary = Color3.fromRGB(80, 50, 180),
-    Secondary = Color3.fromRGB(0, 150, 255),
-    Accent = Color3.fromRGB(200, 200, 255),
-    Text = Color3.fromRGB(240, 240, 255),
-    Error = Color3.fromRGB(255, 50, 50)
+    Background = Color3.fromRGB(10, 10, 10), -- Preto escuro
+    Primary = Color3.fromRGB(0, 255, 255),   -- Ciano
+    Secondary = Color3.fromRGB(0, 150, 150), -- Ciano mais escuro
+    Accent = Color3.fromRGB(200, 200, 200),  -- Cinza claro
+    Text = Color3.fromRGB(255, 255, 255),   -- Branco
+    Error = Color3.fromRGB(255, 50, 50)     -- Vermelho para o botão de fechar
 }
 
 -- Função para aplicar o tema
@@ -34,41 +35,35 @@ local function ApplyTheme()
     if MainFrame then
         MainFrame.BackgroundColor3 = Theme.Background
         -- A verificação `if UIStroke` garante que esta linha não cause um erro
-        if UIStroke then UIStroke.Color = Theme.Primary end
+        local stroke = MainFrame:FindFirstChildOfClass("UIStroke")
+        if stroke then stroke.Color = Theme.Primary end
     end
     
     -- Barra de título
     if TitleBar then
-        TitleBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 5, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 5, 0, 255)
-        )
+        TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Um pouco mais claro que o fundo
     end
     
     -- Textos
-    if Title then Title.TextColor3 = Theme.Accent end
-    if PlayerName then PlayerName.TextColor3 = Theme.Accent end
-    if PlayerId then PlayerId.TextColor3 = Theme.Text end
-    if GameName then GameName.TextColor3 = Theme.Text end
+    if Title then Title.TextColor3 = Theme.Primary end
+    if PlayerName then PlayerName.TextColor3 = Theme.Primary end
+    if PlayerId then PlayerId.TextColor3 = Theme.Accent end
+    if GameName then GameName.TextColor3 = Theme.Accent end
     if SearchHint then 
-        SearchHint.TextColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
+        SearchHint.TextColor3 = Color3.fromRGB(150, 150, 150)
     end
     
     -- Botões das abas
     if TabScrollingFrame then
         for _, tab in ipairs(TabScrollingFrame:GetChildren()) do
             if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Color3.fromRGB(
-                    math.clamp(Theme.Background.R * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.G * 255 + 25, 0, 255),
-                    math.clamp(Theme.Background.B * 255 + 25, 0, 255)
-                )
+                tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
                 tab.TextColor3 = Theme.Text
+                
+                -- Ajustar a cor da aba ativa
+                if tab.BackgroundColor3 == Theme.Primary then
+                    tab.BackgroundColor3 = Theme.Primary
+                end
             end
         end
     end
@@ -79,43 +74,49 @@ local function ApplyTheme()
         CloseButton.TextColor3 = Theme.Text
     end
     if MinimizeButton then
-        MinimizeButton.BackgroundColor3 = Theme.Primary
-        MinimizeButton.TextColor3 = Theme.Text
+        MinimizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        MinimizeButton.TextColor3 = Theme.Primary
     end
     
     -- Barra de pesquisa
     if SearchBar then
-        SearchBar.BackgroundColor3 = Color3.fromRGB(
-            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-        )
+        SearchBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
         SearchBar.TextColor3 = Theme.Text
-        SearchBar.PlaceholderColor3 = Color3.fromRGB(
-            math.clamp(Theme.Text.R * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.G * 255 - 90, 0, 255),
-            math.clamp(Theme.Text.B * 255 - 90, 0, 255)
-        )
+        SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
     end
     
-    -- Conteúdo das abas
+    -- Conteúdo das abas e botões
     if MainFrame then
         for _, contentFrame in ipairs(MainFrame:GetChildren()) do
             if contentFrame:IsA("ScrollingFrame") and contentFrame.Name:find("Content") then
                 for _, element in ipairs(contentFrame:GetChildren()) do
                     if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Color3.fromRGB(
-                            math.clamp(Theme.Background.R * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.G * 255 + 15, 0, 255),
-                            math.clamp(Theme.Background.B * 255 + 15, 0, 255)
-                        )
+                        element.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
                         element.TextColor3 = Theme.Text
                         
-                        local stroke = element:FindFirstChild("UIStroke")
-                        if stroke then stroke.Color = Theme.Primary end
+                        local stroke = element:FindFirstChildOfClass("UIStroke")
+                        if stroke then stroke.Color = Theme.Secondary end
+                    elseif element:IsA("Frame") and element.Name:find("Divider") then
+                        local label = element:FindFirstChildOfClass("TextLabel")
+                        if label then label.TextColor3 = Theme.Primary end
+                        local lines = element:GetChildren()
+                        for _, line in ipairs(lines) do
+                            if line:IsA("Frame") and line.Name:find("Line") then
+                                line.BackgroundColor3 = Theme.Primary
+                            end
+                        end
                     end
                 end
             end
+        end
+    end
+    -- Ajustar a cor dos scrollbars
+    if TabScrollingFrame then
+        TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
+    end
+    for _, contentFrame in ipairs(MainFrame:GetChildren()) do
+        if contentFrame:IsA("ScrollingFrame") then
+            contentFrame.ScrollBarImageColor3 = Theme.Primary
         end
     end
 end
@@ -173,22 +174,21 @@ local function SafeLoad(url)
     end
 end
 
--- ===== CONSTRUÇÃO DA INTERFACE =====
--- Definir os dois tamanhos
+-- ===== CONSTRUÇÃO DA INTERFACE (TAMANHO MAIOR) =====
 local smallSize = UDim2.new(0.35, 0, 0.5, 0)
-local largeSize = UDim2.new(0.6, 0, 0.8, 0)  -- Tamanho aumentado
+local largeSize = UDim2.new(0.4, 0, 0.7, 0) -- Novo tamanho maior
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = smallSize  -- Começa com o tamanho pequeno
-MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+MainFrame.Size = largeSize -- Começa com o tamanho maior
+MainFrame.Position = UDim2.new(0.3, 0, 0.15, 0) -- Posição inicial centralizada
 MainFrame.BackgroundColor3 = Theme.Background
-MainFrame.BackgroundTransparency = 0.1
+MainFrame.BackgroundTransparency = 0
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 
 -- Efeitos visuais atualizados
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.CornerRadius = UDim.new(0, 10)
 UICorner.Parent = MainFrame
 
 local UIStroke = Instance.new("UIStroke")
@@ -196,18 +196,18 @@ UIStroke.Color = Theme.Primary
 UIStroke.Thickness = 2
 UIStroke.Parent = MainFrame
 
--- Barra de título premium
+-- Barra de título premium (ARRRASTÁVEL)
 local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, 30)
-TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+TitleBar.Size = UDim2.new(1, 0, 0, 35)
+TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
-Title.TextColor3 = Theme.Accent
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V6.0 🐉"
+Title.TextColor3 = Theme.Primary
 Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 14
+Title.TextSize = 16
 Title.Size = UDim2.new(0.7, 0, 1, 0)
 Title.Position = UDim2.new(0.15, 0, 0, 0)
 Title.BackgroundTransparency = 1
@@ -216,30 +216,30 @@ Title.Parent = TitleBar
 -- Botões de controle atualizados
 local CloseButton = Instance.new("TextButton")
 CloseButton.Text = "✕"
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -35, 0, 0)
+CloseButton.Size = UDim2.new(0, 35, 0, 35)
+CloseButton.Position = UDim2.new(1, -40, 0, 0)
 CloseButton.BackgroundColor3 = Theme.Error
 CloseButton.TextColor3 = Theme.Text
 CloseButton.Font = Enum.Font.GothamBold
-CloseButton.TextSize = 16
+CloseButton.TextSize = 18
 CloseButton.Parent = TitleBar
 
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Text = "─"
-MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
-MinimizeButton.Position = UDim2.new(1, -70, 0, 0)
-MinimizeButton.BackgroundColor3 = Theme.Primary
-MinimizeButton.TextColor3 = Theme.Text
+MinimizeButton.Size = UDim2.new(0, 35, 0, 35)
+MinimizeButton.Position = UDim2.new(1, -80, 0, 0)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MinimizeButton.TextColor3 = Theme.Primary
 MinimizeButton.Font = Enum.Font.GothamBold
-MinimizeButton.TextSize = 16
+MinimizeButton.TextSize = 18
 MinimizeButton.Parent = TitleBar
 
 -- Barra de abas com rolagem automática
 local TabScrollingFrame = Instance.new("ScrollingFrame")
-TabScrollingFrame.Size = UDim2.new(1, 0, 0, 35)
-TabScrollingFrame.Position = UDim2.new(0, 0, 0, 30)
+TabScrollingFrame.Size = UDim2.new(1, 0, 0, 40)
+TabScrollingFrame.Position = UDim2.new(0, 0, 0, 35)
 TabScrollingFrame.BackgroundTransparency = 1
-TabScrollingFrame.ScrollBarThickness = 3
+TabScrollingFrame.ScrollBarThickness = 5
 TabScrollingFrame.ScrollBarImageColor3 = Theme.Primary
 TabScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
 TabScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.X
@@ -248,31 +248,14 @@ TabScrollingFrame.Parent = MainFrame
 -- Layout para organização automática das abas
 local TabListLayout = Instance.new("UIListLayout")
 TabListLayout.FillDirection = Enum.FillDirection.Horizontal
-TabListLayout.Padding = UDim.new(0, 5)
+TabListLayout.Padding = UDim.new(0, 7)
 TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 TabListLayout.Parent = TabScrollingFrame
 
 -- Atualizar CanvasSize automaticamente
 TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, 35)
+    TabScrollingFrame.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 10, 0, 40)
 end)
-
--- Variáveis para controle de estado
-local minimized = false
-local isSmallSize = true  -- Começa com o tamanho pequeno
-local relativePosition = {X = 0.05, Y = 0.25}  -- Posição inicial relativa
-
--- Função para ajustar a posição ao mudar de tamanho
-local function AdjustPosition()
-    local viewportSize = workspace.CurrentCamera.ViewportSize
-    local newX = relativePosition.X * viewportSize.X - (MainFrame.AbsoluteSize.X / 2)
-    local newY = relativePosition.Y * viewportSize.Y - (MainFrame.AbsoluteSize.Y / 2)
-    
-    MainFrame.Position = UDim2.new(
-        0, math.clamp(newX, 0, viewportSize.X - MainFrame.AbsoluteSize.X),
-        0, math.clamp(newY, 0, viewportSize.Y - MainFrame.AbsoluteSize.Y)
-    )
-end
 
 -- Sistema de arrastar para mover a janela
 local dragging = false
@@ -283,13 +266,6 @@ TitleBar.InputBegan:Connect(function(input)
         dragging = true
         dragStart = input.Position
         startPos = MainFrame.Position
-        
-        -- Salva a posição relativa
-        local viewportSize = workspace.CurrentCamera.ViewportSize
-        relativePosition = {
-            X = (startPos.X.Offset + MainFrame.AbsoluteSize.X/2) / viewportSize.X,
-            Y = (startPos.Y.Offset + MainFrame.AbsoluteSize.Y/2) / viewportSize.Y
-        }
     end
 end)
 
@@ -303,38 +279,21 @@ end)
 TitleBar.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
-        
-        -- Atualiza a posição relativa
-        local viewportSize = workspace.CurrentCamera.ViewportSize
-        relativePosition = {
-            X = (MainFrame.Position.X.Offset + MainFrame.AbsoluteSize.X/2) / viewportSize.X,
-            Y = (MainFrame.Position.Y.Offset + MainFrame.AbsoluteSize.Y/2) / viewportSize.Y
-        }
     end
 end)
 
 -- Função do botão Minimizar
+local isMinimized = false
 MinimizeButton.MouseButton1Click:Connect(function()
-    if minimized then
-        -- Restaurar (alternar entre tamanhos)
-        MainFrame.Visible = true
-        if isSmallSize then
-            MainFrame.Size = largeSize
-            MinimizeButton.Text = "◄"  -- Ícone diferente para indicar que pode voltar ao pequeno
-        else
-            MainFrame.Size = smallSize
-            MinimizeButton.Text = "─"  -- Ícone padrão
-        end
-        isSmallSize = not isSmallSize
-        minimized = false
-        AdjustPosition()  -- Ajusta a posição após mudar o tamanho
-    else
-        -- Minimizar (esconder)
+    isMinimized = not isMinimized
+    if isMinimized then
         MainFrame.Visible = false
-        minimized = true
-        MinimizeButton.Text = "►"  -- Ícone para indicar que está minimizado
+        MinimizeButton.Text = "►"
+    else
+        MainFrame.Visible = true
+        MinimizeButton.Text = "─"
     end
-    Notify("Robloki Hub", minimized and "Minimizado" or (isSmallSize and "Tamanho normal" or "Tamanho aumentado"), 1)
+    Notify("Robloki Hub", isMinimized and "Minimizado" or "Restaurado", 1)
 end)
 
 -- Função do botão Fechar
@@ -347,34 +306,30 @@ end)
 local function CreateTab(name)
     local tab = Instance.new("TextButton")
     tab.Text = name
-    tab.Size = UDim2.new(0.15, 0, 0.8, 0)
+    tab.Size = UDim2.new(0, 100, 0.8, 0) -- Tamanho fixo para melhor visualização
     tab.AnchorPoint = Vector2.new(0, 0.5)
-    tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     tab.TextColor3 = Theme.Text
     tab.Font = Enum.Font.GothamMedium
-    tab.TextSize = 12
+    tab.TextSize = 14
     tab.TextWrapped = true
     tab.LayoutOrder = #TabScrollingFrame:GetChildren()
     tab.Parent = TabScrollingFrame
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = tab
     
     tab.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         }):Play()
     end)
     
     tab.MouseLeave:Connect(function()
         game:GetService("TweenService"):Create(tab, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         }):Play()
-    end)
-    
-    tab.MouseButton1Click:Connect(function()
-        pcall(callback)
     end)
     
     return tab
@@ -383,8 +338,8 @@ end
 local function CreateContentFrame(name)
     local frame = Instance.new("ScrollingFrame")
     frame.Name = name
-    frame.Size = UDim2.new(1, 0, 1, -70)
-    frame.Position = UDim2.new(0, 0, 0, 70)
+    frame.Size = UDim2.new(1, 0, 1, -75) -- Ajustado para caber no novo layout
+    frame.Position = UDim2.new(0, 0, 0, 75)
     frame.BackgroundTransparency = 1
     frame.ScrollBarThickness = 5
     frame.ScrollBarImageColor3 = Theme.Primary
@@ -392,11 +347,11 @@ local function CreateContentFrame(name)
     frame.Parent = MainFrame
     
     local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 8)
+    layout.Padding = UDim.new(0, 10)
     layout.Parent = frame
     
     local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 5)
+    padding.PaddingTop = UDim.new(0, 10)
     padding.PaddingLeft = UDim.new(0.05, 0)
     padding.Parent = frame
     
@@ -407,33 +362,33 @@ end
 local function CreateButton(name, callback, parent)
     local button = Instance.new("TextButton")
     button.Text = name
-    button.Size = UDim2.new(0.9, 0, 0, 40)
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    button.Size = UDim2.new(0.9, 0, 0, 45) -- Botões maiores
+    button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     button.TextColor3 = Theme.Text
     button.Font = Enum.Font.Gotham
-    button.TextSize = 14
+    button.TextSize = 15
     button.AutoButtonColor = false
     button.Parent = parent
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = button
     
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Theme.Primary
+    stroke.Color = Theme.Secondary
     stroke.Thickness = 1
     stroke.Parent = button
     
     button.MouseEnter:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(50, 50, 70),
-            TextColor3 = Theme.Accent
+            BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+            TextColor3 = Theme.Primary
         }):Play()
     end)
     
     button.MouseLeave:Connect(function()
         game:GetService("TweenService"):Create(button, TweenInfo.new(0.1), {
-            BackgroundColor3 = Color3.fromRGB(30, 30, 50),
+            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
             TextColor3 = Theme.Text
         }):Play()
     end)
@@ -447,6 +402,7 @@ end
 
 local function CreateDivider(text, parent)
     local divider = Instance.new("Frame")
+    divider.Name = "Divider"
     divider.Size = UDim2.new(0.9, 0, 0, 25)
     divider.BackgroundTransparency = 1
     divider.Parent = parent
@@ -454,7 +410,7 @@ local function CreateDivider(text, parent)
     local label = Instance.new("TextLabel")
     label.Text = " "..text.." "
     label.TextColor3 = Theme.Primary
-    label.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+    label.BackgroundColor3 = Theme.Background
     label.Size = UDim2.new(0.5, 0, 0.8, 0)
     label.Position = UDim2.new(0.25, 0, 0.1, 0)
     label.Font = Enum.Font.GothamBold
@@ -467,14 +423,16 @@ local function CreateDivider(text, parent)
     corner.Parent = label
     
     local leftLine = Instance.new("Frame")
-    leftLine.Size = UDim2.new(0.2, 0, 0, 1)
+    leftLine.Name = "LeftLine"
+    leftLine.Size = UDim2.new(0.2, 0, 0, 2)
     leftLine.Position = UDim2.new(0.05, 0, 0.5, 0)
     leftLine.BackgroundColor3 = Theme.Primary
     leftLine.BorderSizePixel = 0
     leftLine.Parent = divider
     
     local rightLine = Instance.new("Frame")
-    rightLine.Size = UDim2.new(0.2, 0, 0, 1)
+    rightLine.Name = "RightLine"
+    rightLine.Size = UDim2.new(0.2, 0, 0, 2)
     rightLine.Position = UDim2.new(0.75, 0, 0.5, 0)
     rightLine.BackgroundColor3 = Theme.Primary
     rightLine.BorderSizePixel = 0
@@ -534,7 +492,7 @@ UniversalTab.LayoutOrder = 1
 -- Frame do perfil do jogador
 local ProfileFrame = Instance.new("Frame")
 ProfileFrame.Size = UDim2.new(0.9, 0, 0, 120)
-ProfileFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+ProfileFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 ProfileFrame.Parent = InicioContent
 
 local UICornerProfile = Instance.new("UICorner")
@@ -545,7 +503,7 @@ UICornerProfile.Parent = ProfileFrame
 local PlayerThumbnail = Instance.new("ImageLabel")
 PlayerThumbnail.Size = UDim2.new(0, 80, 0, 80)
 PlayerThumbnail.Position = UDim2.new(0, 15, 0, 15)
-PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 PlayerThumbnail.BorderSizePixel = 0
 PlayerThumbnail.Parent = ProfileFrame
 
@@ -565,7 +523,7 @@ end)
 -- Informações do jogador
 local PlayerName = Instance.new("TextLabel")
 PlayerName.Text = Player.Name
-PlayerName.TextColor3 = Theme.Accent
+PlayerName.TextColor3 = Theme.Primary
 PlayerName.Font = Enum.Font.GothamBold
 PlayerName.TextSize = 18
 PlayerName.TextXAlignment = Enum.TextXAlignment.Left
@@ -576,7 +534,7 @@ PlayerName.Parent = ProfileFrame
 
 local PlayerId = Instance.new("TextLabel")
 PlayerId.Text = "ID: "..userId
-PlayerId.TextColor3 = Theme.Text
+PlayerId.TextColor3 = Theme.Accent
 PlayerId.Font = Enum.Font.Gotham
 PlayerId.TextSize = 14
 PlayerId.TextXAlignment = Enum.TextXAlignment.Left
@@ -587,7 +545,7 @@ PlayerId.Parent = ProfileFrame
 
 local GameName = Instance.new("TextLabel")
 GameName.Text = "Jogo: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-GameName.TextColor3 = Theme.Text
+GameName.TextColor3 = Theme.Accent
 GameName.Font = Enum.Font.Gotham
 GameName.TextSize = 14
 GameName.TextXAlignment = Enum.TextXAlignment.Left
@@ -599,24 +557,24 @@ GameName.Parent = ProfileFrame
 
 -- Barra de pesquisa
 local SearchBar = Instance.new("TextBox")
-SearchBar.Size = UDim2.new(0.9, 0, 0, 35)
-SearchBar.Position = UDim2.new(0.05, 0, 0, 130)
-SearchBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+SearchBar.Size = UDim2.new(0.9, 0, 0, 40) -- Maior
+SearchBar.Position = UDim2.new(0.05, 0, 0, 140)
+SearchBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 SearchBar.TextColor3 = Theme.Text
 SearchBar.Font = Enum.Font.Gotham
-SearchBar.TextSize = 14
+SearchBar.TextSize = 15
 SearchBar.PlaceholderText = "Pesquisar scripts (ex: Tomato Hub)"
-SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 180)
+SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
 SearchBar.Text = ""
 SearchBar.Parent = InicioContent
 
 local UICornerSearch = Instance.new("UICorner")
-UICornerSearch.CornerRadius = UDim.new(0, 6)
+UICornerSearch.CornerRadius = UDim.new(0, 8)
 UICornerSearch.Parent = SearchBar
 
 local SearchIcon = Instance.new("ImageLabel")
-SearchIcon.Size = UDim2.new(0, 20, 0, 20)
-SearchIcon.Position = UDim2.new(1, -30, 0.5, -10)
+SearchIcon.Size = UDim2.new(0, 25, 0, 25)
+SearchIcon.Position = UDim2.new(1, -35, 0.5, -12)
 SearchIcon.BackgroundTransparency = 1
 SearchIcon.Image = "rbxassetid://3926305904"
 SearchIcon.ImageRectOffset = Vector2.new(964, 324)
@@ -625,8 +583,8 @@ SearchIcon.Parent = SearchBar
 
 -- Frame de resultados
 local ResultsFrame = Instance.new("ScrollingFrame")
-ResultsFrame.Size = UDim2.new(0.9, 0, 0.5, -180)
-ResultsFrame.Position = UDim2.new(0.05, 0, 0, 180)
+ResultsFrame.Size = UDim2.new(0.9, 0, 0.5, -200)
+ResultsFrame.Position = UDim2.new(0.05, 0, 0, 190)
 ResultsFrame.BackgroundTransparency = 1
 ResultsFrame.ScrollBarThickness = 5
 ResultsFrame.ScrollBarImageColor3 = Theme.Primary
@@ -646,7 +604,7 @@ end)
 local function SearchScripts(query)
     -- Limpar resultados anteriores
     for _, child in ipairs(ResultsFrame:GetChildren()) do
-        if child:IsA("TextButton") then
+        if child:IsA("TextButton") or child:IsA("TextLabel") then
             child:Destroy()
         end
     end
@@ -750,11 +708,11 @@ local function SearchScripts(query)
             
             local resultButton = Instance.new("TextButton")
             resultButton.Text = script.Name
-            resultButton.Size = UDim2.new(1, 0, 0, 40)
-            resultButton.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+            resultButton.Size = UDim2.new(1, 0, 0, 45) -- Botão maior
+            resultButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             resultButton.TextColor3 = Theme.Text
             resultButton.Font = Enum.Font.Gotham
-            resultButton.TextSize = 14
+            resultButton.TextSize = 15
             resultButton.TextXAlignment = Enum.TextXAlignment.Left
             resultButton.Parent = ResultsFrame
             
@@ -765,7 +723,7 @@ local function SearchScripts(query)
             categoryLabel.TextSize = 12
             categoryLabel.BackgroundTransparency = 1
             categoryLabel.Size = UDim2.new(0.5, 0, 0, 15)
-            categoryLabel.Position = UDim2.new(0, 10, 0, 20)
+            categoryLabel.Position = UDim2.new(0, 10, 0, 25)
             categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
             categoryLabel.Parent = resultButton
             
@@ -774,7 +732,7 @@ local function SearchScripts(query)
             padding.Parent = resultButton
             
             local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, 6)
+            corner.CornerRadius = UDim.new(0, 8)
             corner.Parent = resultButton
             
             resultButton.MouseButton1Click:Connect(function()
@@ -791,13 +749,13 @@ local function SearchScripts(query)
             
             resultButton.MouseEnter:Connect(function()
                 game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
-                    BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+                    BackgroundColor3 = Color3.fromRGB(50, 50, 50)
                 }):Play()
             end)
             
             resultButton.MouseLeave:Connect(function()
                 game:GetService("TweenService"):Create(resultButton, TweenInfo.new(0.1), {
-                    BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+                    BackgroundColor3 = Color3.fromRGB(35, 35, 35)
                 }):Play()
             end)
         end
@@ -825,7 +783,7 @@ end)
 -- Adicionar dica de pesquisa
 local SearchHint = Instance.new("TextLabel")
 SearchHint.Text = "Digite o nome de um script e pressione Enter para pesquisar"
-SearchHint.TextColor3 = Color3.fromRGB(150, 150, 180)
+SearchHint.TextColor3 = Color3.fromRGB(150, 150, 150)
 SearchHint.Font = Enum.Font.Gotham
 SearchHint.TextSize = 12
 SearchHint.BackgroundTransparency = 1
@@ -836,7 +794,21 @@ SearchHint.Parent = InicioContent
 CreateDivider("Temas do Hub", InicioContent)
 
 -- Botão Tema Normal
-CreateButton("Tema Normal (Padrão)", function()
+CreateButton("Tema Preto e Ciano", function()
+    Theme = {
+        Background = Color3.fromRGB(10, 10, 10),
+        Primary = Color3.fromRGB(0, 255, 255),
+        Secondary = Color3.fromRGB(0, 150, 150),
+        Accent = Color3.fromRGB(200, 200, 200),
+        Text = Color3.fromRGB(255, 255, 255),
+        Error = Color3.fromRGB(255, 50, 50)
+    }
+    ApplyTheme()
+    Notify("Tema", "Tema preto e ciano aplicado!", 2)
+end, InicioContent)
+
+-- Botão Tema Azul
+CreateButton("Tema Azul (Original)", function()
     Theme = {
         Background = Color3.fromRGB(15, 15, 25),
         Primary = Color3.fromRGB(80, 50, 180),
@@ -846,7 +818,7 @@ CreateButton("Tema Normal (Padrão)", function()
         Error = Color3.fromRGB(255, 50, 50)
     }
     ApplyTheme()
-    Notify("Tema", "Tema normal aplicado!", 2)
+    Notify("Tema", "Tema azul aplicado!", 2)
 end, InicioContent)
 
 -- Botão Tema Branco
@@ -862,21 +834,6 @@ CreateButton("Tema Branco", function()
     ApplyTheme()
     Notify("Tema", "Tema branco aplicado!", 2)
 end, InicioContent)
-
--- Botão Tema Azul
-CreateButton("Tema Azul", function()
-    Theme = {
-        Background = Color3.fromRGB(10, 20, 40),
-        Primary = Color3.fromRGB(0, 100, 255),
-        Secondary = Color3.fromRGB(0, 150, 255),
-        Accent = Color3.fromRGB(180, 220, 255),
-        Text = Color3.fromRGB(220, 240, 255),
-        Error = Color3.fromRGB(255, 50, 100)
-    }
-    ApplyTheme()
-    Notify("Tema", "Tema azul aplicado!", 2)
-end, InicioContent)
-
 
 
 -- ABA UNIVERSAL
@@ -1179,7 +1136,7 @@ local function SwitchTab(selectedTab)
                 BackgroundColor3 = Theme.Primary
             }):Play()
         else
-            tab.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
             contents[i].Visible = false
         end
     end
@@ -1205,46 +1162,6 @@ TheMimicTab.MouseButton1Click:Connect(function() SwitchTab(TheMimicTab) end)
 BrainrotTab.MouseButton1Click:Connect(function() SwitchTab(BrainrotTab) end)
 BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
 
--- ===== CONTROLES DA INTERFACE =====
-local minimized = false
-local dragging = false
-local dragInput, dragStart, startPos
-
--- Fechar e minimizar
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-    Notify("Robloki Hub", "Hub fechado", 2)
-end)
-
-MinimizeButton.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    MainFrame.Visible = not minimized
-    Notify("Robloki Hub", minimized and "Minimizado" or "Restaurado", 1)
-end)
-
--- Sistema de arrastar
-local function UpdateInput(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end
-
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-TitleBar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(UpdateInput)
 
 -- ===== PROTEÇÃO CONTRA DETECÇÃO =====
 local function AntiDetection()
@@ -1308,8 +1225,9 @@ end
 -- Garante que todos os elementos da UI existam antes de serem manipulados
 task.wait(1) -- Pequeno delay para garantir que a UI seja renderizada
 
+-- Mudar a aba inicial para a de Início
 SwitchTab(InicioTab)
-Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!\n15 abas disponíveis", 5)
 
--- ▼▼▼ CHAMAR ApplyTheme() AQUI PARA APLICAR O TEMA INICIAL ▼▼▼
+-- Aplicar o novo tema e notificar o usuário
 ApplyTheme()
+Notify("Robloki Hub Premium V6.0", "Hub carregado com sucesso!\nInterface maior e arrastável", 5)

@@ -1,17 +1,3 @@
---[
-  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
-  Atualizações:
-  - **Interface TOTALMENTE REMODELADA para o novo design.**
-  - **Sistema de minimização para um botão flutuante ciano.**
-  - **Interface arrastável pela barra de título.**
-  - **Barra de pesquisa funcional corrigida.**
-  - Scripts verificados e atualizados
-  - Sistema anti-detecção aprimorado
-  - Interface mais fluida e responsiva
-  - 15 abas completas com todos os scripts originais
-  - Sistema de rolagem automático nas abas
-  - Sistema de temas personalizáveis
-]]
 
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()

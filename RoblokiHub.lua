@@ -1,5 +1,5 @@
 --[[
-  🐉 Robloki Hub Premium - Versão Otimizada V8.0
+  🐉 Robloki Hub Premium - Versão Otimizada V5.0
   Atualizações:
   - **Interface baseada no modelo fornecido**
   - **Sistema de minimização para um botão flutuante CIANO**
@@ -200,7 +200,7 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🐉 ROBLOKI HUB PREMIUM V8.0 🐉"
+Title.Text = "🐉 ROBLOKI HUB PREMIUM V5.0 🐉"
 Title.TextColor3 = Theme.Primary
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 16
@@ -975,4 +975,4 @@ BrookhavenTab.MouseButton1Click:Connect(function() SwitchTab(BrookhavenTab) end)
 task.wait(1)
 ApplyTheme()
 SwitchTab(InicioTab)
-Notify("Robloki Hub Premium V8.0", "Hub carregado com sucesso!", 5)
+Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!", 5)

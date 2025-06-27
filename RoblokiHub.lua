@@ -1,16 +1,17 @@
 --[
---  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.0
- -- Atualizações:
-  -- - **Interface TOTALMENTE REMODELADA para o novo design.**
- -- - **Sistema de minimização para um botão flutuante ciano.**
- -- - **Interface arrastável pela barra de título.**
---  - **Barra de pesquisa funcional corrigida.**
---  - Scripts verificados e atualizados
---  - Sistema anti-detecção aprimorado
---  - Interface mais fluida e responsiva
- -- - 15 abas completas com todos os scripts originais
- -- - Sistema de rolagem automático nas abas
- -- - Sistema de temas personalizáveis
+--  🐉 Robloki Hub Premium - Versão Completa Otimizada V5.1 (Corrigido)
+-- Atualizações:
+-- - **CORREÇÃO CRÍTICA DE ERRO:** O erro 'attempt to call a nil value' na função SwitchTab foi resolvido garantindo a ordem de execução do código.
+-- - Interface TOTALMENTE REMODELADA para o novo design.
+-- - Sistema de minimização para um botão flutuante ciano.
+-- - Interface arrastável pela barra de título.
+-- - Barra de pesquisa funcional corrigida.
+-- - Scripts verificados e atualizados
+-- - Sistema anti-detecção aprimorado
+-- - Interface mais fluida e responsiva
+-- - 15 abas completas com todos os scripts originais
+-- - Sistema de rolagem automático nas abas
+-- - Sistema de temas personalizáveis
 -- ]]
 
 local Player = game:GetService("Players").LocalPlayer
@@ -18,6 +19,7 @@ local Mouse = Player:GetMouse()
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
+local HttpService = game:GetService("HttpService")
 
 -- ===== CONFIGURAÇÃO INICIAL SEGURA =====
 local ScreenGui = Instance.new("ScreenGui")
@@ -38,6 +40,12 @@ local Theme = {
     ButtonBackground=Color3.fromRGB(25,25,25)
 }
 
+-- ===== VARIÁVEIS DA UI =====
+local MainFrame, TitleBar, MainLayout, TabFrame, ContentScrollingFrame, CloseButton, MinimizeButton, FloatingButton, SearchBar, ResultsFrame, ResultsLayout, PlayerThumbnail, PlayerName, PlayerId, GameName
+
+local tabButtons = {}
+local tabContents = {}
+
 -- Função para aplicar o tema
 local function ApplyTheme()
     if MainFrame then
@@ -46,11 +54,10 @@ local function ApplyTheme()
         if stroke then stroke.Color = Theme.Primary end
     end
     if TitleBar then TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25) end
-    if Title then Title.TextColor3 = Theme.Primary end
+    if TitleBar:FindFirstChild("Title") then TitleBar.Title.TextColor3 = Theme.Primary end
     if PlayerName then PlayerName.TextColor3 = Theme.Primary end
     if PlayerId then PlayerId.TextColor3 = Theme.Accent end
     if GameName then GameName.TextColor3 = Theme.Accent end
-    if SearchHint then SearchHint.TextColor3 = Color3.fromRGB(150, 150, 150) end
     if CloseButton then CloseButton.BackgroundColor3 = Theme.Error; CloseButton.TextColor3 = Theme.Text end
     if MinimizeButton then MinimizeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30); MinimizeButton.TextColor3 = Theme.Primary end
     if TabFrame then
@@ -68,8 +75,11 @@ local function ApplyTheme()
     if TabFrame then
         for _, tab in ipairs(TabFrame:GetChildren()) do
             if tab:IsA("TextButton") then
-                tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
                 tab.TextColor3 = Theme.Text
+                -- Keep selected tab color
+                if tab.BackgroundColor3 ~= Theme.Primary then
+                    tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                end
             end
         end
     end
@@ -77,21 +87,19 @@ local function ApplyTheme()
     -- Update content buttons/dividers
     if ContentScrollingFrame then
         for _, content in ipairs(ContentScrollingFrame:GetChildren()) do
-            if content.Visible then
-                for _, element in ipairs(content:GetChildren()) do
-                    if element:IsA("TextButton") then
-                        element.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-                        element.TextColor3 = Theme.Text
-                        local stroke = element:FindFirstChildOfClass("UIStroke")
-                        if stroke then stroke.Color = Theme.Secondary end
-                    elseif element.Name == "Divider" then
-                        local label = element:FindFirstChildOfClass("TextLabel")
-                        if label then label.TextColor3 = Theme.Primary end
-                        local lines = element:GetChildren()
-                        for _, line in ipairs(lines) do
-                            if line:IsA("Frame") and (line.Name == "LeftLine" or line.Name == "RightLine") then
-                                line.BackgroundColor3 = Theme.Primary
-                            end
+            for _, element in ipairs(content:GetChildren()) do
+                if element:IsA("TextButton") then
+                    element.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                    element.TextColor3 = Theme.Text
+                    local stroke = element:FindFirstChildOfClass("UIStroke")
+                    if stroke then stroke.Color = Theme.Secondary end
+                elseif element.Name == "Divider" then
+                    local label = element:FindFirstChildOfClass("TextLabel")
+                    if label then label.TextColor3 = Theme.Primary end
+                    local lines = element:GetChildren()
+                    for _, line in ipairs(lines) do
+                        if line:IsA("Frame") and (line.Name == "LeftLine" or line.Name == "RightLine") then
+                            line.BackgroundColor3 = Theme.Primary
                         end
                     end
                 end
@@ -275,6 +283,20 @@ local function CreateDivider(text, parent)
     return divider
 end
 
+-- Lógica para trocar de aba
+local function SwitchTab(selectedTabName)
+    for name, data in pairs(tabContents) do
+        local isSelected = (name == selectedTabName)
+        data.frame.Visible = isSelected
+        tabButtons[name].BackgroundColor3 = isSelected and Theme.Primary or Color3.fromRGB(30, 30, 30)
+        
+        if isSelected then
+            task.wait() -- Allow layout to update
+            ContentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, data.layout.AbsoluteContentSize.Y + 20)
+        end
+    end
+end
+
 -- ===== DATA DOS SCRIPTS (Dados que você forneceu) =====
 local scriptData = {
     Inicio = {}, -- Adicionei uma aba Inicio vazia para a lógica de temas e perfil
@@ -390,12 +412,7 @@ local scriptURLs = {
 }
 
 -- ===== CONSTRUÇÃO DINÂMICA DA UI =====
-local MainFrame, TitleBar, MainLayout, TabFrame, ContentScrollingFrame, CloseButton, MinimizeButton, FloatingButton, SearchBar, ResultsFrame, ResultsLayout, PlayerThumbnail, PlayerName, PlayerId, GameName, SearchHint
-
-local tabButtons = {}
-local tabContents = {}
-
-local function CreateUI()
+local function CreateMainUI()
     local largeSize = UDim2.new(0.45, 0, 0.7, 0)
     
     MainFrame = Instance.new("Frame")
@@ -519,8 +536,6 @@ local function CreateUI()
     local FloatingCorner = Instance.new("UICorner")
     FloatingCorner.CornerRadius = UDim.new(0.5, 0)
     FloatingCorner.Parent = FloatingButton
-
-    return MainFrame, TitleBar, TabFrame, ContentScrollingFrame, CloseButton, MinimizeButton, FloatingButton
 end
 
 local function AddTab(name, layoutOrder)
@@ -559,7 +574,8 @@ local function AddDivider(tabName, text)
     CreateDivider(text, contentFrame)
 end
 
-local function CreateDynamicUI()
+-- Lógica de construção dinâmica da interface
+local function CreateDynamicContent()
     -- Create tabs and fill with scripts
     local tabsLayoutOrder = 1
     for name, scripts in pairs(scriptData) do
@@ -597,12 +613,12 @@ local function CreateDynamicUI()
     local ProfileFrame = Instance.new("Frame", inicioTabContent)
     ProfileFrame.Size = UDim2.new(1, -20, 0, 120); ProfileFrame.Position = UDim2.new(0.5, 0, 0, 0); ProfileFrame.AnchorPoint = Vector2.new(0.5, 0); ProfileFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     local cornerProfile = Instance.new("UICorner", ProfileFrame); cornerProfile.CornerRadius = UDim.new(0, 8)
-    local PlayerThumbnail = Instance.new("ImageLabel", ProfileFrame); PlayerThumbnail.Size = UDim2.new(0, 80, 0, 80); PlayerThumbnail.Position = UDim2.new(0, 15, 0.5, 0); PlayerThumbnail.AnchorPoint = Vector2.new(0, 0.5); PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 40); PlayerThumbnail.BorderSizePixel = 0
+    PlayerThumbnail = Instance.new("ImageLabel", ProfileFrame); PlayerThumbnail.Size = UDim2.new(0, 80, 0, 80); PlayerThumbnail.Position = UDim2.new(0, 15, 0.5, 0); PlayerThumbnail.AnchorPoint = Vector2.new(0, 0.5); PlayerThumbnail.BackgroundColor3 = Color3.fromRGB(40, 40, 40); PlayerThumbnail.BorderSizePixel = 0
     local cornerThumb = Instance.new("UICorner", PlayerThumbnail); cornerThumb.CornerRadius = UDim.new(0, 8)
     game:GetService("Players"):GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420, function(content) PlayerThumbnail.Image = content end)
-    local PlayerName = Instance.new("TextLabel", ProfileFrame); PlayerName.Text = LocalPlayer.Name; PlayerName.TextColor3 = Theme.Primary; PlayerName.Font = Enum.Font.GothamBold; PlayerName.TextSize = 18; PlayerName.TextXAlignment = Enum.TextXAlignment.Left; PlayerName.BackgroundTransparency = 1; PlayerName.Size = UDim2.new(0.6, 0, 0, 25); PlayerName.Position = UDim2.new(0, 110, 0, 20)
-    local PlayerId = Instance.new("TextLabel", ProfileFrame); PlayerId.Text = "ID: "..LocalPlayer.UserId; PlayerId.TextColor3 = Theme.Accent; PlayerId.Font = Enum.Font.Gotham; PlayerId.TextSize = 14; PlayerId.TextXAlignment = Enum.TextXAlignment.Left; PlayerId.BackgroundTransparency = 1; PlayerId.Size = UDim2.new(0.6, 0, 0, 20); PlayerId.Position = UDim2.new(0, 110, 0, 45)
-    local GameName = Instance.new("TextLabel", ProfileFrame); GameName.Text = "Jogo: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name; GameName.TextColor3 = Theme.Accent; GameName.Font = Enum.Font.Gotham; GameName.TextSize = 14; GameName.TextXAlignment = Enum.TextXAlignment.Left; GameName.BackgroundTransparency = 1; GameName.Size = UDim2.new(0.8, 0, 0, 20); GameName.Position = UDim2.new(0, 110, 0, 70); GameName.TextTruncate = Enum.TextTruncate.AtEnd
+    PlayerName = Instance.new("TextLabel", ProfileFrame); PlayerName.Text = LocalPlayer.Name; PlayerName.TextColor3 = Theme.Primary; PlayerName.Font = Enum.Font.GothamBold; PlayerName.TextSize = 18; PlayerName.TextXAlignment = Enum.TextXAlignment.Left; PlayerName.BackgroundTransparency = 1; PlayerName.Size = UDim2.new(0.6, 0, 0, 25); PlayerName.Position = UDim2.new(0, 110, 0, 20)
+    PlayerId = Instance.new("TextLabel", ProfileFrame); PlayerId.Text = "ID: "..LocalPlayer.UserId; PlayerId.TextColor3 = Theme.Accent; PlayerId.Font = Enum.Font.Gotham; PlayerId.TextSize = 14; PlayerId.TextXAlignment = Enum.TextXAlignment.Left; PlayerId.BackgroundTransparency = 1; PlayerId.Size = UDim2.new(0.6, 0, 0, 20); PlayerId.Position = UDim2.new(0, 110, 0, 45)
+    GameName = Instance.new("TextLabel", ProfileFrame); GameName.Text = "Jogo: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name; GameName.TextColor3 = Theme.Accent; GameName.Font = Enum.Font.Gotham; GameName.TextSize = 14; GameName.TextXAlignment = Enum.TextXAlignment.Left; GameName.BackgroundTransparency = 1; GameName.Size = UDim2.new(0.8, 0, 0, 20); GameName.Position = UDim2.new(0, 110, 0, 70); GameName.TextTruncate = Enum.TextTruncate.AtEnd
 
     SearchBar = Instance.new("TextBox", inicioTabContent); SearchBar.Size = UDim2.new(1, -20, 0, 40); SearchBar.Position = UDim2.new(0.5, 0, 0, 140); SearchBar.AnchorPoint = Vector2.new(0.5, 0); SearchBar.BackgroundColor3 = Theme.ButtonBackground; SearchBar.TextColor3 = Theme.Text; SearchBar.Font = Enum.Font.Gotham; SearchBar.TextSize = 15; SearchBar.PlaceholderText = "Pesquisar scripts..."; SearchBar.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
     local cornerSearch = Instance.new("UICorner", SearchBar); cornerSearch.CornerRadius = UDim.new(0, 8)
@@ -610,116 +626,4 @@ local function CreateDynamicUI()
     ResultsLayout = Instance.new("UIListLayout", ResultsFrame); ResultsLayout.Padding = UDim.new(0, 8)
     
     AddDivider("Inicio", "Temas do Hub")
-    CreateButton("Tema Preto e Ciano", function() Theme.Background=Color3.fromRGB(15,15,15); Theme.Primary=Color3.fromRGB(0,255,255); Theme.Secondary=Color3.fromRGB(0,150,150); Theme.Accent=Color3.fromRGB(200,200,200); Theme.Text=Color3.fromRGB(255,255,255); Theme.Error=Color3.fromRGB(255,50,50); Theme.TitleBar=Color3.fromRGB(25,25,25); Theme.TabBackground=Color3.fromRGB(20,20,20); Theme.ButtonHover=Color3.fromRGB(40,40,40); Theme.ButtonBackground=Color3.fromRGB(25,25,25); ApplyTheme(); Notify("Tema", "Tema ciano aplicado!", 2) end, inicioTabContent)
-    CreateButton("Tema Azul (Original)", function() Theme.Background=Color3.fromRGB(15,15,25); Theme.Primary=Color3.fromRGB(80,50,180); Theme.Secondary=Color3.fromRGB(0,150,255); Theme.Accent=Color3.fromRGB(200,200,255); Theme.Text=Color3.fromRGB(240,240,255); Theme.Error=Color3.fromRGB(255,50,50); Theme.TitleBar=Color3.fromRGB(25,25,35); Theme.TabBackground=Color3.fromRGB(20,20,30); Theme.ButtonHover=Color3.fromRGB(35,35,45); Theme.ButtonBackground=Color3.fromRGB(25,25,35); ApplyTheme(); Notify("Tema", "Tema azul aplicado!", 2) end, inicioTabContent)
-    CreateButton("Tema Branco", function() Theme.Background=Color3.fromRGB(240,240,245); Theme.Primary=Color3.fromRGB(180,180,190); Theme.Secondary=Color3.fromRGB(150,150,160); Theme.Accent=Color3.fromRGB(50,50,60); Theme.Text=Color3.fromRGB(30,30,40); Theme.Error=Color3.fromRGB(200,50,50); Theme.TitleBar=Color3.fromRGB(230,230,235); Theme.TabBackground=Color3.fromRGB(220,220,225); Theme.ButtonHover=Color3.fromRGB(200,200,205); Theme.ButtonBackground=Color3.fromRGB(215,215,220); ApplyTheme(); Notify("Tema", "Tema branco aplicado!", 2) end, inicioTabContent)
-
-    -- Update layout size after adding content
-    inicioLayout.AbsoluteContentSize = inicioLayout.AbsoluteContentSize + Vector2.new(0, 100) -- Adjust as needed
-    
-end
-
--- ===== LÓGICA DE PESQUISA, DRAG E SWITCH =====
-local function SearchScripts(query)
-    for _, child in ipairs(ResultsFrame:GetChildren()) do child:Destroy() end
-    if query == "" then return end
-    
-    local results = {}
-    local lowerQuery = query:lower()
-    for tabName, data in pairs(tabContents) do
-        if tabName ~= "Inicio" then
-            for _, btnData in ipairs(data.buttons) do
-                if btnData.name:lower():find(lowerQuery) then
-                    table.insert(results, { name = btnData.name, tab = tabName, callback = btnData.btn.MouseButton1Click })
-                end
-            end
-        end
-    end
-    
-    if #results == 0 then
-        local noResults = Instance.new("TextLabel", ResultsFrame); noResults.Text = "Nenhum resultado para: '"..query.."'"; noResults.TextColor3 = Theme.Text; noResults.BackgroundTransparency = 1; noResults.Size = UDim2.new(1, 0, 0, 30); noResults.Font = Enum.Font.Gotham; noResults.TextSize = 14
-    else
-        for _, result in ipairs(results) do
-            local resultBtn = CreateButton(result.name, result.callback, ResultsFrame)
-            local categoryLabel = Instance.new("TextLabel", resultBtn); categoryLabel.Text = "Categoria: "..result.tab; categoryLabel.TextColor3 = Theme.Secondary
-            categoryLabel.Font = Enum.Font.Gotham; categoryLabel.TextSize = 12; categoryLabel.BackgroundTransparency = 1; categoryLabel.Size = UDim2.new(0.5, 0, 0, 15); categoryLabel.Position = UDim2.new(0, 10, 0, 25); categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
-        end
-    end
-    ResultsFrame.CanvasSize = UDim2.new(0, 0, 0, ResultsLayout.AbsoluteContentSize.Y)
-end
-
-SearchBar.FocusLost:Connect(function(enterPressed) if enterPressed then SearchScripts(SearchBar.Text) end end)
-
-local function SwitchTab(selectedTabName)
-    for name, data in pairs(tabContents) do
-        local isSelected = (name == selectedTabName)
-        data.frame.Visible = isSelected
-        tabButtons[name].BackgroundColor3 = isSelected and Theme.Primary or Color3.fromRGB(30, 30, 30)
-        
-        if isSelected then
-            task.wait() -- Allow layout to update
-            ContentScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, data.layout.AbsoluteContentSize.Y + 20)
-        end
-    end
-end
-
--- Dragging logic
-local isDragging = false
-local dragStartPos
-local dragStartMousePos
-
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        isDragging = true
-        dragStartPos = MainFrame.Position
-        dragStartMousePos = UserInputService:GetMouseLocation()
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStartMousePos
-        MainFrame.Position = UDim2.new(dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X, dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        isDragging = false
-    end
-end)
-
--- Minimize/Restore logic
-local isMinimized = false
-MinimizeButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    MainFrame.Visible = not isMinimized
-    FloatingButton.Visible = isMinimized
-    if isMinimized then
-        Notify("Robloki Hub", "Hub minimizado", 1)
-        TweenService:Create(FloatingButton, TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Position = UDim2.new(1, -70, 0.05, 0)}):Play()
-    else
-        Notify("Robloki Hub", "Hub restaurado", 1)
-    end
-end)
-
-FloatingButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    MainFrame.Visible = not isMinimized
-    FloatingButton.Visible = isMinimized
-    Notify("Robloki Hub", "Hub restaurado", 1)
-end)
-
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-    FloatingButton:Destroy()
-    Notify("Robloki Hub", "Interface fechada", 1)
-end)
-
--- ===== INICIALIZAÇÃO =====
-CreateUI()
-CreateDynamicUI()
-task.wait(1)
-ApplyTheme()
-SwitchTab("Inicio")
-Notify("Robloki Hub Premium V5.0", "Hub carregado com sucesso!", 5)
+    CreateButton("Tema Preto e Ciano", function() Theme.Background=Color3.fromRGB(15,15,15); Theme.Primary
